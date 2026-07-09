@@ -1,0 +1,10 @@
+/* Add this to your page.module.css */
+.sectionWrapper h2,
+.sectionWrapper .title {
+  color: #111; /* Dark color for visibility */
+}
+
+/* Or if you want to target all titles in the container */
+.container h2 {
+  color: #111;
+}

@@ -1,0 +1,73 @@
+.container {
+  width: 100%;
+  padding: 20px 16px;
+}
+
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 16px;
+}
+
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+
+.action {
+  border: none;
+  background: none;
+
+  color: #2563eb;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+.grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 14px;
+
+ padding-bottom: calc(74px + env(safe-area-inset-bottom) + 20px);
+
+}
+
+
+.message {
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  min-height: 120px;
+
+  color: #777;
+
+  font-size: 14px;
+
+  text-align: center;
+}
+
+
+
+@media (min-width: 768px) {
+
+  .grid {
+
+    grid-template-columns: repeat(4, 1fr);
+
+  }
+
+}

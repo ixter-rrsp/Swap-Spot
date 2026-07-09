@@ -1,0 +1,226 @@
+.container {
+  padding: 20px 16px 80px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.profileHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.profileHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #d1fae5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 18px;
+  color: #065f46;
+}
+
+.profileName {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+  color: #1A1A2E;
+}
+
+.profileBadge {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.settingsBtn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.statsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background: white;
+  border-radius: 12px;
+  padding: 16px 12px;
+  margin-bottom: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1px solid #f3f4f6;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statNumber {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1A1A2E;
+}
+
+.statLabel {
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.statDivider {
+  width: 1px;
+  height: 30px;
+  background: #e5e7eb;
+}
+
+.statsSub {
+  text-align: center;
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 8px 0 20px;
+}
+
+.statusGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.statusItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  padding: 12px 4px;
+  border-radius: 10px;
+  border: 1px solid #f3f4f6;
+  font-size: 12px;
+  color: #374151;
+}
+
+.statusCircle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9ca3af;
+}
+
+.progressSection {
+  background: white;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  border: 1px solid #f3f4f6;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+
+.progressBar {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: #059669;
+  border-radius: 10px;
+}
+
+.tabsRow {
+  display: flex;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 20px;
+}
+
+.tabBtn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tabBtn.activeTab {
+  background: #059669;
+  color: white;
+}
+
+.section {
+  margin-bottom: 28px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1F2937;
+  margin: 0;
+}
+
+.seeAll {
+  background: none;
+  border: none;
+  color: #059669;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.offerList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.offerItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid #f3f4f6;
+  font-size: 14px;
+  color: #1F2937;
+}
+
+.offerIcon {
+  font-size: 20px;
+}

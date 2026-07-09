@@ -1,0 +1,78 @@
+.container {
+ margin-left: auto;
+ margin-right: auto;
+
+ margin-top: 4dvh;
+
+  position: relative;
+  top: -8dvh;
+
+  width: 85%;
+
+  align-items: center;
+
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+
+  padding: 10px 12px;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.searchIcon {
+  color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  font-size: 15px;
+  color: #1f2937;
+
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.filterButton {
+  width: 40px;
+  height: 40px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #2563eb;
+  color: white;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: background 0.2s ease;
+}
+
+.filterButton:hover {
+  background: #1d4ed8;
+}
+
+.filterButton:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
+}

@@ -1,0 +1,141 @@
+.container {
+  padding: 20px 16px 80px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+.notifHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.notifHeader h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: #1A1A2E;
+}
+
+.markAll {
+  background: none;
+  border: none;
+  color: #059669;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.notifSection {
+  margin-bottom: 24px;
+}
+
+.notifSectionTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9ca3af;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.notifItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 12px 14px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  border: 1px solid #f3f4f6;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.notifContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.notifIcon {
+  font-size: 20px;
+}
+
+.messageAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #d1fae5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+  color: #065f46;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.unreadDot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background: #059669;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.notifTitle {
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 2px;
+  color: #1F2937;
+}
+
+.notifDesc {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.notifRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.notifTime {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.notifBadge {
+  background: #059669;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0 6px;
+  border-radius: 12px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.unsentMsg {
+  margin-top: 20px;
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
+  background: #f3f4f6;
+  padding: 12px;
+  border-radius: 8px;
+}

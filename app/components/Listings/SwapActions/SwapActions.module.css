@@ -1,0 +1,47 @@
+.container {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  padding: 20px 16px 32px;
+}
+
+.primaryButton,
+.secondaryButton {
+  width: 100%;
+
+  padding: 14px;
+
+  border-radius: 12px;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.primaryButton {
+  border: none;
+
+  background: #2563eb;
+  color: white;
+}
+
+.primaryButton:hover {
+  opacity: 0.9;
+}
+
+.secondaryButton {
+  background: white;
+
+  color: #2563eb;
+
+  border: 2px solid #2563eb;
+}
+
+.secondaryButton:hover {
+  background: #eff6ff;
+}
