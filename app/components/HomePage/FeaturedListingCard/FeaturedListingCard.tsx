@@ -7,7 +7,7 @@ interface ListingCardProps {
   id: string;
   title: string;
   imageUrl?: string;
-  location: string;
+  city: string;
   swapValue: number;
   lookingFor: string;
   rating?: number;
@@ -16,7 +16,7 @@ interface ListingCardProps {
 export default function ListingCard({
   title,
   imageUrl,
-  location,
+  city,
   swapValue,
   lookingFor,
   rating,
@@ -38,7 +38,7 @@ export default function ListingCard({
 
         <div className={styles.infoRow}>
           <MapPin size={14} />
-          <span>{location}</span>
+          <span>{city}</span>
         </div>
 
         <div className={styles.infoRow}>

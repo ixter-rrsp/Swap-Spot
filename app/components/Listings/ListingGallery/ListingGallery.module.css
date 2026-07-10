@@ -2,15 +2,21 @@
   position: relative;
 
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
+  max-height: 500px;
 
   overflow: hidden;
 
+  max-width: 70vw;
+
   background: #f3f4f6;
+  border-radius: 12px;
+
+  margin: 0 auto;
 }
 
 .image {
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .placeholder {

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
-import listings from "@/lib/mock/listings";
+import { getListingById } from "@/lib/services/ListingService";
+import { Listing } from "@/lib/types/Listing";
 
 import ListingGallery from "@/app/components/Listings/ListingGallery/ListingGallery";
 import ListingInfo from "@/app/components/Listings/ListingInfo/ListingInfo";
@@ -20,11 +21,32 @@ export default async function ListingPage({
 }: ListingPageProps) {
   const { id } = await params;
 
-  const listing = listings.find((listing) => listing.id === id);
+  let row;
 
-  if (!listing) {
+  try {
+    row = await getListingById(id);
+  } catch {
     notFound();
   }
+
+  const listing: Listing = {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    city: row.city,
+    swapValue: row.swap_value,
+    lookingFor: row.looking_for,
+    boosted: row.boosted,
+    rating: 0,
+
+    owner: {
+      id: row.owner_id,
+      name: "Unknown User",
+      rating: 0,
+    },
+
+    imageUrl: row.listing_images?.[0]?.image_url,
+  };
 
   return (
     <main className={styles.container}>
@@ -35,7 +57,7 @@ export default async function ListingPage({
 
       <ListingInfo
         title={listing.title}
-        location={listing.location}
+        location={listing.city}
         swapValue={listing.swapValue}
         lookingFor={listing.lookingFor}
         description={listing.description}

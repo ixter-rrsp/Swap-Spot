@@ -7,7 +7,7 @@ export interface Listing {
 
   imageUrl?: string;
 
-  location: string;
+  city: string;
 
   swapValue: number;
 

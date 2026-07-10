@@ -1,20 +1,20 @@
 import styles from "./page.module.css";
 
-import LoginForm from "@/app/components/Auth/LoginForm/LoginForm ";
+import SignupForm from "@/app/components/Auth/SignupForm/SignupForm";
 
-export default function LoginPage() {
+export default function SignupPage() {
   return (
     <main className={styles.container}>
       <div className={styles.card}>
         <h1 className={styles.title}>
-          Welcome Back
+          Create Account
         </h1>
 
         <p className={styles.subtitle}>
-          Sign in to continue swapping.
+          Join SwapSpot and start swapping.
         </p>
 
-        <LoginForm />
+        <SignupForm />
       </div>
     </main>
   );
