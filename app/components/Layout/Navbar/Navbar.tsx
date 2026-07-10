@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   House,
-  RefreshCcw,
   Plus,
   Compass,
   User,
@@ -14,7 +13,7 @@ import styles from "./Navbar.module.css";
 
 const navItems = [
   {
-    href: "/",
+    href: "/home",
     icon: House,
   },
   {
