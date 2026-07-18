@@ -5,7 +5,7 @@
 .title {
   margin: 0;
 
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 700;
 
   color: #111827;
@@ -16,34 +16,80 @@
   justify-content: space-between;
   align-items: center;
 
-  margin-top: 8px;
+  margin-top: 6px;
   margin-bottom: 24px;
 
   color: #6b7280;
   font-size: 14px;
 }
 
+.location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ratingBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  color: #f59e0b;
+  font-weight: 600;
+}
+
 .card {
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .heading {
-  margin-bottom: 8px;
+  margin: 0 0 10px;
 
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 
-  color: #374151;
+  color: #9ca3af;
 }
 
 .value {
-  font-size: 22px;
+  margin: 0;
+
+  font-size: 24px;
   font-weight: 700;
 
   color: #2563eb;
 }
 
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  padding: 8px 14px;
+  border-radius: 999px;
+
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+
+  color: #2563eb;
+  font-size: 13px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
 .description {
-  line-height: 1.7;
+  margin: 0;
+
   color: #4b5563;
+  font-size: 14px;
+
+  line-height: 1.7;
+
+  white-space: pre-wrap;
+  word-break: break-word;
 }

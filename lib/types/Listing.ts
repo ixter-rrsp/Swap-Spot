@@ -7,20 +7,45 @@ export interface Listing {
 
   imageUrl?: string;
 
+  images: ListingImage[];
+
   city: string;
 
   swapValue: number;
 
   lookingFor: string;
 
-  rating?: number;
-
   boosted?: boolean;
 
-  owner: {
-    id: string;
-    name: string;
-    avatar?: string;
-    rating: number;
-  };
+  owner: ListingOwner;
+
+  distance?: number;
+}
+
+export interface ListingImage {
+  id: string;
+
+  url: string;
+
+  sortOrder: number;
+}
+
+export interface ListingOwner {
+  id: string;
+
+  username: string;
+
+  fullName: string;
+
+  avatarUrl?: string | null;
+
+  rating: number;
+
+  badge: string;
+
+  city: string;
+
+  latitude?: number | null;
+
+  longitude?: number | null;
 }

@@ -1,50 +1,238 @@
 .form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  width: 100%;
+  max-width: 620px;
+
+  margin: 2rem auto;
+
+  background: #fff;
+
+  border-radius: 28px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 12px 30px rgba(0,0,0,.08);
+}
+
+/* ---------------- Header ---------------- */
+
+.ticketHeader {
+  position: relative;
+
+  padding: 2rem;
+
+  background: linear-gradient(
+    180deg,
+    #2d6fb8,
+    #2461a6
+  );
+
+  color: white;
+}
+
+.ticketHeader small {
+  display: block;
+
+  letter-spacing: .12em;
+
+  font-size: .8rem;
+
+  font-weight: 700;
+
+  opacity: .75;
+
+  text-transform: uppercase;
+}
+
+.ticketHeader h1 {
+  margin-top: .35rem;
+
+  font-size: 2rem;
+
+  font-weight: 700;
+}
+
+/* ticket perforation */
+
+.ticketHeader::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: -14px;
+
+  height: 28px;
+
+  background:
+    radial-gradient(circle at 14px 14px,
+      white 14px,
+      transparent 15px)
+      repeat-x;
+
+  background-size: 56px 28px;
+}
+
+/* ---------------- Body ---------------- */
+
+.content {
+  padding: 2rem;
+}
+
+.sectionTitle {
+  margin-bottom: 1.25rem;
+
+  font-size: .8rem;
+
+  font-weight: 700;
+
+  color: #2563eb;
+
+  text-transform: uppercase;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+
+  margin-bottom: 1.6rem;
+  color: #1f2937;
 }
 
 .field label {
-  font-weight: 600;
-  color: #374151;
+  margin-bottom: .35rem;
+
+  font-size: .75rem;
+
+  font-weight: 700;
+
+  color: #2563eb;
+
+  text-transform: uppercase;
 }
 
 .field input,
-.field textarea {
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
+.field textarea,
+.field select {
+  border: none;
+
+  border-bottom: 2px solid #3b82f6;
+
+  background: transparent;
+
+  padding: .6rem 0;
+
   font-size: 1rem;
-  color: #111827;
+
+  outline: none;
 }
 
 .field textarea {
-  resize: vertical;
+  resize: none;
 }
 
 .field p {
-  color: red;
-  font-size: 0.85rem;
+  margin-top: .35rem;
+
+  color: #dc2626;
+
+  font-size: .8rem;
+}
+
+/* Select Field */
+
+.field select {
+  appearance: none;
+
+  cursor: pointer;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%233b82f6' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+
+  background-position: right center;
+
+  padding-right: 2rem;
+}
+
+.field select:disabled {
+  opacity: .65;
+
+  cursor: not-allowed;
+}
+
+.field select option {
+  background: white;
+
+  color: #1f2937;
+}
+
+/* City Pill */
+
+.cityInput {
+  border: 2px solid #3b82f6 !important;
+
+  border-radius: 999px;
+
+  padding: .85rem 1rem !important;
+}
+
+/* Submit */
+
+.submitButton {
+  width: 100%;
+
+  margin-top: 2rem;
+
+  height: 56px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: #65a30d;
+
+  color: white;
+
+  font-size: 1rem;
+
+  font-weight: 700;
+
+  letter-spacing: .05em;
+
+  cursor: pointer;
+
+  transition: .25s;
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 10px 20px rgba(101,163,13,.3);
+}
+
+.submitButton:disabled {
+  opacity: .65;
+
+  cursor: not-allowed;
 }
 
 .submitButton {
-  padding: 14px;
-  border: none;
-  border-radius: 12px;
-  background: #2563eb;
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: .75rem;
 }
 
-.submitButton:hover {
-  background: #1d4ed8;
+.locationBox {
+  padding: 12px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 0.9rem;
 }

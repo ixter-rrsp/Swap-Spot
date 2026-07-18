@@ -1,0 +1,27 @@
+.container {
+  background: white;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  padding: 16px;
+}
+
+.title {
+  margin: 0 0 12px;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.message {
+  margin: 0;
+
+  color: #4b5563;
+
+  line-height: 1.6;
+
+  white-space: pre-wrap;
+}

@@ -1,13 +1,18 @@
+/* page.module.css */
 .container {
   min-height: 100vh;
+  min-height: 100dvh; /* For mobile browsers with dynamic toolbars */
 
   display: flex;
   justify-content: center;
   align-items: center;
 
-  padding: 24px;
+  padding: 2rem;
 
-  background: #f5f7fb;
+  background: #f7f4f4;
+  
+  /* Prevent the container from causing scroll */
+  overflow: hidden;
 }
 
 .card {
@@ -16,24 +21,147 @@
 
   background: white;
 
-  border-radius: 20px;
+  border-radius: 24px;
 
-  padding: 32px 24px;
+  padding: 2rem;
 
-  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  
+  /* Allow the card to shrink if needed */
+  max-height: 100%;
+  
+  /* Prevent the card itself from scrolling */
+  overflow: visible;
 }
 
-.title {
-  text-align: center;
-  font-size: 2rem;
-  font-weight: 700;
+@media (max-width: 768px) {
+  .container {
+    padding: 0;
+    background: white;
+    
+    /* Ensure container doesn't scroll on mobile */
+    overflow: hidden;
+  }
+
+  .card {
+    max-width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh; /* Use dynamic viewport height */
+    
+    border-radius: 0;
+    box-shadow: none;
+
+    padding: 2rem 1.5rem;
+    
+    /* Allow card to scroll internally if needed */
+    overflow-y: auto;
+    
+    /* Prevent horizontal overflow */
+    overflow-x: hidden;
+  }
 }
 
-.subtitle {
-  margin-top: 8px;
-  margin-bottom: 32px;
+/* Optional: Further adjustments for very small screens */
+@media (max-height: 700px) {
+  .card {
+    padding: 1.5rem;
+  }
+}
 
-  text-align: center;
+@media (max-height: 600px) {
+  .card {
+    padding: 1rem 1.5rem;
+  }
+}
 
-  color: #6b7280;
+/* LoginForm.module.css - Add these at the end */
+
+/* Reduce spacing on smaller screens */
+@media (max-height: 700px) {
+  .form {
+    gap: 1rem;
+  }
+  
+  .header {
+    margin-bottom: 0.25rem;
+  }
+  
+  .header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .header p {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+  
+  .button {
+    height: 48px;
+    font-size: 0.95rem;
+  }
+  
+  .socialButton {
+    width: 48px;
+    height: 48px;
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-height: 600px) {
+  .form {
+    gap: 0.75rem;
+  }
+  
+  .header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .button {
+    height: 42px;
+    font-size: 0.9rem;
+  }
+  
+  .socialButton {
+    width: 42px;
+    height: 42px;
+    font-size: 1rem;
+  }
+  
+  .footer {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-height: 500px) {
+  .form {
+    gap: 0.5rem;
+  }
+  
+  .header h1 {
+    font-size: 1.3rem;
+  }
+  
+  .header p {
+    font-size: 0.75rem;
+    margin-top: 0.1rem;
+  }
+  
+  .forgot {
+    margin-top: -0.25rem;
+  }
+  
+  .forgot a {
+    font-size: 0.75rem;
+  }
+  
+  .button {
+    height: 36px;
+    font-size: 0.8rem;
+  }
+  
+  .socialButton {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
 }

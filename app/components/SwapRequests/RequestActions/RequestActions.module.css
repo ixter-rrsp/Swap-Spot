@@ -1,0 +1,81 @@
+.container {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.acceptButton,
+.declineButton {
+  width: 100%;
+
+  border: none;
+  border-radius: 12px;
+
+  padding: 14px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.acceptButton {
+  background: #16a34a;
+  color: white;
+}
+
+.acceptButton:hover {
+  background: #15803d;
+}
+
+.declineButton {
+  background: #ef4444;
+  color: white;
+}
+
+.declineButton:hover {
+  background: #dc2626;
+}
+
+.acceptButton:disabled,
+.declineButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.statusCard {
+  text-align: center;
+
+  padding: 16px;
+
+  border-radius: 12px;
+
+  background: #f3f4f6;
+
+  font-weight: 600;
+}
+
+.cancelButton {
+  width: 100%;
+
+  padding: 14px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #6b7280;
+
+  color: white;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.cancelButton:hover {
+  background: #4b5563;
+}

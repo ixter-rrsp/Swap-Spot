@@ -1,20 +1,80 @@
-import { type NextRequest } from "next/server";
-import { createClient } from "./utils/supabase/middleware";
+import {
+  NextResponse,
+  type NextRequest,
+} from "next/server";
 
-export async function middleware(request: NextRequest) {
-  return createClient(request);
+import {
+  createClient,
+} from "@/utils/supabase/middleware";
+
+
+export async function middleware(
+  request: NextRequest
+) {
+
+  const {
+    supabase,
+    response,
+  } =
+    await createClient(request);
+
+
+  const {
+    data:{
+      user,
+    },
+  } =
+    await supabase.auth.getUser();
+
+
+  const pathname =
+    request.nextUrl.pathname;
+
+
+  const protectedRoutes = [
+    "/profile",
+    "/profile/edit",
+    "/post-listing",
+    "/notifications",
+    "/requests",
+  ];
+
+
+  const isProtected =
+    protectedRoutes.some(
+      (route) =>
+        pathname.startsWith(route)
+    );
+
+
+  if (
+    isProtected &&
+    !user
+  ) {
+
+    const loginUrl =
+      request.nextUrl.clone();
+
+    loginUrl.pathname =
+      "/login";
+
+
+    return NextResponse.redirect(
+      loginUrl
+    );
+  }
+
+
+  return response;
 }
+
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static
-     * - _next/image
-     * - favicon.ico
-     * - images
-     * - static assets
-     */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/profile/:path*",
+    "/post-listing/:path*",
+    "/notifications/:path*",
+    "/requests/:path*",
+    "/api/:path*",
   ],
 };

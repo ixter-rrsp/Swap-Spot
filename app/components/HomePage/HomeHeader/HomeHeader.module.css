@@ -14,20 +14,10 @@
   gap: 16px;
 }
 
-.logo {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
-
-.logoGreen {
-  color: #22c55e;
-}
-
 .tagline {
-  margin-top: 4px;
-  font-size: 1.75rem;
+  margin-top: 16px;
+  margin-left: 10px;
+  font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.85);
 }
 
@@ -39,26 +29,17 @@
   top: 4dvh;
 }
 
-.iconButton,
 .avatarButton {
   border: none;
   background: rgba(255, 255, 255, 0.18);
   cursor: pointer;
   transition: background 0.2s ease;
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
-.iconButton:hover,
 .avatarButton:hover {
   background: rgba(255, 255, 255, 0.28);
-}
-
-.iconButton {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  font-size: 1.1rem;
 }
 
 .avatarButton {
@@ -89,4 +70,12 @@
 .avatarButton:focus-visible {
   outline: 3px solid #ffffff;
   outline-offset: 2px;
+}
+
+.icon{
+  width: 40px;        /* Adjust as needed */
+  height: 40px;       /* Adjust as needed */
+  object-fit: contain; /* or 'cover' */
+  border-radius: 50%;  /* if you want it circular */
+  /* Add any other styles */
 }

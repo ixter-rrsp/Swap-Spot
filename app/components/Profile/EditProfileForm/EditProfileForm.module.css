@@ -1,0 +1,112 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+}
+
+.title {
+  margin-bottom: 32px;
+
+  text-align: center;
+
+  font-size: 28px;
+  font-weight: 700;
+
+  color: #111827;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.9rem;
+}
+
+.saveButton {
+  margin-top: 4dvh;
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+
+  background-color: #2563eb;
+  color: white;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: opacity 0.2s ease;
+}
+
+.saveButton:hover {
+  opacity: 0.9;
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.locationSection {
+  margin-top: 8px;
+}
+
+.locationTitle {
+  margin-bottom: 8px;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  color: #111827;
+}
+
+.locationCard {
+  padding: 16px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  background: #ffffff;
+}
+
+.locationDescription {
+  margin: 0 0 12px;
+
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.locationStatus {
+  margin-bottom: 16px;
+
+  font-size: 0.95rem;
+  font-weight: 500;
+
+  color: #374151;
+}
+
+.locationButton {
+  padding: 10px 16px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #2563eb;
+  color: white;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: opacity 0.2s ease;
+}
+
+.locationButton:hover {
+  opacity: 0.9;
+}
+
+.locationButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

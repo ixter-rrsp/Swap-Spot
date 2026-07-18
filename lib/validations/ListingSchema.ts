@@ -13,11 +13,6 @@ export const listingSchema = z.object({
     .min(20, "Description must be at least 20 characters.")
     .max(1000, "Description cannot exceed 1000 characters."),
 
-  city: z
-    .string()
-    .trim()
-    .min(2, "City is required."),
-
   lookingFor: z
     .string()
     .trim()
@@ -30,5 +25,9 @@ export const listingSchema = z.object({
     .positive("Swap value must be greater than zero."),
 });
 
-export type ListingFormData = z.output<typeof listingSchema>;
-export type ListingFormInput = z.input<typeof listingSchema>;
+
+export type ListingFormData =
+  z.output<typeof listingSchema>;
+
+export type ListingFormInput =
+  z.input<typeof listingSchema>;

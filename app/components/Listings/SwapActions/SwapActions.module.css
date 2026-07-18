@@ -1,22 +1,32 @@
 .container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 
   gap: 12px;
 
-  padding: 20px 16px 32px;
+  padding: 16px;
+
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(74px + env(safe-area-inset-bottom));
+
+  background: #fff;
+  border-top: 1px solid #f3f4f6;
+
+  z-index: 900;
 }
 
 .primaryButton,
 .secondaryButton {
-  width: 100%;
+  flex: 1;
 
   padding: 14px;
 
-  border-radius: 12px;
+  border-radius: 999px;
 
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
 
   cursor: pointer;
 
@@ -26,22 +36,27 @@
 .primaryButton {
   border: none;
 
-  background: #2563eb;
+  background: #16a34a;
   color: white;
 }
 
 .primaryButton:hover {
-  opacity: 0.9;
+  background: #15803d;
 }
 
 .secondaryButton {
   background: white;
 
-  color: #2563eb;
+  color: #111827;
 
-  border: 2px solid #2563eb;
+  border: 1.5px solid #d1d5db;
 }
 
 .secondaryButton:hover {
-  background: #eff6ff;
+  background: #f9fafb;
+}
+
+.primaryButton:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
 }

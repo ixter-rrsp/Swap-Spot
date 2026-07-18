@@ -1,10 +1,18 @@
-/* Add this to your page.module.css */
-.sectionWrapper h2,
-.sectionWrapper .title {
-  color: #111; /* Dark color for visibility */
+/* page.module.css */
+.container {
+  /* Keep your existing styles */
+  padding: 0px 0px calc(74px + env(safe-area-inset-bottom) + 20px);
+  /* This adds space at the bottom for the navbar */
+  background: #f9fafb;
+  min-height: 100vh;
 }
 
-/* Or if you want to target all titles in the container */
+/* Your existing styles */
+.sectionWrapper h2,
+.sectionWrapper .title {
+  color: #111;
+}
+
 .container h2 {
   color: #111;
 }
