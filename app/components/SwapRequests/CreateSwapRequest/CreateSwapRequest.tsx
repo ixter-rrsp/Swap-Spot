@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./CreateSwapRequest.module.css";
 import { Listing } from "@/lib/types/Listing";
 
@@ -13,7 +14,7 @@ export default function CreateSwapRequest({
   requestedListingId,
   onClose,
 }: Props) {
-  console.log("CREATE SWAP REQUEST RENDERED");
+  const router = useRouter();
 
   const [listings, setListings] = useState<Listing[]>([]);
   const [selectedListing, setSelectedListing] = useState<string>("");
@@ -25,8 +26,12 @@ export default function CreateSwapRequest({
     async function loadListings() {
       try {
         const response = await fetch("/api/listings/my");
+        if (response.status === 401) {
+          router.push("/login");
+          return;
+        }
         const data = await response.json();
-        setListings(data);
+        setListings(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
       } finally {
@@ -35,7 +40,7 @@ export default function CreateSwapRequest({
     }
 
     loadListings();
-  }, []);
+  }, [router]);
 
   async function handleSubmit() {
     if (!selectedListing) {
@@ -45,30 +50,38 @@ export default function CreateSwapRequest({
     try {
       setSubmitting(true);
 
-    await fetch(
-      "/api/swap-requests",
-      {
-        method: "POST",
+      const response = await fetch(
+        "/api/swap-requests",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            offeredListingId: selectedListing,
+            requestedListingId,
+          }),
+        }
+      );
 
-        headers: {
-          "Content-Type": "application/json",
-        },
-
-        body: JSON.stringify({
-          offeredListingId: selectedListing,
-          requestedListingId,
-        }),
+      if (response.status === 401) {
+        router.push("/login");
+        return;
       }
-    );
 
-    setSent(true);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send swap request.");
+      }
 
-    setTimeout(() => {
-    onClose();
-    }, 1500);
+      setSent(true);
+
+      setTimeout(() => {
+        onClose();
+      }, 1500);
     } catch (error) {
       console.error(error);
-      alert("Failed to send swap request.");
+      alert(error instanceof Error ? error.message : "Failed to send swap request.");
     } finally {
       setSubmitting(false);
     }

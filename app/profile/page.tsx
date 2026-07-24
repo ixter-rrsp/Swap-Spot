@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import ProfileHeader from "../components/Profile/ProfileHeader/ProfileHeader";
 import ProfileStats from "../components/Profile/ProfileStats/ProfileStats";
 import ProgressCard from "../components/Profile/ProgressCard/ProgressCard";
@@ -11,6 +12,14 @@ import styles from "./page.module.css";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
 
   // Run the test query first
   const { data, error } = await supabase

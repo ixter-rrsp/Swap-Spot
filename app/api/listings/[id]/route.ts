@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-
+import { createClient } from "@/utils/supabase/server";
 import {
   deleteListing,
   updateListing,
@@ -15,6 +15,18 @@ export async function PATCH(
     }>;
   }
 ) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   try {
     const { id } = await params;
 
@@ -39,16 +51,12 @@ export async function PATCH(
       error
     );
 
+    const message = error instanceof Error ? error.message : "Failed to update listing.";
+    const status = message.toLowerCase().includes("not authenticated") ? 401 : 500;
+
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to update listing.",
-      },
-      {
-        status: 500,
-      }
+      { error: message },
+      { status }
     );
   }
 }
@@ -63,6 +71,18 @@ export async function DELETE(
     }>;
   }
 ) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+
   try {
     const { id } = await params;
 
@@ -77,16 +97,12 @@ export async function DELETE(
       error
     );
 
+    const message = error instanceof Error ? error.message : "Failed to delete listing.";
+    const status = message.toLowerCase().includes("not authenticated") ? 401 : 500;
+
     return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to delete listing.",
-      },
-      {
-        status: 500,
-      }
+      { error: message },
+      { status }
     );
   }
 }

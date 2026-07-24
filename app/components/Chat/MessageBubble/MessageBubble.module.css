@@ -1,0 +1,17 @@
+.mine {
+    align-self: flex-end;
+    background: #2563eb;
+    color: white;
+    padding: 10px 14px;
+    border-radius: 16px;
+    max-width: 70%;
+}
+
+.theirs {
+    align-self: flex-start;
+    background: #e5e7eb;
+    color: black;
+    padding: 10px 14px;
+    border-radius: 16px;
+    max-width: 70%;
+}

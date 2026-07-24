@@ -23,11 +23,12 @@ export async function POST(
     await supabase.auth.getUser();
 
 
-  console.log(
-    "API USER:",
-    user
-  );
-
+  if (!user) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    );
+  }
 
   try {
 

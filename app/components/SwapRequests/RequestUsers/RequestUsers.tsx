@@ -4,6 +4,10 @@ import { ListingOwner } from "@/lib/types/Listing";
 
 import styles from "./RequestUsers.module.css";
 
+import {
+  ArrowLeftRight,
+} from "lucide-react";
+
 interface RequestUsersProps {
   sender: ListingOwner;
   receiver: ListingOwner;
@@ -37,7 +41,7 @@ export default function RequestUsers({
       </div>
 
       <div className={styles.swapArrow}>
-        ⇄
+        <ArrowLeftRight/>
       </div>
 
       <div className={styles.userCard}>

@@ -11,70 +11,59 @@ import {
 export async function middleware(
   request: NextRequest
 ) {
-
   const {
     supabase,
     response,
   } =
     await createClient(request);
 
-
   const {
-    data:{
+    data: {
       user,
     },
   } =
     await supabase.auth.getUser();
 
-
   const pathname =
     request.nextUrl.pathname;
 
-
-  const protectedRoutes = [
-    "/profile",
-    "/profile/edit",
-    "/post-listing",
-    "/notifications",
-    "/requests",
-  ];
-
-
   const isProtected =
-    protectedRoutes.some(
-      (route) =>
-        pathname.startsWith(route)
-    );
-
+    pathname === "/profile" ||
+    pathname.startsWith("/profile/edit") ||
+    pathname.startsWith("/post") ||
+    pathname.startsWith("/notifications") ||
+    pathname.startsWith("/requests") ||
+    pathname.startsWith("/swap-requests") ||
+    pathname.startsWith("/messages") ||
+    (pathname.startsWith("/Listing/") && pathname.endsWith("/edit"));
 
   if (
     isProtected &&
     !user
   ) {
-
     const loginUrl =
       request.nextUrl.clone();
 
     loginUrl.pathname =
       "/login";
 
-
     return NextResponse.redirect(
       loginUrl
     );
   }
 
-
   return response;
 }
 
-
 export const config = {
   matcher: [
-    "/profile/:path*",
-    "/post-listing/:path*",
+    "/profile",
+    "/profile/edit/:path*",
+    "/post/:path*",
     "/notifications/:path*",
     "/requests/:path*",
-    "/api/:path*",
+    "/swap-requests/:path*",
+    "/messages/:path*",
+    "/Listing/:path*/edit",
   ],
 };

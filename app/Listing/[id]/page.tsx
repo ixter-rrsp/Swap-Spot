@@ -114,12 +114,11 @@ export default async function ListingPage({
 
       {
         listing.owner.id !== currentUserId && (
-
           <SwapActions
             requestedListingId={listing.id}
             hasPendingRequest={pendingRequest}
+            isAuthenticated={!!currentUserId}
           />
-
         )
       }
 

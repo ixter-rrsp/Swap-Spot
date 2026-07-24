@@ -30,6 +30,11 @@ export default function ListingActions({ listingId }: ListingActionsProps) {
         method: "DELETE",
       });
 
+      if (response.status === 401) {
+        router.push("/login");
+        return;
+      }
+
       if (!response.ok) {
         const data = await response.json();
         throw new Error(data.error || "Failed to delete listing.");

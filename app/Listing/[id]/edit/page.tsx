@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getListingById } from "@/lib/services/ServerListingService";
 import { Listing } from "@/lib/types/Listing";
 import PostListingForm from "@/app/components/PostListing/PostListingForm/PostListingForm";
@@ -33,7 +33,11 @@ export default async function EditListingPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user || listing.owner.id !== user.id) {
+  if (!user) {
+    redirect("/login");
+  }
+
+  if (listing.owner.id !== user.id) {
     notFound();
   }
 

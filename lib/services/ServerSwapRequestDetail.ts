@@ -5,7 +5,6 @@ import { SwapRequestDetail } from "@/lib/types/SwapRequestDetail";
 export async function getSwapRequestById(
   requestId: string
 ): Promise<SwapRequestDetail> {
-
   const supabase = await createClient();
 
   const {
@@ -46,7 +45,9 @@ export async function getSwapRequestById(
       offered_listing:listings!swap_requests_offered_listing_id_fkey(
         id,
         title,
+        description,
         city,
+        looking_for,
         swap_value,
         listing_images(
           image_url,
@@ -56,7 +57,9 @@ export async function getSwapRequestById(
       requested_listing:listings!swap_requests_requested_listing_id_fkey(
         id,
         title,
+        description,
         city,
+        looking_for,
         swap_value,
         listing_images(
           image_url,
@@ -112,7 +115,9 @@ export async function getSwapRequestById(
     offeredListing: {
       id: data.offered_listing.id,
       title: data.offered_listing.title,
+      description: data.offered_listing.description,
       city: data.offered_listing.city,
+      lookingFor: data.offered_listing.looking_for,
       swapValue: data.offered_listing.swap_value,
       imageUrl:
         data.offered_listing.listing_images?.[0]?.image_url,
@@ -121,7 +126,9 @@ export async function getSwapRequestById(
     requestedListing: {
       id: data.requested_listing.id,
       title: data.requested_listing.title,
+      description: data.requested_listing.description,
       city: data.requested_listing.city,
+      lookingFor: data.requested_listing.looking_for,
       swapValue: data.requested_listing.swap_value,
       imageUrl:
         data.requested_listing.listing_images?.[0]?.image_url,

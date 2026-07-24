@@ -160,15 +160,22 @@ export default function PostListingForm({
 
 
     } catch (error) {
-
       console.error(error);
-
-      alert(
+      const message =
         error instanceof Error
           ? error.message
-          : "Something went wrong."
-      );
+          : "Something went wrong.";
 
+      if (
+        message.toLowerCase().includes("logged in") ||
+        message.toLowerCase().includes("unauthenticated") ||
+        message.toLowerCase().includes("unauthorized")
+      ) {
+        router.push("/login");
+        return;
+      }
+
+      alert(message);
     } finally {
 
       setLoading(false);

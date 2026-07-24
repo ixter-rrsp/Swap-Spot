@@ -260,7 +260,11 @@ export async function getListingById(id: string) {
 export async function getListings() {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let query = supabase
     .from("listings")
     .select(`
       *,
@@ -273,6 +277,12 @@ export async function getListings() {
     .order("created_at", {
       ascending: false,
     });
+
+  if (user) {
+    query = query.neq("owner_id", user.id);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(error.message);

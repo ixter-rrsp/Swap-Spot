@@ -1,14 +1,21 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
 import {
   getIncomingRequests,
   getOutgoingRequests,
 } from "@/lib/services/ServerSwapRequestService";
-
 import RequestPageClient from "./RequestPageClient";
-
 import styles from "./page.module.css";
 
-
 export default async function RequestsPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
 
   const incomingRequests =
     await getIncomingRequests();

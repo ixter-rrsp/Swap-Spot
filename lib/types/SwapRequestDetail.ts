@@ -2,7 +2,9 @@ import { ListingOwner } from "./Listing";
 
 export interface SwapRequestDetail {
   id: string;
+
   currentUserId: string;
+
   status:
     | "pending"
     | "accepted"
@@ -21,7 +23,9 @@ export interface SwapRequestDetail {
   offeredListing: {
     id: string;
     title: string;
+    description: string;
     city: string;
+    lookingFor: string;
     swapValue: number;
     imageUrl?: string;
   };
@@ -29,7 +33,9 @@ export interface SwapRequestDetail {
   requestedListing: {
     id: string;
     title: string;
+    description: string;
     city: string;
+    lookingFor: string;
     swapValue: number;
     imageUrl?: string;
   };

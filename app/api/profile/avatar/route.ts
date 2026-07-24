@@ -20,14 +20,10 @@ export async function PATCH(
       await supabase.auth.getUser();
 
 
-    if (authError) {
-      throw new Error(authError.message);
-    }
-
-
-    if (!user) {
-      throw new Error(
-        "User not authenticated."
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
       );
     }
 

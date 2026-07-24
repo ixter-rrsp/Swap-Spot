@@ -74,10 +74,39 @@
 }
 
 .swapIcon {
-  text-align: center;
+  align-self: center;
 
   font-size: 28px;
   font-weight: 700;
 
   color: #16a34a;
+}
+
+.city {
+  color: #666;
+  margin-top: 4px;
+}
+
+.value {
+  margin: 10px 0;
+}
+
+.section {
+  margin-top: 16px;
+  text-align: left;
+}
+
+.heading {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.section p {
+  margin: 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
 }

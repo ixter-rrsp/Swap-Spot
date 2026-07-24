@@ -32,7 +32,6 @@ export default function RequestActions({
   async function sendAction(
     action: "accept" | "decline" | "cancel"
   ) {
-
     const response =
       await fetch(
         `/api/swap-requests/${request.id}/${action}`,
@@ -41,13 +40,16 @@ export default function RequestActions({
         }
       );
 
+    if (response.status === 401) {
+      window.location.href = "/login";
+      return;
+    }
 
     if (!response.ok) {
       throw new Error(
         "Request failed."
       );
     }
-
   }
 
 
