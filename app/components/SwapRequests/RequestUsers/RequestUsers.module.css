@@ -1,0 +1,62 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 16px;
+}
+
+.userCard {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+}
+
+.avatar {
+  position: relative;
+
+  width: 72px;
+  height: 72px;
+
+  border-radius: 50%;
+
+  overflow: hidden;
+
+  background: #e5e7eb;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.avatar img {
+  object-fit: cover;
+}
+
+.userCard h3 {
+  margin: 10px 0 4px;
+
+  font-size: 16px;
+}
+
+.userCard p {
+  margin: 0;
+
+  font-size: 14px;
+
+  color: #6b7280;
+}
+
+.swapArrow {
+  font-size: 30px;
+  font-weight: 700;
+
+  color: #16a34a;
+}

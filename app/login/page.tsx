@@ -1,19 +1,11 @@
 import styles from "./page.module.css";
 
-import LoginForm from "@/app/components/Auth/LoginForm/LoginForm ";
+import LoginForm from "@/app/components/Auth/LoginForm/LoginForm";
 
 export default function LoginPage() {
   return (
     <main className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>
-          Welcome Back
-        </h1>
-
-        <p className={styles.subtitle}>
-          Sign in to continue swapping.
-        </p>
-
         <LoginForm />
       </div>
     </main>

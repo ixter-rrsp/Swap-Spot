@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.badge {
+  padding: 8px 18px;
+
+  border-radius: 999px;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.declined {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.completed {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.cancelled {
+  background: #f3f4f6;
+  color: #4b5563;
+}

@@ -4,6 +4,7 @@ import ListingCard from "../ListingCard/ListingCard";
 
 import { Listing } from "@/lib/types/Listing";
 
+import EmptyState from "@/app/components/UI/EmptyState/EmptyState";
 
 interface ListingGridProps {
   title: string;
@@ -12,27 +13,27 @@ interface ListingGridProps {
   actionLabel?: string;
   onActionClick?: () => void;
 
-  loading?: boolean;
-}
+  showActions?: boolean;
 
+  emptyTitle?: string;
+  emptyDescription?: string;
+}
 
 export default function ListingGrid({
   title,
   listings,
   actionLabel,
   onActionClick,
-  loading = false,
+  showActions = false,
+  emptyTitle,
+  emptyDescription,
 }: ListingGridProps) {
-
   return (
     <section className={styles.container}>
-
       <header className={styles.header}>
-
         <h2 className={styles.title}>
           {title}
         </h2>
-
 
         {actionLabel && (
           <button
@@ -42,42 +43,30 @@ export default function ListingGrid({
             {actionLabel}
           </button>
         )}
-
       </header>
 
-
-
-      {loading ? (
-
-        <div className={styles.message}>
-          Loading listings...
-        </div>
-
-
-      ) : listings.length === 0 ? (
-
-        <div className={styles.message}>
-          No listings available.
-        </div>
-
-
+      {listings.length === 0 ? (
+        <EmptyState
+          title={
+            emptyTitle ??
+            "No listings found"
+          }
+          description={
+            emptyDescription ??
+            "Check back later or be the first to post an item."
+          }
+        />
       ) : (
-
         <div className={styles.grid}>
-
           {listings.map((listing) => (
-
             <ListingCard
               key={listing.id}
               {...listing}
+              showActions={showActions}
             />
-
           ))}
-
         </div>
-
       )}
-
     </section>
   );
 }

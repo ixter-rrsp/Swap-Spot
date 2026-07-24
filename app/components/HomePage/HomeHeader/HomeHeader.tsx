@@ -1,24 +1,18 @@
 import styles from "./HomeHeader.module.css";
+import icon from '../../../../public/src/icon.png'; // or wherever it is
 
 export default function HomeHeader() {
   return (
     <header className={styles.header}>
       <div className={styles.topRow}>
         <div>
-          <h1 className={styles.logo}>
-            <span className={styles.logoGreen}>SWAP</span>SPOT
-          </h1>
+          <div>
+<img src={icon.src} alt="Icon" style={{ width: '180px', height: '50px' }}
+/>
+          </div>
           <p className={styles.tagline}>Your spot to <br /> swap.</p>
         </div>
 
-        <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.iconButton}
-            aria-label="Notifications"
-          >
-            🔔
-          </button>
 
           <button
             type="button"
@@ -28,7 +22,6 @@ export default function HomeHeader() {
             <img src="/src/karina.jpg" alt="Profile" />
           </button>
         </div>
-      </div>
     </header>
   );
 }

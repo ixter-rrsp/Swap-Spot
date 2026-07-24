@@ -1,0 +1,86 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  padding: 14px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+
+  background: #fff;
+
+  transition: border-color 0.15s ease;
+}
+
+.inputWrapper:focus-within {
+  border-color: #2563eb;
+}
+
+.inputWrapperError {
+  border-color: #ef4444;
+}
+
+.icon {
+  margin-top: 3px;
+  flex-shrink: 0;
+  color: #6b7280;
+}
+
+.textarea {
+  flex: 1;
+
+  min-height: 120px;
+
+  border: none;
+  outline: none;
+  resize: vertical;
+
+  background: transparent;
+
+  font-size: 15px;
+  color: #111827;
+
+  font-family: inherit;
+}
+
+.iconButton {
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #6b7280;
+
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  color: #111827;
+}
+
+.error {
+  font-size: 13px;
+  color: #ef4444;
+}

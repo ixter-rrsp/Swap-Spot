@@ -1,32 +1,117 @@
+.wrapper {
+  width: 100%;
+}
+
+
 .container {
   position: relative;
-
   width: 100%;
-  aspect-ratio: 4 / 3;
-  max-height: 500px;
-
+  aspect-ratio: 1 / 1;
   overflow: hidden;
-
-  max-width: 70vw;
-
-  background: #f3f4f6;
-  border-radius: 12px;
-
-  margin: 0 auto;
+  border-radius: 20px;
+  background: #e5e7eb;
 }
+
 
 .image {
-  object-fit: contain;
+  object-fit: cover;
 }
 
+
 .placeholder {
-  width: 100%;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+
+.counter {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  background: rgba(17, 24, 39, 0.65);
+  color: #fff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  backdrop-filter: blur(2px);
+}
+
+
+.thumbnails {
+  display: flex;
+  gap: 10px;
+
+  margin-top: 12px;
+
+  overflow-x: auto;
+  padding: 16px;
+}
+
+
+.thumbnail,
+.activeThumbnail {
+  position: relative;
+  flex-shrink: 0;
+
+  width: 64px;
+  height: 64px;
+
+  border-radius: 14px;
+  overflow: hidden;
+
+  border: 2px solid transparent;
+  padding: 0;
+
+  cursor: pointer;
+
+  background: #e5e7eb;
+
+  transition: 0.15s ease;
+}
+
+
+.thumbnail {
+  opacity: 0.55;
+}
+
+
+.thumbnail:hover {
+  opacity: 0.8;
+}
+
+
+.activeThumbnail {
+  opacity: 1;
+  border-color: #2563eb;
+}
+
+
+.thumbnailImage {
+  object-fit: cover;
+}
+
+
+.overflowOverlay {
+  position: absolute;
+  inset: 0;
 
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 
-  color: #6b7280;
-  font-size: 14px;
+  background: rgba(219, 234, 254, 0.85);
+  color: #2563eb;
+
+  font-size: 15px;
+  font-weight: 700;
 }

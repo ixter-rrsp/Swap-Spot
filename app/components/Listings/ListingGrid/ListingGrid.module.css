@@ -45,23 +45,6 @@
 }
 
 
-.message {
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  min-height: 120px;
-
-  color: #777;
-
-  font-size: 14px;
-
-  text-align: center;
-}
-
-
-
 @media (min-width: 768px) {
 
   .grid {

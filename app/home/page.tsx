@@ -1,71 +1,131 @@
 import styles from "./page.module.css";
 
 import HomeHeader from "../components/HomePage/HomeHeader/HomeHeader";
-import SearchBar from "../components/HomePage/SearchBar/SearchBar";
-import CategoryChips from "../components/HomePage/CategoryChips/CategoryChips";
-import BoostedSection from "../components/HomePage/BoostedSection/BoostedSection";
-import ListingGrid from "../components/Listings/ListingGrid/ListingGrid";
-import { getListings } from "@/lib/services/ListingService";
-import { Listing } from "@/lib/types/Listing";
+import HomeContent from "../components/HomePage/HomeContent/HomeContent";
+
+import { getListings } from "@/lib/services/ServerListingService";
+import { getNearbyListings } from "@/lib/services/NearbyListingService";
+
+import type { Listing } from "@/lib/types/Listing";
+
 
 export default async function HomePage() {
-const rows = await getListings();
 
-const listings: Listing[] = rows.map((row) => ({
-  id: row.id,
-  title: row.title,
-  description: row.description,
-  city: row.city,
-  swapValue: row.swap_value,
-  lookingFor: row.looking_for,
-  boosted: row.boosted,
-  rating: 0,
+  const rows = await getListings();
 
-  owner: {
-    id: row.owner_id,
-    name: "Unknown User",
-    rating: 0,
-  },
+  const nearbyListings =
+    await getNearbyListings();
 
-  imageUrl: row.listing_images?.[0]?.image_url,
-}));
 
-const nearbyListings = listings.slice(0, 4);
-const recommendedListings = listings.slice(4, 8);
-const newestListings = listings.slice(8, 12);
-const boostedListings = listings.filter(
-  (listing) => listing.boosted
-);
+  const listings: Listing[] =
+    rows.map((row) => ({
+      
+      id: row.id,
+
+      title: row.title,
+
+      description:
+        row.description,
+
+
+      imageUrl:
+        row.listing_images?.[0]
+          ?.image_url,
+
+
+      images:
+        row.listing_images?.map(
+          (image: {
+            id: string;
+            image_url: string;
+            sort_order: number;
+          }) => ({
+            id: image.id,
+            url: image.image_url,
+            sortOrder:
+              image.sort_order,
+          })
+        ) ?? [],
+
+
+      city:
+        row.city,
+
+
+      swapValue:
+        row.swap_value,
+
+
+      lookingFor:
+        row.looking_for,
+
+
+      boosted:
+        row.boosted,
+
+
+      owner: {
+        id:
+          row.profiles?.id ??
+          row.owner_id,
+
+
+        username:
+          row.profiles?.username ??
+          "",
+
+
+        fullName:
+          row.profiles?.full_name ??
+          "",
+
+
+        avatarUrl:
+          row.profiles?.avatar_url ??
+          null,
+
+
+        rating:
+          Number(
+            row.profiles?.rating ??
+            0
+          ),
+
+
+        badge:
+          row.profiles?.badge ??
+          "Member",
+
+
+        city:
+          row.profiles?.city ??
+          row.city,
+
+
+        latitude:
+          row.profiles?.latitude ??
+          null,
+
+
+        longitude:
+          row.profiles?.longitude ??
+          null,
+      },
+    }));
+
+
 
   return (
     <div className={styles.container}>
+
       <HomeHeader />
 
-      <SearchBar />
 
-      <CategoryChips />
-
-      <BoostedSection
-      listings={boostedListings}
-    />
-
-      <ListingGrid
-        title="Nearby Swaps"
-        listings={nearbyListings}
-        actionLabel="See All"
+      <HomeContent
+        listings={listings}
+        nearbyListings={nearbyListings}
       />
 
-      <ListingGrid
-        title="Recommended for You"
-        listings={recommendedListings}
-        actionLabel="See All"
-      />
-
-      <ListingGrid
-        title="Newest Listings"
-        listings={newestListings}
-        actionLabel="See All"
-      />
     </div>
   );
 }

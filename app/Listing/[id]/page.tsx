@@ -1,6 +1,10 @@
 import { notFound } from "next/navigation";
 
-import { getListingById } from "@/lib/services/ListingService";
+import { getListingById } from "@/lib/services/ServerListingService";
+import {
+  hasPendingSwapRequest,
+} from "@/lib/services/ServerSwapRequestService";
+
 import { Listing } from "@/lib/types/Listing";
 
 import ListingGallery from "@/app/components/Listings/ListingGallery/ListingGallery";
@@ -8,7 +12,10 @@ import ListingInfo from "@/app/components/Listings/ListingInfo/ListingInfo";
 import OwnerCard from "@/app/components/Listings/OwnerCard/OwnerCard";
 import SwapActions from "@/app/components/Listings/SwapActions/SwapActions";
 
+import { createClient } from "@/utils/supabase/server";
+
 import styles from "./page.module.css";
+
 
 interface ListingPageProps {
   params: Promise<{
@@ -16,44 +23,78 @@ interface ListingPageProps {
   }>;
 }
 
+
 export default async function ListingPage({
   params,
 }: ListingPageProps) {
+
   const { id } = await params;
 
-  let row;
+
+  const supabase = await createClient();
+
+
+  const {
+    data: {
+      user,
+    },
+  } = await supabase.auth.getUser();
+
+
+  const currentUserId = user?.id;
+
+
+
+  let listing: Listing;
+
 
   try {
-    row = await getListingById(id);
-  } catch {
+
+    listing = await getListingById(id);
+
+
+    console.log(
+      "DETAIL LISTING:",
+      JSON.stringify(listing, null, 2)
+    );
+
+
+    console.log(
+      "OWNER DATA:",
+      listing.owner
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "GET LISTING ERROR:",
+      error
+    );
+
+
     notFound();
+
   }
 
-  const listing: Listing = {
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    city: row.city,
-    swapValue: row.swap_value,
-    lookingFor: row.looking_for,
-    boosted: row.boosted,
-    rating: 0,
 
-    owner: {
-      id: row.owner_id,
-      name: "Unknown User",
-      rating: 0,
-    },
 
-    imageUrl: row.listing_images?.[0]?.image_url,
-  };
+  const pendingRequest =
+    await hasPendingSwapRequest(listing.id);
+
+
 
   return (
+
     <main className={styles.container}>
+
+
       <ListingGallery
-        imageUrl={listing.imageUrl}
+        images={listing.images}
         title={listing.title}
       />
+
+
 
       <ListingInfo
         title={listing.title}
@@ -61,15 +102,28 @@ export default async function ListingPage({
         swapValue={listing.swapValue}
         lookingFor={listing.lookingFor}
         description={listing.description}
-        rating={listing.rating}
       />
+
+
 
       <OwnerCard
-        name={listing.owner.name}
-        rating={listing.owner.rating}
+        owner={listing.owner}
       />
 
-      <SwapActions />
+
+
+      {
+        listing.owner.id !== currentUserId && (
+          <SwapActions
+            requestedListingId={listing.id}
+            hasPendingRequest={pendingRequest}
+            isAuthenticated={!!currentUserId}
+          />
+        )
+      }
+
+
     </main>
+
   );
 }

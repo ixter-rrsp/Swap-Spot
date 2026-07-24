@@ -1,0 +1,51 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+
+  margin-bottom: 32px;
+}
+
+.avatar {
+  position: relative;
+
+  width: 110px;
+  height: 110px;
+
+  border-radius: 50%;
+
+  background: #2563eb;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 42px;
+  font-weight: 700;
+
+  overflow: hidden;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.button {
+  border: none;
+  background: none;
+
+  color: #2563eb;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: color 0.15s ease;
+}
+
+.button:hover {
+  color: #1d4ed8;
+}

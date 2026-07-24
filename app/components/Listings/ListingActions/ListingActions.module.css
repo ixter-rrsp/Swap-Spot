@@ -1,0 +1,50 @@
+.container {
+  display: flex;
+  gap: 0;
+  margin-top: auto;
+  padding-left: 7px;
+  padding-bottom: 10px;
+}
+
+.edit,
+.delete {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 8px 9px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s ease; /* Smooth transition */
+}
+
+.edit {
+  background: transparent;
+  color: #059669;
+}
+
+.delete {
+  border: none;
+  background: transparent;
+  color: #dc2626;
+}
+
+/* Icon animation */
+.icon {
+  transition: transform 0.15s ease;
+  display: block;
+}
+
+.icon.pressed {
+  transform: scale(1.4); /* Grows to 140% when pressed */
+}
+
+/* Optional: Add hover effect too */
+.edit:hover .icon {
+  transform: scale(1.1);
+}
+
+.delete:hover .icon {
+  transform: scale(1.1);
+}

@@ -1,0 +1,32 @@
+.container {
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+.content {
+  padding: 5px;
+}
+
+
+.pageHeader {
+  margin-bottom: 5px;
+}
+
+.pageHeader h1 {
+  font-size: 28px;
+  font-weight: 700;
+}
+.pageHeader p {
+  color: #777;
+  font-size: 14px;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.description {
+  color: #666;
+  font-size: 15px;
+}

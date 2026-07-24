@@ -7,25 +7,86 @@ export async function uploadListingImages(
 
   const imageUrls: string[] = [];
 
-  for (const image of images) {
-    const fileName = `${crypto.randomUUID()}-${image.name}`;
+  try {
+    for (const image of images) {
+      const extension =
+        image.name
+          .split(".")
+          .pop()
+          ?.toLowerCase() ?? "jpg";
 
-    const { error } = await supabase.storage
-      .from("listing-images")
-      .upload(fileName, image);
+      const fileName =
+        `${crypto.randomUUID()}.${extension}`;
 
-    if (error) {
-      throw new Error(error.message);
+      const { error } =
+        await supabase.storage
+          .from("listing-images")
+          .upload(fileName, image);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage
+        .from("listing-images")
+        .getPublicUrl(fileName);
+
+      imageUrls.push(publicUrl);
     }
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage
-      .from("listing-images")
-      .getPublicUrl(fileName);
+    return imageUrls;
+  } catch (error) {
+    if (imageUrls.length > 0) {
+      try {
+        await deleteListingImages(imageUrls);
+      } catch {}
+    }
 
-    imageUrls.push(publicUrl);
+    throw error;
+  }
+}
+
+export async function deleteListingImages(
+  imageUrls: string[]
+) {
+  const supabase = createClient();
+
+  const filePaths = imageUrls
+    .map((url) => {
+      const index = url.indexOf("/listing-images/");
+
+      if (index === -1) return null;
+
+      return url.substring(
+        index + "/listing-images/".length
+      );
+    })
+    .filter(Boolean) as string[];
+
+  if (filePaths.length === 0) {
+    return;
   }
 
-  return imageUrls;
+  const { error } = await supabase.storage
+    .from("listing-images")
+    .remove(filePaths);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function uploadNewListingImages(
+  existingImages: string[],
+  newImages: File[]
+): Promise<string[]> {
+  const uploaded =
+    await uploadListingImages(newImages);
+
+  return [
+    ...existingImages,
+    ...uploaded,
+  ];
 }

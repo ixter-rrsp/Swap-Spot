@@ -1,85 +1,97 @@
-import Navbar from "../components/Layout/Navbar/Navbar";
+import { redirect } from "next/navigation";
+import ProfileHeader from "../components/Profile/ProfileHeader/ProfileHeader";
+import ProfileStats from "../components/Profile/ProfileStats/ProfileStats";
+import ProgressCard from "../components/Profile/ProgressCard/ProgressCard";
+import ProfileContent from "../components/Profile/ProfileContent/ProfileContent";
+import { createClient } from "@/utils/supabase/server";
+import { Listing } from "@/lib/types/Listing";
+import { getCurrentProfile } from "@/lib/services/ProfileService";
+import { getMyListings } from "@/lib/services/ServerListingService";
 import styles from "./page.module.css";
 
-export default function ProfilePage() {
-  const statusItems = ["To confirm", "To exchange", "To receive", "To rate"];
+
+export default async function ProfilePage() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  // Run the test query first
+  const { data, error } = await supabase
+    .from("swap_requests")
+    .select(`
+      *,
+      sender:profiles!swap_requests_sender_id_fkey(
+        id,
+        username,
+        full_name,
+        avatar_url
+      ),
+      receiver:profiles!swap_requests_receiver_id_fkey(
+        id,
+        username,
+        full_name,
+        avatar_url
+      ),
+      offered_listing:listings!swap_requests_offered_listing_id_fkey(
+        id,
+        title,
+        city,
+        swap_value,
+        listing_images(
+          image_url,
+          sort_order
+        )
+      ),
+      requested_listing:listings!swap_requests_requested_listing_id_fkey(
+        id,
+        title,
+        city,
+        swap_value,
+        listing_images(
+          image_url,
+          sort_order
+        )
+      )
+    `);
+
+  console.log("SWAP REQUEST TEST");
+  console.log(JSON.stringify(data, null, 2));
+
+  if (error) {
+    console.error("ERROR:", error);
+  }
+
+  // Now get the profile and listings data
+  const profile = await getCurrentProfile();
+  const myOffers = await getMyListings();
+  const receivedOffers: Listing[] = [];
 
   return (
-    <>
-      <div className={styles.container}>
-        <header className={styles.profileHeader}>
-          <div className={styles.profileHeaderLeft}>
-            <div className={styles.avatar}>
-              <span>PM</span>
-            </div>
-            <div>
-              <h2 className={styles.profileName}>p_mncda</h2>
-              <p className={styles.profileBadge}>Member</p>
-            </div>
-          </div>
-          <button className={styles.settingsBtn}>⚙️</button>
-        </header>
+    <main className={styles.profilePage}>
+      <ProfileHeader
+        username={profile?.username ?? "Unknown User"}
+        avatarUrl={profile?.avatarUrl}
+        badge={profile?.badge ?? "Member"}
+        showActions={false}
+      />
 
-        <div className={styles.statsRow}>
-          <div className={styles.statItem}>
-            <span className={styles.statNumber}>20</span>
-            <span className={styles.statLabel}>of 20</span>
-          </div>
-          <div className={styles.statDivider} />
-          <div className={styles.statItem}>
-            <span className={styles.statNumber}>20</span>
-            <span className={styles.statLabel}>Finished transactions</span>
-          </div>
-        </div>
-        <p className={styles.statsSub}>Tracked over the last 3 months</p>
+      <ProfileStats />
 
-        <div className={styles.statusGrid}>
-          {statusItems.map((label, i) => (
-            <div key={i} className={styles.statusItem}>
-              <div className={styles.statusCircle} />
-              <span>{label}</span>
-            </div>
-          ))}
-        </div>
+      <ProgressCard
+        completed={18}
+        confirmed={20}
+      />
 
-        <div className={styles.progressSection}>
-          <div className={styles.progressHeader}>
-            <span>To confirm</span>
-            <span>To verify</span>
-            <span>Completed</span>
-          </div>
-          <div className={styles.progressBar}>
-            <div className={styles.progressFill} style={{ width: "33%" }} />
-          </div>
-        </div>
-
-        <div className={styles.tabsRow}>
-          <button className={`${styles.tabBtn} ${styles.activeTab}`}>My Offers</button>
-          <button className={styles.tabBtn}>Received Offers</button>
-        </div>
-
-        <section className={styles.section}>
-          <div className={styles.sectionHeader}>
-            <h3 className={styles.sectionTitle}>Recent offers</h3>
-            <button className={styles.seeAll}>See all</button>
-          </div>
-          <div className={styles.offerList}>
-            <div className={styles.offerItem}>
-              <div className={styles.offerIcon}>👶</div>
-              <span>Baby clothes</span>
-            </div>
-            <div className={styles.offerItem}>
-              <div className={styles.offerIcon}>👞</div>
-              <span>Leather shoes</span>
-            </div>
-            <div className={styles.offerItem}>
-              <div className={styles.offerIcon}>👔</div>
-              <span>School uniform</span>
-            </div>
-          </div>
-        </section>
-      </div>
-      <Navbar />
-    </>
+      <ProfileContent
+        myOffers={myOffers}
+        receivedOffers={receivedOffers}
+      />
+    </main>
   );
 }

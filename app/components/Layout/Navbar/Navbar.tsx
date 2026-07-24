@@ -8,6 +8,7 @@ import {
   Compass,
   User,
   Bell,
+  Repeat
 } from "lucide-react";
 import styles from "./Navbar.module.css";
 
@@ -30,7 +31,14 @@ const navItems = [
   },
 ];
 
-export default function Navbar() {
+interface NavbarProps {
+  unreadCount?: number;
+}
+
+export default function Navbar({
+  unreadCount = 0,
+}: NavbarProps) {
+
   const pathname = usePathname();
 
   return (
@@ -41,15 +49,29 @@ export default function Navbar() {
           const active = pathname === item.href;
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${styles.navItem} ${
-                active ? styles.active : ""
-              }`}
-            >
-              <Icon size={22} strokeWidth={2} />
-            </Link>
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`${styles.navItem} ${
+              active ? styles.active : ""
+            }`}
+          >
+            <div className={styles.iconWrapper}>
+              <Icon
+                size={22}
+                strokeWidth={2}
+              />
+
+              {item.href === "/notifications" &&
+                unreadCount > 0 && (
+                  <span className={styles.badge}>
+                    {unreadCount > 9
+                      ? "9+"
+                      : unreadCount}
+                  </span>
+                )}
+            </div>
+          </Link>
           );
         })}
 
@@ -61,15 +83,29 @@ export default function Navbar() {
           const active = pathname === item.href;
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`${styles.navItem} ${
-                active ? styles.active : ""
-              }`}
-            >
-              <Icon size={22} strokeWidth={2} />
-            </Link>
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`${styles.navItem} ${
+              active ? styles.active : ""
+            }`}
+          >
+            <div className={styles.iconWrapper}>
+              <Icon
+                size={22}
+                strokeWidth={2}
+              />
+
+              {item.href === "/notifications" &&
+                unreadCount > 0 && (
+                  <span className={styles.badge}>
+                    {unreadCount > 9
+                      ? "9+"
+                      : unreadCount}
+                  </span>
+                )}
+            </div>
+          </Link>
           );
         })}
       </div>
@@ -79,7 +115,7 @@ export default function Navbar() {
         className={styles.postButton}
         aria-label="Create new listing"
       >
-        <Plus size={32} strokeWidth={2.5} />
+        <Repeat size={32} strokeWidth={2.5} />
       </Link>
     </nav>
   );

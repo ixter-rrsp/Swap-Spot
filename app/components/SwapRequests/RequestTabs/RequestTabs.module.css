@@ -1,0 +1,31 @@
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+
+.tabs button {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 14px;
+}
+
+
+.tabs button span {
+  font-size: 12px;
+}
+
+
+.active {
+  background: #111;
+  color: white;
+}

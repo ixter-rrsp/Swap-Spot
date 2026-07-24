@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Layout/Navbar/Navbar";
+import { getUnreadNotificationCount } from "@/lib/services/ServerNotificationService";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,16 +19,24 @@ export const metadata: Metadata = {
   description: "A barter system for trading items.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const unreadCount =
+    await getUnreadNotificationCount();
+
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable}`}
-      style={{ height: "100%", width: "100%", margin: 0, padding: 0 }}
+      style={{
+        height: "100%",
+        width: "100%",
+        margin: 0,
+        padding: 0,
+      }}
     >
       <head>
         <meta
@@ -35,6 +44,7 @@ export default function RootLayout({
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
         />
       </head>
+
       <body
         style={{
           margin: 0,
@@ -46,7 +56,8 @@ export default function RootLayout({
           flexDirection: "column",
         }}
       >
-        <Navbar />
+        <Navbar unreadCount={unreadCount} />
+
         <main
           style={{
             flex: 1,

@@ -1,80 +1,185 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  align-items: center;
+
+  gap: 1rem;
+
+  margin-bottom: 2rem;
 }
 
-.label {
-  font-weight: 600;
-}
+/* Empty Upload */
 
 .uploadBox {
-  border: 2px dashed #d1d5db;
-  border-radius: 12px;
-  padding: 40px;
-  cursor: pointer;
-  text-align: center;
-}
-
-.previewGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
-}
-
-.preview {
-  position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 12px;
-  overflow: hidden;
+  max-width: 420px;
+
+  aspect-ratio: 1;
+
+  border: 2px dashed #d1d5db;
+  border-radius: 18px;
+
+  background: #fafafa;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 1rem;
+
+  cursor: pointer;
+
+  transition: .25s;
 }
 
-.image {
+.uploadBox:hover:not(:disabled) {
+  border-color: #2563eb;
+
+  background: #eff6ff;
+
+  color: #2563eb;
+}
+
+.uploadBox span {
+  font-size: 1rem;
+
+  font-weight: 600;
+
+  color: #374151;
+}
+
+.uploadBox small {
+  color: #9ca3af;
+}
+
+/* Featured Preview */
+
+.featuredPreview {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 16 / 9;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+  background: #f3f4f6;
+}
+
+.featuredPreview img {
+  width: 100%;
+  height: 100%;
+
   object-fit: cover;
 }
 
+/* Remove Button */
+
 .removeButton {
   position: absolute;
-  top: 6px;
-  right: 6px;
 
-  width: 28px;
-  height: 28px;
+  top: 12px;
+  right: 12px;
+
+  width: 38px;
+  height: 38px;
 
   border: none;
   border-radius: 50%;
-  background: rgba(0,0,0,.6);
-  color: white;
-  cursor: pointer;
+
+  background: white;
 
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+
+  box-shadow: 0 6px 15px rgba(0,0,0,.2);
+
+  transition: .2s;
 }
 
-.previewGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 12px;
+.removeButton:hover {
+  transform: scale(1.08);
 }
 
-.preview {
-  position: relative;
-  aspect-ratio: 1;
+/* Thumbnails */
+
+.thumbnailRow {
+  width: 100%;
+
+  display: flex;
+
+  gap: .75rem;
+
+  overflow-x: auto;
+
+  padding-bottom: .25rem;
+}
+
+.thumbnail,
+.addThumbnail {
+  width: 84px;
+  height: 84px;
+
+  flex-shrink: 0;
+
+  border: none;
+
+  border-radius: 14px;
+
   overflow: hidden;
-  border-radius: 12px;
+
+  cursor: pointer;
+
+  transition: .2s;
 }
 
-.image {
+.thumbnail {
+  background: #f3f4f6;
+}
+
+.thumbnail:hover {
+  transform: translateY(-2px);
+}
+
+.thumbnail img {
   width: 100%;
   height: 100%;
+
   object-fit: cover;
-  display: block;
 }
 
-.removeButton {
-  position: absolute;
-  top: 6px;
-  right: 6px;
+/* Add Button */
+
+.addThumbnail {
+  border: 2px dashed #cbd5e1;
+
+  background: white;
+
+  color: #2563eb;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.addThumbnail:hover {
+  border-color: #2563eb;
+
+  background: #eff6ff;
+}
+
+/* Counter */
+
+.counter {
+  font-size: .9rem;
+
+  color: #6b7280;
+
+  text-align: center;
 }

@@ -1,31 +1,71 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./SwapActions.module.css";
+import CreateSwapRequest from "@/app/components/SwapRequests/CreateSwapRequest/CreateSwapRequest";
+import MessageSellerButton from "@/app/components/Chat/MessageSellerButton";
 
 interface SwapActionsProps {
-  onRequestSwap?: () => void;
-  onChat?: () => void;
+  requestedListingId: string;
+  hasPendingRequest: boolean;
+  isAuthenticated?: boolean;
 }
 
 export default function SwapActions({
-  onRequestSwap,
-  onChat,
+  requestedListingId,
+  hasPendingRequest,
+  isAuthenticated = true,
 }: SwapActionsProps) {
-  return (
-    <section className={styles.container}>
-      <button
-        className={styles.primaryButton}
-        onClick={onRequestSwap}
-      >
-        Request Swap
-      </button>
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
 
-      <button
-        className={styles.secondaryButton}
-        onClick={onChat}
-      >
-        Chat Owner
-      </button>
-    </section>
+  const handleProposeSwap = () => {
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+    setOpen(true);
+  };
+
+  return (
+    <>
+      <section className={styles.container}>
+        <MessageSellerButton listingId={requestedListingId} />
+
+        {
+          hasPendingRequest ? (
+            <button
+              className={styles.primaryButton}
+              disabled
+            >
+              Request Sent ✓
+            </button>
+          ) : (
+            <button
+              className={styles.primaryButton}
+              onClick={handleProposeSwap}
+            >
+              Propose a swap
+            </button>
+          )
+        }
+      </section>
+
+
+
+      {
+        open && (
+          <CreateSwapRequest
+            requestedListingId={requestedListingId}
+            onClose={() =>
+              setOpen(false)
+            }
+          />
+        )
+      }
+
+
+    </>
   );
 }

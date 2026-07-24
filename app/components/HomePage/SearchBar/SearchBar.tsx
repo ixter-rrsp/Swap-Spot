@@ -1,9 +1,27 @@
-import { Search, SlidersHorizontal } from "lucide-react";
+import {
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
+
 import styles from "./SearchBar.module.css";
 
-export default function SearchBar() {
+interface SearchBarProps {
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+}
+
+export default function SearchBar({
+  value,
+  onChange,
+  disabled = false,
+}: SearchBarProps) {
   return (
-    <section className={styles.container} aria-label="Search items">
+    <section
+      className={styles.container}
+      aria-label="Search items"
+    >
       <div className={styles.searchBox}>
         <Search
           className={styles.searchIcon}
@@ -16,15 +34,31 @@ export default function SearchBar() {
           placeholder="Search items to swap..."
           className={styles.input}
           aria-label="Search items"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
         />
 
-        <button
-          type="button"
-          className={styles.filterButton}
-          aria-label="Filter search"
-        >
-          <SlidersHorizontal size={20} />
-        </button>
+        {value.trim() ? (
+          <button
+            type="button"
+            className={styles.filterButton}
+            aria-label="Clear search"
+            onClick={() => onChange("")}
+            disabled={disabled}
+          >
+            <X size={20} />
+          </button>
+        ) : (
+          <button
+            type="button"
+            className={styles.filterButton}
+            aria-label="Filter search"
+            disabled={disabled}
+          >
+            <SlidersHorizontal size={20} />
+          </button>
+        )}
       </div>
     </section>
   );
