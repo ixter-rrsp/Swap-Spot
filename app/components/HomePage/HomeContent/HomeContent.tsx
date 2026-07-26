@@ -91,16 +91,6 @@ export default function HomeContent({
 
 
 
-  const recommendedListings =
-    filteredListings.slice(0, 4);
-
-
-
-  const newestListings =
-    filteredListings.slice(4, 8);
-
-
-
   const boostedListings =
     filteredListings.filter(
       (listing) =>
@@ -146,23 +136,15 @@ export default function HomeContent({
 
       <ListingGrid
 
-        title="Recommended for You"
+        title="Listings"
 
-        listings={recommendedListings}
-
-        actionLabel="See All"
-
-      />
-
-
-
-      <ListingGrid
-
-        title="Newest Listings"
-
-        listings={newestListings}
+        listings={filteredListings.slice(0, 8)}
 
         actionLabel="See All"
+
+        onActionClick={() =>
+          router.push("/listings")
+        }
 
       />
 

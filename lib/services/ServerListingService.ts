@@ -1,5 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { Listing } from "@/lib/types/Listing";
+import { haversineDistance } from "@/lib/utils/distance";
+import { getFallbackCityCoordinates, resolveListingLandmark } from "./landmark";
 
 export async function getMyListings(): Promise<Listing[]> {
   const supabase = await createClient();
@@ -28,6 +30,7 @@ export async function getMyListings(): Promise<Listing[]> {
       )
     `)
     .eq("owner_id", user.id)
+    .eq("traded", false)
     .order("created_at", {
       ascending: false,
     });
@@ -151,6 +154,7 @@ export async function getListingsByOwner(ownerId: string): Promise<Listing[]> {
       )
     `)
     .eq("owner_id", ownerId)
+    .eq("traded", false)
     .order("created_at", {
       ascending: false,
     });
@@ -230,6 +234,11 @@ export async function getListingById(id: string) {
     title: data.title,
     description: data.description,
     city: data.city,
+    latitude: data.latitude ?? null,
+    longitude: data.longitude ?? null,
+    landmarkLatitude: data.landmark_latitude ?? null,
+    landmarkLongitude: data.landmark_longitude ?? null,
+    nearbyLandmark: data.nearby_landmark ?? null,
     swapValue: data.swap_value,
     lookingFor: data.looking_for,
     boosted: data.boosted,
@@ -272,8 +281,20 @@ export async function getListings() {
         id,
         image_url,
         sort_order
-      )
+      ),
+        profiles (
+          id,
+          username,
+          full_name,
+          avatar_url,
+          rating,
+          badge,
+          city,
+          latitude,
+          longitude
+        )
     `)
+    .eq("traded", false)
     .order("created_at", {
       ascending: false,
     });
@@ -288,7 +309,46 @@ export async function getListings() {
     throw new Error(error.message);
   }
 
-  return data;
+  let currentUserLocation: { latitude: number; longitude: number } | null = null;
+
+  if (user) {
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("latitude, longitude")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileData?.latitude != null && profileData?.longitude != null) {
+      currentUserLocation = {
+        latitude: profileData.latitude,
+        longitude: profileData.longitude,
+      };
+    }
+  }
+
+  return (data ?? []).map((row: any) => {
+    const ownerProfile = row.profiles?.[0] ?? row.profiles ?? null;
+    let distance: number | undefined;
+
+    if (
+      currentUserLocation &&
+      ownerProfile?.latitude != null &&
+      ownerProfile?.longitude != null
+    ) {
+      distance = haversineDistance(
+        currentUserLocation.latitude,
+        currentUserLocation.longitude,
+        ownerProfile.latitude,
+        ownerProfile.longitude
+      );
+    }
+
+    return {
+      ...row,
+      distance,
+      profiles: ownerProfile,
+    };
+  });
 }
 
 export async function deleteListing(id: string) {
@@ -362,6 +422,7 @@ export async function updateListing(
     city: string;
     lookingFor: string;
     swapValue: number;
+    showOnMap?: boolean;
     images: string[];
   }
 ) {
@@ -385,7 +446,7 @@ export async function updateListing(
     error: listingError,
   } = await supabase
     .from("listings")
-    .select("owner_id")
+    .select("owner_id, city")
     .eq("id", id)
     .single();
 
@@ -423,6 +484,54 @@ export async function updateListing(
     }
   }
 
+  console.log("[updateListing] input", { id, data });
+
+  const profileLocation = await supabase
+    .from("profiles")
+    .select("city, latitude, longitude")
+    .eq("id", user.id)
+    .single();
+
+  let landmarkUpdate = {};
+
+  const fallbackCity = profileLocation.data?.city || data.city || listing.city || "";
+  const fallbackCoordinates = getFallbackCityCoordinates(fallbackCity);
+
+  if (!profileLocation.error && profileLocation.data?.latitude != null && profileLocation.data?.longitude != null) {
+    const landmarkInfo = await resolveListingLandmark(
+      profileLocation.data.latitude,
+      profileLocation.data.longitude,
+      fallbackCity
+    );
+    const resolvedCity = landmarkInfo.city || fallbackCity || "";
+    const resolvedLandmark = landmarkInfo.landmark || fallbackCity || null;
+    const resolvedLatitude = landmarkInfo.landmarkLatitude ?? fallbackCoordinates?.lat ?? null;
+    const resolvedLongitude = landmarkInfo.landmarkLongitude ?? fallbackCoordinates?.lon ?? null;
+
+    console.log("[updateListing] landmark info", {
+      landmarkInfo,
+      fallbackCity,
+      resolvedCity,
+      resolvedLandmark,
+      resolvedLatitude,
+      resolvedLongitude,
+    });
+
+    landmarkUpdate = {
+      city: resolvedCity,
+      nearby_landmark: resolvedLandmark,
+      landmark_latitude: resolvedLatitude,
+      landmark_longitude: resolvedLongitude,
+    };
+  } else {
+    landmarkUpdate = {
+      city: fallbackCity,
+      nearby_landmark: fallbackCity || null,
+      landmark_latitude: fallbackCoordinates?.lat ?? null,
+      landmark_longitude: fallbackCoordinates?.lon ?? null,
+    };
+  }
+
   // Update listing details
   const { error: updateError } = await supabase
     .from("listings")
@@ -432,9 +541,13 @@ export async function updateListing(
       city: data.city,
       looking_for: data.lookingFor,
       swap_value: data.swapValue,
+      show_on_map: data.showOnMap ?? true,
+      ...landmarkUpdate,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
+
+  console.log("[updateListing] update result", { updateError });
 
   if (updateError) {
     throw new Error(updateError.message);

@@ -1,0 +1,114 @@
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px;
+  min-width: 260px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #16a34a;
+  font-size: 18px;
+}
+
+.heading {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.deliveryMethod {
+  margin: 2px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.detailsBox {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.detailLine {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #14532d;
+  line-height: 1.4;
+}
+
+.statusRow {
+  margin-bottom: 8px;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.statusGray {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.statusAmber {
+  background: #fef3c7;
+  color: #78350f;
+}
+
+.statusBlue {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.statusGreen {
+  background: #dcfce7;
+  color: #14532d;
+}
+
+.statusRed {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+
+.subStatus {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.viewButton {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 999px;
+  background: #16a34a;
+  color: white;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 13px;
+}

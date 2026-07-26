@@ -1,101 +1,59 @@
 .card {
-    display: flex;
-    align-items: center;
-
-    gap: 16px;
-
-    padding: 16px;
-
-    border-radius: 12px;
-
-    text-decoration: none;
-
-    color: inherit;
-
-    background: white;
-
-    border: 1px solid #e5e7eb;
-
-    transition: 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 4px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  background: transparent;
+  transition: background 0.15s ease;
 }
-
 
 .card:hover {
-    background: #f8fafc;
+  background: #f9fafb;
 }
-
 
 .avatar {
-    width: 55px;
-    height: 55px;
-
-    border-radius: 50%;
-
-    overflow: hidden;
-
-    background: #e5e7eb;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 22px;
-    font-weight: 600;
-
-    flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #2563eb;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+  position: relative;
 }
-
 
 .content {
-    flex: 1;
-
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
-
 
 .content h3 {
-
-    margin: 0;
-
-    font-size: 16px;
-
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
 }
-
-
-.username {
-
-    margin-top: 2px;
-
-    color: #6b7280;
-
-    font-size: 13px;
-
-}
-
-
-.listing {
-
-    margin-top: 8px;
-
-    font-size: 14px;
-
-    font-weight: 600;
-
-}
-
 
 .message {
+  margin-top: 2px;
+  color: #9ca3af;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-    margin-top: 6px;
-
-    color: #6b7280;
-
-    font-size: 14px;
-
-    white-space: nowrap;
-
-    overflow: hidden;
-
-    text-overflow: ellipsis;
-
+.time {
+  color: #9ca3af;
+  font-size: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }

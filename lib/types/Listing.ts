@@ -20,6 +20,18 @@ export interface Listing {
   owner: ListingOwner;
 
   distance?: number;
+
+  latitude?: number | null;
+
+  longitude?: number | null;
+
+  landmarkLatitude?: number | null;
+
+  landmarkLongitude?: number | null;
+
+  nearbyLandmark?: string | null;
+
+  showOnMap?: boolean;
 }
 
 export interface ListingImage {

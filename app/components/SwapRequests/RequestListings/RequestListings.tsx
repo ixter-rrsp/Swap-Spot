@@ -84,7 +84,7 @@ function ListingCard({
 
       <p className={styles.value}>
         <strong>
-          ₱{listing.swapValue.toLocaleString()}
+          {listing.swapValue.toLocaleString()}
         </strong>
       </p>
 

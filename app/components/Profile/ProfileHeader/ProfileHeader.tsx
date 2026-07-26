@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Menu } from "lucide-react";
+import MenuDrawer from "@/app/components/UI/MenuDrawer";
 
 import styles from "./ProfileHeader.module.css";
 
@@ -37,6 +39,8 @@ export default function ProfileHeader({
 }: ProfileHeaderProps) {
 
   const [following, setFollowing] = useState(isFollowing);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [localAvatar, setLocalAvatar] = useState<string | null | undefined>(avatarUrl ?? null);
 
   const memberSinceYear =
     memberSince === undefined
@@ -62,17 +66,40 @@ export default function ProfileHeader({
     onToggleFollow?.(next);
   };
 
+  // Listen for optimistic avatar updates
+  useEffect(() => {
+    setLocalAvatar(avatarUrl ?? null);
+  }, [avatarUrl]);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const custom = e as CustomEvent;
+      const detail = custom?.detail;
+      if (detail?.avatarUrl) {
+        setLocalAvatar(detail.avatarUrl);
+      }
+    };
+
+    window.addEventListener("swapspot:avatar-updated", handler as EventListener);
+    return () => window.removeEventListener("swapspot:avatar-updated", handler as EventListener);
+  }, []);
+
 
   return (
-    <section className={styles.container}>
+    <>
+    <section className={styles.container} style={{ position: "relative" }}>
+      <button
+        type="button"
+        className={styles.menuButton}
+        aria-label="Open menu"
+        onClick={() => setMenuOpen(true)}
+      >
+        <Menu size={22} />
+      </button>
 
       <div className={styles.avatar}>
-        {avatarUrl ? (
-          <img
-            src={avatarUrl}
-            alt={username}
-            className={styles.avatarImage}
-          />
+        {localAvatar ? (
+          <img src={localAvatar} alt={username} className={styles.avatarImage} />
         ) : (
           <span>{username.charAt(0).toUpperCase()}</span>
         )}
@@ -138,5 +165,7 @@ export default function ProfileHeader({
       )}
 
     </section>
+    <MenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+    </>
   );
 }

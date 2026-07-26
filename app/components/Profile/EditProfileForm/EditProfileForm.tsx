@@ -120,11 +120,6 @@ export default function EditProfileForm({
   return (
     <main className={styles.container}>
 
-      <h1 className={styles.title}>
-        Edit Profile
-      </h1>
-
-
       <AvatarUploader profile={profile} />
 
 

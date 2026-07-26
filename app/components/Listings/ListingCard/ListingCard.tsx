@@ -26,6 +26,7 @@ interface ListingCardProps {
   boosted?: boolean;
 
   distance?: number;
+  nearbyLandmark?: string | null;
 
   showActions?: boolean;
 }
@@ -41,9 +42,17 @@ export default function ListingCard({
   rating = 0,
   boosted = false,
   distance,
+  nearbyLandmark,
   showActions = false,
 }: ListingCardProps)
  {
+  const getLocationName = (): string => {
+    if (nearbyLandmark) {
+      return `Near ${nearbyLandmark}`;
+    }
+
+    return city ? `Near ${city}` : "Nearby";
+  };
   return (
     <article className={styles.card}>
 
@@ -93,7 +102,7 @@ export default function ListingCard({
           <div className={styles.info}>
             <MapPin size={16} />
             <span>
-              {city}
+              {getLocationName()}
             </span>
           </div>
 
@@ -102,7 +111,11 @@ export default function ListingCard({
             <div className={styles.info}>
               <Navigation size={16} />
               <span>
-                {distance} km away
+                {distance === undefined || Number.isNaN(distance)
+                  ? "Distance unavailable"
+                  : distance < 0.1
+                  ? "Less than 100m away"
+                  : `${distance.toFixed(1)} km away`}
               </span>
             </div>
           )}
@@ -111,7 +124,7 @@ export default function ListingCard({
           <div className={styles.info}>
             <Banknote size={16} />
             <span>
-              ₱{swapValue.toLocaleString()}
+              {swapValue.toLocaleString()}
             </span>
           </div>
 

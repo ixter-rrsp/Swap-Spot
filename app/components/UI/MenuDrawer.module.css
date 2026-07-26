@@ -1,0 +1,133 @@
+/* ── Backdrop ─────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+  display: flex;
+  z-index: 2000;
+
+  /* Mobile default: center the card */
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Shared drawer base ───────────────────────────────── */
+.drawer {
+  background: var(--menu-bg, rgba(255, 255, 255, 0.95));
+  color: var(--menu-text, #111);
+  overflow-y: auto;
+  padding: 1.5rem;
+}
+
+/* ── Mobile card (default / small screens) ───────────── */
+.mobile {
+  width: 90%;
+  max-width: 400px;
+  border-radius: 16px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  animation: popIn 0.22s ease-out forwards;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Desktop drawer (≥ 769px) – slides in from RIGHT ─── */
+@media (min-width: 769px) {
+  .overlay {
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+
+  .desktop {
+    width: 25vw;
+    max-width: 320px;
+    margin-left: auto;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.12);
+    animation: slideInRight 0.25s ease-out forwards;
+  }
+
+  /* Hide the mobile card on desktop */
+  .mobile {
+    display: none;
+  }
+}
+
+/* Hide the desktop drawer on mobile */
+@media (max-width: 768px) {
+  .desktop {
+    display: none;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ── Close button (mobile card) ───────────────────────── */
+.closeBtn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+/* ── Menu list ────────────────────────────────────────── */
+.menuList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.menuItem a {
+  text-decoration: none;
+  color: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.menuItem a:hover {
+  color: #059669;
+}
+
+.logoutLink {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #e74c3c;
+  transition: color 0.2s;
+  text-align: left;
+  width: 100%;
+  padding: 0;
+  font-family: inherit;
+}
+
+.logoutLink:hover {
+  color: #c0392b;
+}

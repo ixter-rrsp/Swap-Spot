@@ -1,3 +1,4 @@
 .profilePage {
   background: #f9fafb;
-}
+  padding-bottom: calc(74px + env(safe-area-inset-bottom) + 16px);
+}

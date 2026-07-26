@@ -30,6 +30,8 @@ import {
 
 import { signUp } from "@/lib/services/AuthService";
 
+import { useToast } from "@/app/components/UI/Toast/ToastContext";
+
 import styles from "./SignupForm.module.css";
 
 import Spinner from "@/app/components/UI/Spinner/Spinner";
@@ -46,6 +48,8 @@ export default function SignupForm() {
   const [loading, setLoading] =
     useState(false);
 
+  const toast = useToast();
+
   const {
     register,
     handleSubmit,
@@ -60,14 +64,16 @@ export default function SignupForm() {
     try {
       await signUp(data);
 
-      alert(
-        "Account created successfully! Please check your email to verify your account."
+      toast(
+        "Account created successfully! Please check your email to verify your account.",
+        "success"
       );
     } catch (error) {
-      alert(
+      toast(
         error instanceof Error
           ? error.message
-          : "Something went wrong."
+          : "Something went wrong.",
+        "error"
       );
     } finally {
       setLoading(false);
@@ -76,11 +82,6 @@ export default function SignupForm() {
 
   return (
     <>
-      <div className={styles.header}>
-        <h1>Create your account</h1>
-        <p>Sign up to start swapping items.</p>
-      </div>
-
       <form
         className={styles.form}
         onSubmit={handleSubmit(onSubmit)}

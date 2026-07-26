@@ -3,6 +3,10 @@ import { createClient } from "@/utils/supabase/server";
 import { SwapRequest } from "@/lib/types/SwapRequest";
 
 import { createNotification } from "@/lib/services/NotificationService";
+import {
+  createOrGetConversation,
+  sendSwapProposalMessage,
+} from "@/lib/services/ServerChatService";
 
 export async function getIncomingRequests(): Promise<SwapRequest[]> {
   const supabase = await createClient();
@@ -254,7 +258,9 @@ export async function createSwapRequest(
 
   }
 
+  const conversation = await createOrGetConversation(requestedListingId);
 
+  await sendSwapProposalMessage(conversation.id, data.id);
 
   await createNotification({
 
@@ -277,7 +283,10 @@ export async function createSwapRequest(
 
 
 
-  return data;
+  return {
+    ...data,
+    conversationId: conversation.id,
+  };
 
 }
 

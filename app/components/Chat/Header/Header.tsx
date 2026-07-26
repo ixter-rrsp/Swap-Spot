@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 import styles from "./ChatHeader.module.css";
 
@@ -6,16 +7,20 @@ interface HeaderProps {
     username: string;
     fullName: string | null;
     avatarUrl: string | null;
+    listingId: string;
     listingTitle: string;
     listingImage: string | null;
+    swapValue?: number;
 }
 
 export default function Header({
     username,
     fullName,
     avatarUrl,
+    listingId,
     listingTitle,
     listingImage,
+    swapValue,
 }: HeaderProps) {
 
     return (
@@ -44,30 +49,38 @@ export default function Header({
                         {fullName || username}
                     </h3>
 
-                    <p>
-                        @{username}
+                    <p className={styles.activeStatus}>
+                        <span className={styles.activeDot} />
+                        Active now
                     </p>
                 </div>
 
             </div>
 
-
-            <div className={styles.listing}>
+            <Link href={`/Listing/${listingId}`} className={styles.listing}>
 
                 {listingImage && (
                     <Image
                         src={listingImage}
                         alt={listingTitle}
-                        width={50}
-                        height={50}
+                        width={36}
+                        height={36}
+                        className={styles.listingImage}
                     />
                 )}
 
-                <span>
-                    {listingTitle}
-                </span>
+                <div className={styles.listingText}>
+                    <span className={styles.listingTitle}>{listingTitle}</span>
+                    {swapValue !== undefined && (
+                        <span className={styles.listingValue}>
+                            Swap value · {swapValue.toLocaleString()}
+                        </span>
+                    )}
+                </div>
 
-            </div>
+                <span className={styles.viewLink}>View listing</span>
+
+            </Link>
 
         </header>
     );

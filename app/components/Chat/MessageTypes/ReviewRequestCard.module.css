@@ -1,0 +1,68 @@
+.card {
+  background-color: var(--card-bg, #ffffff);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 12px;
+  padding: 16px;
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.heading {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary, #666666);
+  text-transform: uppercase;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.body {
+  font-size: 14px;
+  color: var(--text-primary, #333333);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.reviewButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color, #007bff);
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.2s;
+}
+
+.reviewButton:hover {
+  background-color: var(--primary-color-dark, #0056b3);
+}
+
+.completedState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--success-bg, #e8f5e9);
+  color: var(--success-color, #2e7d32);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  width: 100%;
+  text-align: center;
+  border: 1px solid var(--success-border, #c8e6c9);
+}

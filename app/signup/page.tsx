@@ -1,18 +1,13 @@
 import styles from "./page.module.css";
 
 import SignupForm from "@/app/components/Auth/SignupForm/SignupForm";
+import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
 
 export default function SignupPage() {
   return (
     <main className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>
-          Create Account
-        </h1>
-
-        <p className={styles.subtitle}>
-          Join SwapSpot and start swapping.
-        </p>
+        <PageHeader title="Create Account" subtitle="Join SwapSpot and start swapping." />
 
         <SignupForm />
       </div>

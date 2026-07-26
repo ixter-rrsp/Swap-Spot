@@ -24,6 +24,9 @@ export default function NotificationItem({
 
   function getIcon() {
     switch (notification.type) {
+      case "new_message":
+        return "💬";
+
       case "swap_request":
         return "🔄";
 
@@ -72,52 +75,56 @@ export default function NotificationItem({
     return `${Math.floor(days / 7)}w`;
   }
 
-    function handleClick() {
+  function handleClick() {
     startTransition(async () => {
+      if (!notification.isRead) {
+        await markNotificationAsReadAction(notification.id);
+      }
 
-        if (!notification.isRead) {
-        await markNotificationAsReadAction(
-            notification.id
-        );
+      if (notification.referenceId) {
+        if (notification.type === "new_message") {
+          router.push(`/messages/${notification.referenceId}`);
+          return;
         }
 
+        if (notification.type === "swap_request") {
+          router.push(`/swap-requests/${notification.referenceId}`);
+          return;
+        }
 
         if (
-        notification.type === "swap_request" &&
-        notification.referenceId
+          notification.type === "swap_accepted" ||
+          notification.type === "swap_declined" ||
+          notification.type === "swap_cancelled"
         ) {
-
-        router.push(
-            `/swap-requests/${notification.referenceId}`
-        );
-
-        return;
-
+          router.push(`/swap-requests/${notification.referenceId}`);
+          return;
         }
 
+        if (
+          notification.type === "agreement_created" ||
+          notification.type === "agreement_confirmed" ||
+          notification.type === "agreement_completed" ||
+          notification.type === "agreement_cancelled"
+        ) {
+          router.push(`/agreements/${notification.referenceId}`);
+          return;
+        }
+      }
 
-        router.push("/notifications");
-
+      router.push("/notifications");
     });
-    }
+  }
 
   return (
     <article
-      className={`${styles.card} ${
-        !notification.isRead
-          ? styles.unread
-          : ""
-      }`}
+      className={styles.card}
       onClick={handleClick}
     >
       <div className={styles.iconContainer}>
         <span className={styles.icon}>
           {getIcon()}
         </span>
-
-        {!notification.isRead && (
-          <span className={styles.dot} />
-        )}
       </div>
 
       <div className={styles.content}>
@@ -126,13 +133,19 @@ export default function NotificationItem({
         <p>{notification.message}</p>
       </div>
 
-      <span className={styles.time}>
-        {isPending
-          ? "..."
-          : getRelativeTime(
-              notification.createdAt
-            )}
-      </span>
+      <div className={styles.meta}>
+        <span className={styles.time}>
+          {isPending
+            ? "..."
+            : getRelativeTime(
+                notification.createdAt
+              )}
+        </span>
+
+        {!notification.isRead && (
+          <span className={styles.dot} />
+        )}
+      </div>
     </article>
   );
 }

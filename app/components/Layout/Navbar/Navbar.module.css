@@ -1,8 +1,144 @@
-.navbar {
+.navWrapper {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
+
+  z-index: 1000;
+
+  touch-action: none;
+
+  /* transform is written directly via a ref for every drag frame;
+     this transition only governs the snap-open/snap-closed settle
+     once the pointer is released (the "dragging" class below turns
+     it off mid-gesture so the finger never fights an easing curve). */
+  transition: transform 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.navWrapper.dragging {
+  transition: none;
+}
+
+/* ---------------------------------------------------------- */
+/* Drag handle — always present, sitting just above the navbar */
+/* so a curious finger can find it, but subtle enough to read  */
+/* as a normal design flourish rather than a control.          */
+/* ---------------------------------------------------------- */
+
+.dragHandle {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%);
+
+  width: 40px;
+  height: 4px;
+
+  border-radius: 999px;
+
+  background: #86efac;
+  opacity: 0.5;
+
+  transition:
+    opacity 150ms ease,
+    width 150ms ease;
+
+  pointer-events: none;
+}
+
+.dragHandle.active {
+  opacity: 0.95;
+  width: 50px;
+}
+
+/* ---------------------------------------------------------- */
+/* Hidden footer — stacked below the navbar, tucked out of     */
+/* view (via the wrapper's resting transform) until revealed.  */
+/* ---------------------------------------------------------- */
+
+.hiddenFooter {
+  position: relative;
+
+  padding: 26px 24px calc(22px + env(safe-area-inset-bottom));
+
+  background: linear-gradient(180deg, #ffffff 0%, #f5fff7 50%, #ffffff 100%);
+
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  gap: 6px;
+}
+
+.footerBrand {
+  font-size: 15px;
+  font-weight: 700;
+  color: #16a34a;
+  letter-spacing: 0.2px;
+  margin: 0;
+}
+
+.footerTagline {
+  font-size: 12px;
+  font-weight: 500;
+  color: #4b5563;
+  margin: 0 0 4px;
+}
+
+.footerDescription {
+  font-size: 12px;
+  color: #6b7280;
+  max-width: 280px;
+  line-height: 1.5;
+  margin: 0 0 10px;
+}
+
+.footerQuote {
+  font-size: 11.5px;
+  font-style: italic;
+  color: #059669;
+  max-width: 260px;
+  line-height: 1.5;
+  margin: 4px 0 10px;
+}
+
+.footerMeta {
+  font-size: 10.5px;
+  color: #9ca3af;
+  margin: 1px 0;
+}
+
+.footerCredit {
+  font-size: 10.5px;
+  color: #9ca3af;
+  margin: 1px 0;
+}
+
+.footerCredit strong {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.footerEasterEgg {
+  font-size: 10.5px;
+  color: #86efac;
+  margin: 8px 0 0;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------- */
+/* Existing navbar (untouched visually)                        */
+/* ---------------------------------------------------------- */
+
+.navbar {
+  position: relative;
 
   height: 74px;
   padding-bottom: env(safe-area-inset-bottom);
@@ -12,7 +148,7 @@
 
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
 
-  z-index: 1000;
+  touch-action: none;
 }
 
 .navContent {
@@ -118,6 +254,14 @@
   outline-offset: 4px;
 }
 
+.postButtonIcon {
+  transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.postButtonIcon.flipped {
+  transform: rotate(180deg);
+}
+
 @media (max-width: 380px) {
   .postButton {
     width: 62px;
@@ -167,4 +311,12 @@
   justify-content: center;
 
   border: 2px solid white;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navWrapper,
+  .postButtonIcon,
+  .dragHandle {
+    transition: none !important;
+  }
 }

@@ -236,3 +236,84 @@
   color: #374151;
   font-size: 0.9rem;
 }
+
+/* Toggle Switch */
+
+.toggleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.6rem;
+}
+
+.toggleLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.toggleLabel .label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #2563eb;
+  text-transform: uppercase;
+}
+
+.toggleLabel .helper {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: #6b7280;
+  text-transform: none;
+}
+
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 48px;
+  height: 28px;
+  background-color: #ccc;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.toggle input {
+  display: none;
+}
+
+.toggle.enabled {
+  background-color: #65a30d;
+}
+
+.toggle.disabled {
+  background-color: #d1d5db;
+}
+
+.toggleCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.toggle.enabled .toggleCircle {
+  transform: translateX(20px);
+}
+
+.toggle:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

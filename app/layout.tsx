@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "./components/Layout/Navbar/Navbar";
-import { getUnreadNotificationCount } from "@/lib/services/ServerNotificationService";
+import ConditionalNavbar from "./components/Layout/Navbar/ConditionalNavBar";
+import Providers from "./components/Providers/Providers";
+import { getUnreadActivityCount } from "@/lib/services/ServerNotificationService";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,8 +25,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const unreadCount =
-    await getUnreadNotificationCount();
+  const unreadCount = await getUnreadActivityCount();
 
   return (
     <html
@@ -56,18 +56,20 @@ export default async function RootLayout({
           flexDirection: "column",
         }}
       >
-        <Navbar unreadCount={unreadCount} />
+        <ConditionalNavbar unreadCount={unreadCount} />
 
-        <main
-          style={{
-            flex: 1,
-            overflow: "auto",
-            paddingTop: "env(safe-area-inset-top)",
-            paddingBottom: "env(safe-area-inset-bottom)",
-          }}
-        >
-          {children}
-        </main>
+        <Providers>
+          <main
+            style={{
+              flex: 1,
+              overflow: "auto",
+              paddingTop: "env(safe-area-inset-top)",
+              paddingBottom: "env(safe-area-inset-bottom)",
+            }}
+          >
+            {children}
+          </main>
+        </Providers>
       </body>
     </html>
   );

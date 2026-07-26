@@ -1,0 +1,95 @@
+.card {
+  background: white;
+  border-radius: 14px;
+  padding: 14px;
+  min-width: 260px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.heading {
+  margin: 0 0 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+
+.items {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.image {
+  border-radius: 12px;
+  object-fit: cover;
+  background: #2563eb;
+}
+
+.itemTitle {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.declineButton {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.acceptButton {
+  flex: 1;
+  border: none;
+  background: #16a34a;
+  color: white;
+  padding: 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.declineButton:disabled,
+.acceptButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.viewButton {
+  display: block;
+  text-align: center;
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 10px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}

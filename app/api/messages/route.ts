@@ -1,22 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { sendMessage } from "@/lib/services/ServerChatService";
+import { sendChatMessage } from "@/lib/services/ServerChatService";
 
-
-export async function POST(
-    request: NextRequest
-) {
+export async function POST(request: NextRequest) {
     try {
-        const {
-            conversationId,
-            message,
-        } = await request.json();
+        const contentType = request.headers.get("content-type") ?? "";
 
+        let conversationId = "";
+        let message = "";
+        let files: File[] = [];
 
-        if (!conversationId || !message) {
+        if (contentType.includes("multipart/form-data")) {
+            const formData = await request.formData();
+            conversationId = String(formData.get("conversationId") ?? "").trim();
+            message = String(formData.get("message") ?? "").trim();
+            files = Array.from(formData.entries())
+                .filter(([, value]) => value instanceof File)
+                .map(([, value]) => value as File);
+        } else {
+            const body = await request.json();
+            conversationId = String(body?.conversationId ?? "").trim();
+            message = String(body?.message ?? "").trim();
+        }
+
+        if (!conversationId) {
             return NextResponse.json(
                 {
-                    error: "Conversation ID and message are required.",
+                    error: "Conversation ID is required.",
                 },
                 {
                     status: 400,
@@ -24,17 +34,9 @@ export async function POST(
             );
         }
 
+        await sendChatMessage(conversationId, message, files);
 
-        await sendMessage(
-            conversationId,
-            message
-        );
-
-
-        return NextResponse.json({
-            success: true,
-        });
-
+        return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json(
             {

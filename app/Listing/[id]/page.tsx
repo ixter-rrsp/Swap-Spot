@@ -98,7 +98,7 @@ export default async function ListingPage({
 
       <ListingInfo
         title={listing.title}
-        location={listing.city}
+        location={listing.nearbyLandmark ? `Near ${listing.nearbyLandmark}` : listing.city}
         swapValue={listing.swapValue}
         lookingFor={listing.lookingFor}
         description={listing.description}

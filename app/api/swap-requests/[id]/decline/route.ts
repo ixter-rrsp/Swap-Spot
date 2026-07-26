@@ -31,23 +31,12 @@ export async function PATCH(
 
     await declineSwapRequest(id);
 
-    return NextResponse.json({
-      success: true,
-    });
-
+    return NextResponse.json({ success: true });
   } catch (error) {
-
     console.error(error);
-
-    return NextResponse.json(
-      {
-        success: false,
-      },
-      {
-        status: 500,
-      }
-    );
-
+    const message = error instanceof Error ? error.message : "Failed to decline swap request.";
+    const status = message === "Unauthorized." ? 401 : 400;
+    return NextResponse.json({ error: message }, { status });
   }
 
 }

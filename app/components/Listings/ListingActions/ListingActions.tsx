@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
+import { useToast } from "@/app/components/UI/Toast/ToastContext";
 import styles from "./ListingActions.module.css";
 
 interface ListingActionsProps {
@@ -12,6 +13,7 @@ interface ListingActionsProps {
 
 export default function ListingActions({ listingId }: ListingActionsProps) {
   const router = useRouter();
+  const toast = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPressing, setIsPressing] = useState(false);
 
@@ -43,7 +45,10 @@ export default function ListingActions({ listingId }: ListingActionsProps) {
       router.refresh();
     } catch (error) {
       console.error("DELETE ERROR:", error);
-      alert(error instanceof Error ? error.message : "Something went wrong.");
+      toast(
+        error instanceof Error ? error.message : "Something went wrong.",
+        "error"
+      );
     } finally {
       setIsDeleting(false);
     }

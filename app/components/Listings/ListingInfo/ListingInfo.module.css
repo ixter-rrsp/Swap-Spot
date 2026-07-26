@@ -55,10 +55,9 @@
 
 .value {
   margin: 0;
-
-  font-size: 24px;
-  font-weight: 700;
-
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: #2563eb;
 }
 

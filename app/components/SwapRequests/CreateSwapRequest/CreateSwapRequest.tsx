@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./CreateSwapRequest.module.css";
 import { Listing } from "@/lib/types/Listing";
+import { createSwapRequest } from "@/lib/services/SwapRequestService";
 
 interface Props {
   requestedListingId: string;
@@ -21,6 +22,7 @@ export default function CreateSwapRequest({
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadListings() {
@@ -34,6 +36,7 @@ export default function CreateSwapRequest({
         setListings(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error(error);
+        setError("Failed to load your listings.");
       } finally {
         setLoading(false);
       }
@@ -44,45 +47,29 @@ export default function CreateSwapRequest({
 
   async function handleSubmit() {
     if (!selectedListing) {
+      setError("Please select a listing to offer.");
       return;
     }
 
+    setError(null);
+    setSubmitting(true);
+
     try {
-      setSubmitting(true);
-
-      const response = await fetch(
-        "/api/swap-requests",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            offeredListingId: selectedListing,
-            requestedListingId,
-          }),
-        }
-      );
-
-      if (response.status === 401) {
-        router.push("/login");
-        return;
-      }
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to send swap request.");
-      }
+      const result = await createSwapRequest(selectedListing, requestedListingId);
 
       setSent(true);
+
+      if (result?.conversationId) {
+        router.push(`/messages/${result.conversationId}`);
+        return;
+      }
 
       setTimeout(() => {
         onClose();
       }, 1500);
     } catch (error) {
       console.error(error);
-      alert(error instanceof Error ? error.message : "Failed to send swap request.");
-    } finally {
+      setError(error instanceof Error ? error.message : "Failed to send swap request.");
       setSubmitting(false);
     }
   }
@@ -97,9 +84,16 @@ export default function CreateSwapRequest({
           ×
         </button>
 
-        <h2>
+        <h2 className={styles.title}>
           Choose your offer
         </h2>
+        <p className={styles.subtitle}>Select the item you want to trade for this listing.</p>
+
+        {error && (
+          <div className={styles.error}>
+            {error}
+          </div>
+        )}
 
         {loading ? (
           <p>
@@ -107,7 +101,7 @@ export default function CreateSwapRequest({
           </p>
         ) : listings.length === 0 ? (
           <p>
-            You have no listings.
+            You have no listings. Please create a listing first before making swap requests.
           </p>
         ) : (
           <div className={styles.list}>
@@ -119,17 +113,18 @@ export default function CreateSwapRequest({
                     ? styles.selected
                     : styles.item
                 }
-                onClick={() =>
-                  setSelectedListing(
-                    listing.id
-                  )
-                }
+                onClick={() => {
+                  setSelectedListing(listing.id);
+                  setError(null);
+                }}
               >
-                <strong>
-                  {listing.title}
-                </strong>
-                <span>
-                  ₱
+                <div>
+                  <strong>
+                    {listing.title}
+                  </strong>
+                  <p className={styles.itemMeta}>{listing.city || "No location set"}</p>
+                </div>
+                <span className={styles.itemValue}>
                   {listing.swapValue.toLocaleString()}
                 </span>
               </button>
@@ -138,21 +133,19 @@ export default function CreateSwapRequest({
         )}
 
         <button
-        className={styles.submit}
-        disabled={
+          className={styles.submit}
+          disabled={
             !selectedListing ||
             submitting ||
-            sent
-        }
-        onClick={handleSubmit}
+            sent ||
+            loading
+          }
+          onClick={handleSubmit}
         >
-        {
-            sent
-            ? "Request Sent ✓"
-            : submitting
-                ? "Sending..."
-                : "Send Request"
-        }
+          {submitting
+            ? "Sending..."
+            : "Send Request"
+          }
         </button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 import styles from "./RequestCard.module.css";
 
@@ -14,6 +15,10 @@ interface RequestCardProps {
   onAccept?: (id: string) => void;
 
   onDecline?: (id: string) => void;
+
+  hideActions?: boolean;
+
+  href?: string;
 }
 
 export default function RequestCard({
@@ -21,6 +26,8 @@ export default function RequestCard({
   isIncoming,
   onAccept,
   onDecline,
+  hideActions,
+  href,
 }: RequestCardProps) {
 
   const otherUser = isIncoming
@@ -113,15 +120,16 @@ export default function RequestCard({
 
 
       {isIncoming &&
-        request.status === "pending" && (
+        request.status === "pending" && !hideActions && (
 
         <div className={styles.actions}>
 
           <button
             className={styles.accept}
-            onClick={() =>
-              onAccept?.(request.id)
-            }
+            onClick={(e) => {
+              e.preventDefault();
+              onAccept?.(request.id);
+            }}
           >
             Accept
           </button>
@@ -129,15 +137,24 @@ export default function RequestCard({
 
           <button
             className={styles.decline}
-            onClick={() =>
-              onDecline?.(request.id)
-            }
+            onClick={(e) => {
+              e.preventDefault();
+              onDecline?.(request.id);
+            }}
           >
             Decline
           </button>
 
         </div>
 
+      )}
+
+      {href && (
+        <div className={styles.actions} style={{ marginTop: 8 }}>
+          <Link href={href} className={styles.accept} style={{ backgroundColor: '#f0f4f8', color: '#007bff', textAlign: 'center', width: '100%', display: 'block', textDecoration: 'none' }}>
+            View Request
+          </Link>
+        </div>
       )}
 
 
@@ -196,7 +213,7 @@ function ListingPreview({
 
 
       <strong>
-        ₱{swapValue.toLocaleString()}
+        {swapValue.toLocaleString()}
       </strong>
 
 

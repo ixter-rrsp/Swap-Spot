@@ -4,10 +4,12 @@ import { useRouter } from "next/navigation";
 
 interface MessageSellerButtonProps {
     listingId: string;
+    className?: string;
 }
 
 export default function MessageSellerButton({
     listingId,
+    className,
 }: MessageSellerButtonProps) {
     const router = useRouter();
 
@@ -36,7 +38,7 @@ export default function MessageSellerButton({
     }
 
     return (
-        <button onClick={handleClick}>
+        <button className={className} onClick={handleClick}>
             Message Seller
         </button>
     );

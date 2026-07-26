@@ -1,0 +1,88 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 4px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background 0.15s ease;
+}
+
+.row:hover,
+.row.selected {
+  background: #f9fafb;
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #2563eb;
+  font-size: 18px;
+}
+
+.textBlock {
+  flex: 1;
+  min-width: 0;
+}
+
+.textBlock h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.textBlock p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: #9ca3af;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  flex-shrink: 0;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #16a34a;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.expanded {
+  padding: 4px 4px 8px 56px;
+}
+
+.statusMessage,
+.errorMessage {
+  padding: 12px;
+  border-radius: 10px;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 13px;
+}
+
+.errorMessage {
+  background: #fef2f2;
+  color: #991b1b;
+}
