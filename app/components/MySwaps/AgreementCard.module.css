@@ -136,6 +136,16 @@
   word-break: break-word;
 }
 
+.nextStep {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 13px;
+  border: 1px solid #e2e8f0;
+}
+
 .details {
   display: flex;
   flex-wrap: wrap;

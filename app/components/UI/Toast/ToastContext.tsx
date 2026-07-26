@@ -48,7 +48,7 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
   return (
     <ToastContext.Provider value={show}>
       {children}
-      <div className={styles.toastContainer} data-nextjs-toast>
+      <div className={styles.toastContainer} data-nextjs-toast role="status" aria-live="polite">
         {toasts.map((t) => (
           <div key={t.id} className={`${styles.toast} ${t.type ?? ""}`}>
             <span>{t.message}</span>
