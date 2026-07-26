@@ -16,7 +16,12 @@ export default function MySwapList({ title, emptyMessage, children, isEmpty }: M
         <Link href="/profile" className={styles.backButton}>
           ← Back to Dashboard
         </Link>
-        <h2 className={styles.title}>{title}</h2>
+        <div className={styles.headerContent}>
+          <h2 className={styles.title}>{title}</h2>
+          <p className={styles.subtitle}>
+            Keep track of the latest status and next step for each swap in one place.
+          </p>
+        </div>
       </div>
 
       {isEmpty ? (

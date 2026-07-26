@@ -23,6 +23,11 @@
   font-size: 14px;
   transform-origin: top right;
   animation: toastIn 220ms ease;
+  max-width: min(320px, calc(100vw - 32px));
+}
+
+.toast span {
+  flex: 1;
 }
 
 .toast.success { background: #065f46; }

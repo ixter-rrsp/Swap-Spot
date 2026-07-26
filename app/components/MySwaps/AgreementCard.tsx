@@ -14,7 +14,43 @@ interface AgreementCardProps {
   reviewStatus?: ReviewStatus;
 }
 
+function getStatusLabel(status: string) {
+  return status.replace(/_/g, " ");
+}
+
+function getNextStep(status: string) {
+  switch (status) {
+    case "pending_confirmation":
+      return "Confirm the agreement and lock in the handoff.";
+    case "confirmed":
+      return "Complete the exchange and close the swap.";
+    case "completed":
+      return "Swap completed. Share a review if you want.";
+    case "cancelled":
+      return "This agreement was cancelled.";
+    default:
+      return "Keep the handoff details clear and up to date.";
+  }
+}
+
+function formatDeliveryMethod(method: string) {
+  switch (method) {
+    case "meetup":
+      return "Meetup";
+    case "lalamove":
+      return "Courier";
+    case "other_courier":
+      return "Courier";
+    default:
+      return method;
+  }
+}
+
 export default function AgreementCard({ agreement, reviewStatus }: AgreementCardProps) {
+  const statusLabel = getStatusLabel(agreement.status);
+  const nextStep = getNextStep(agreement.status);
+  const deliveryLabel = formatDeliveryMethod(agreement.deliveryMethod);
+
   return (
     <article className={styles.card}>
       <div className={styles.header}>
@@ -38,7 +74,7 @@ export default function AgreementCard({ agreement, reviewStatus }: AgreementCard
           </div>
         </div>
         <span className={`${styles.status} ${styles[agreement.status]}`}>
-          {agreement.status.replace("_", " ")}
+          {statusLabel}
         </span>
       </div>
 
@@ -56,15 +92,17 @@ export default function AgreementCard({ agreement, reviewStatus }: AgreementCard
         />
       </div>
 
+      <div className={styles.nextStep}>{nextStep}</div>
+
       <div className={styles.details}>
-        <p><strong>Method:</strong> {agreement.deliveryMethod}</p>
-        <p><strong>Updated:</strong> {new Date(agreement.updatedAt).toLocaleDateString()}</p>
+        <p><strong>Method:</strong> {deliveryLabel}</p>
+        <p><strong>Updated:</strong> {new Date(agreement.updatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</p>
         <p className={styles.metaPill}><MapPin size={14} /> {agreement.meetupLocation || agreement.pickupAddress || "Location shared"}</p>
       </div>
 
       <div className={styles.actions}>
         <Link href={`/agreements/${agreement.id}`} className={styles.actionButton}>
-          View Agreement
+          Open Agreement
         </Link>
         {reviewStatus && !reviewStatus.currentUserReviewed && (
           <Link href={`/reviews/${agreement.id}`} className={styles.reviewButton}>

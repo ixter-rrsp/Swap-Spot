@@ -13,37 +13,52 @@ const CONDITION_LABELS: Record<string, string> = {
   needs_repair: "Needs Repair",
 };
 
+function formatOptionalValue(value?: string | null) {
+  return value?.trim() ? value : "To be shared";
+}
+
 export default function AgreementDeliveryDetails({
   agreement,
 }: AgreementDeliveryDetailsProps) {
+  const isMeetup = agreement.deliveryMethod === "meetup";
+
   return (
     <section className={styles.section}>
-      <h3 className={styles.heading}>Delivery</h3>
+      <div className={styles.summaryCard}>
+        <p className={styles.summaryTitle}>{isMeetup ? "Meetup handoff" : "Delivery handoff"}</p>
+        <p className={styles.summaryText}>
+          {isMeetup
+            ? "Use the meetup details below to make the handoff simple, clear, and easy to find."
+            : "Use the pickup and drop-off details below to keep the delivery process moving smoothly."}
+        </p>
+      </div>
 
-      {agreement.deliveryMethod === "meetup" ? (
+      <h3 className={styles.heading}>{isMeetup ? "Meetup Details" : "Delivery Details"}</h3>
+
+      {isMeetup ? (
         <div className={styles.grid}>
           <div>
             <p className={styles.label}>Meeting Place</p>
-            <p className={styles.value}>{agreement.meetupLocation || "—"}</p>
+            <p className={styles.value}>{formatOptionalValue(agreement.meetupLocation)}</p>
           </div>
           <div>
             <p className={styles.label}>Date</p>
-            <p className={styles.value}>{agreement.meetupDate || "—"}</p>
+            <p className={styles.value}>{formatOptionalValue(agreement.meetupDate)}</p>
           </div>
           <div>
             <p className={styles.label}>Time</p>
-            <p className={styles.value}>{agreement.meetupTime || "—"}</p>
+            <p className={styles.value}>{formatOptionalValue(agreement.meetupTime)}</p>
           </div>
         </div>
       ) : (
         <div className={styles.grid}>
           <div>
             <p className={styles.label}>Pickup Address</p>
-            <p className={styles.value}>{agreement.pickupAddress || "—"}</p>
+            <p className={styles.value}>{formatOptionalValue(agreement.pickupAddress)}</p>
           </div>
           <div>
             <p className={styles.label}>Drop-off Address</p>
-            <p className={styles.value}>{agreement.dropoffAddress || "—"}</p>
+            <p className={styles.value}>{formatOptionalValue(agreement.dropoffAddress)}</p>
           </div>
         </div>
       )}
@@ -52,13 +67,13 @@ export default function AgreementDeliveryDetails({
       <div className={styles.grid}>
         <div>
           <p className={styles.label}>Requester</p>
-          <p className={styles.value}>{agreement.phoneRequester || "—"}</p>
-          <p className={styles.value}>{agreement.emailRequester || "—"}</p>
+          <p className={styles.value}>{formatOptionalValue(agreement.phoneRequester)}</p>
+          <p className={styles.value}>{formatOptionalValue(agreement.emailRequester)}</p>
         </div>
         <div>
           <p className={styles.label}>Receiver</p>
-          <p className={styles.value}>{agreement.phoneReceiver || "—"}</p>
-          <p className={styles.value}>{agreement.emailReceiver || "—"}</p>
+          <p className={styles.value}>{formatOptionalValue(agreement.phoneReceiver)}</p>
+          <p className={styles.value}>{formatOptionalValue(agreement.emailReceiver)}</p>
         </div>
       </div>
 
