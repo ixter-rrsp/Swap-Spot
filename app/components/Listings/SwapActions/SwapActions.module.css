@@ -19,23 +19,17 @@
 
 .primaryButton,
 .secondaryButton {
-  flex: 1;
-
   padding: 14px;
-
   border-radius: 999px;
-
   font-size: 15px;
   font-weight: 700;
-
   cursor: pointer;
-
   transition: 0.2s;
 }
 
 .primaryButton {
+  flex: 6;
   border: none;
-
   background: #16a34a;
   color: white;
 }
@@ -45,10 +39,9 @@
 }
 
 .secondaryButton {
+  flex: 4;
   background: white;
-
   color: #111827;
-
   border: 1.5px solid #d1d5db;
 }
 

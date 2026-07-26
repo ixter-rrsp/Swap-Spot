@@ -1,45 +1,5 @@
 .container {
   min-height: 100vh;
-
   padding: 20px 16px 90px;
-
-  background: #f9fafb;
-}
-
-.header {
-  display: flex;
-
-  justify-content: space-between;
-
-  align-items: center;
-
-  margin-bottom: 20px;
-}
-
-.header h1 {
-  margin: 0;
-
-  font-size: 24px;
-
-  font-weight: 700;
-
-  color: #111827;
-}
-
-.markAll {
-  border: none;
-
-  background: transparent;
-
-  color: #16a34a;
-
-  font-size: 14px;
-
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.markAll:hover {
-  text-decoration: underline;
+  background: white;
 }

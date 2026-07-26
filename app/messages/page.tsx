@@ -3,6 +3,7 @@ import {
 } from "@/lib/services/ServerChatService";
 
 import ConversationList from "@/app/components/Chat/ConversationList/ConversationList";
+import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
 
 
 export const dynamic = "force-dynamic";
@@ -23,22 +24,10 @@ export default async function MessagesPage() {
 
     return (
 
-        <main
-            style={{
-                padding: "24px",
-            }}
-        >
+        <main style={{ padding: "24px" }}>
+            <PageHeader title="Messages" />
 
-            <h1>
-                Messages
-            </h1>
-
-
-            <ConversationList
-                conversations={conversations}
-            />
-
-
+            <ConversationList conversations={conversations} />
         </main>
 
     );

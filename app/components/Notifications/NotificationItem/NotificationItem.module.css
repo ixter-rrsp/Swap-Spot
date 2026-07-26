@@ -1,87 +1,72 @@
 .card {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 14px;
-
-  padding: 16px;
-
-  background: white;
-
-  border: 1px solid #ececec;
-
-  border-radius: 14px;
-
-  margin-bottom: 12px;
-
+  padding: 10px 4px;
+  background: transparent;
+  border: none;
   cursor: pointer;
-
-  transition:
-    background .2s,
-    border-color .2s;
+  transition: background 0.15s ease;
 }
 
 .card:hover {
-  background: #fafafa;
-}
-
-.unread {
-  border-left: 4px solid #16a34a;
+  background: #f9fafb;
+  border-radius: 12px;
 }
 
 .iconContainer {
   position: relative;
-
   flex-shrink: 0;
 }
 
 .icon {
-  font-size: 26px;
-}
-
-.dot {
-  position: absolute;
-
-  top: -2px;
-  right: -2px;
-
-  width: 10px;
-  height: 10px;
-
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
   border-radius: 50%;
-
-  background: #16a34a;
-
-  border: 2px solid white;
+  background: #2563eb;
+  font-size: 20px;
 }
 
 .content {
   flex: 1;
+  min-width: 0;
 }
 
 .content h3 {
   margin: 0;
-
-  font-size: 15px;
-
+  font-size: 14px;
   font-weight: 700;
-
   color: #111827;
 }
 
 .content p {
-  margin-top: 4px;
+  margin-top: 2px;
+  color: #9ca3af;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-  color: #6b7280;
-
-  font-size: 14px;
-
-  line-height: 1.5;
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .time {
   color: #9ca3af;
-
   font-size: 12px;
-
   white-space: nowrap;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16a34a;
 }

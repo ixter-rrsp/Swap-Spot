@@ -26,7 +26,7 @@ export default function ListingInfo({
 
   return (
     <section className={styles.container}>
-      <h1 className={styles.title}>{title}</h1>
+      <h2 className={styles.title}>{title}</h2>
 
       <div className={styles.meta}>
         <span className={styles.location}>
@@ -45,7 +45,7 @@ export default function ListingInfo({
       <div className={styles.card}>
         <h2 className={styles.heading}>Swap Value</h2>
         <p className={styles.value}>
-          ₱{swapValue.toLocaleString()}
+          {swapValue.toLocaleString()}
         </p>
       </div>
 

@@ -1,6 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/app/components/UI/Toast/ToastContext";
 
 import { SwapRequestDetail } from "@/lib/types/SwapRequestDetail";
 
@@ -18,6 +20,9 @@ export default function RequestActions({
 
   const [isPending, startTransition] =
     useTransition();
+  const [status, setStatus] = useState(request.status);
+  const router = useRouter();
+  const toast = useToast();
 
 
   const isSender =
@@ -52,6 +57,11 @@ export default function RequestActions({
     }
   }
 
+  function applyStatus(nextStatus: typeof request.status) {
+    setStatus(nextStatus);
+    router.refresh();
+  }
+
 
 
   function handleAccept() {
@@ -64,15 +74,16 @@ export default function RequestActions({
           "accept"
         );
 
-        window.location.reload();
-
+        applyStatus("accepted");
+        toast("Swap request accepted.", "success");
 
       } catch (error) {
 
         console.error(error);
 
-        alert(
-          "Failed to accept swap request."
+        toast(
+          "Failed to accept swap request.",
+          "error"
         );
 
       }
@@ -93,15 +104,16 @@ export default function RequestActions({
           "decline"
         );
 
-        window.location.reload();
-
+        applyStatus("declined");
+        toast("Swap request declined.", "success");
 
       } catch (error) {
 
         console.error(error);
 
-        alert(
-          "Failed to decline swap request."
+        toast(
+          "Failed to decline swap request.",
+          "error"
         );
 
       }
@@ -122,15 +134,16 @@ export default function RequestActions({
           "cancel"
         );
 
-        window.location.reload();
-
+        applyStatus("cancelled");
+        toast("Swap request cancelled.", "success");
 
       } catch (error) {
 
         console.error(error);
 
-        alert(
-          "Failed to cancel swap request."
+        toast(
+          "Failed to cancel swap request.",
+          "error"
         );
 
       }
@@ -143,7 +156,7 @@ export default function RequestActions({
 
 
   if (
-    request.status === "pending" &&
+    status === "pending" &&
     isReceiver
   ) {
 
@@ -177,7 +190,7 @@ export default function RequestActions({
 
 
   if (
-    request.status === "pending" &&
+    status === "pending" &&
     isSender
   ) {
 
@@ -202,7 +215,7 @@ export default function RequestActions({
 
 
   if (
-    request.status === "accepted"
+    status === "accepted"
   ) {
 
     return (
@@ -210,7 +223,7 @@ export default function RequestActions({
       <section className={styles.container}>
 
         <div className={styles.statusCard}>
-          ✅ Swap Accepted
+          Waiting for the next step.
         </div>
 
       </section>
@@ -222,7 +235,7 @@ export default function RequestActions({
 
 
   if (
-    request.status === "declined"
+    status === "declined"
   ) {
 
     return (
@@ -230,7 +243,7 @@ export default function RequestActions({
       <section className={styles.container}>
 
         <div className={styles.statusCard}>
-          ❌ Swap Declined
+          This swap request was declined.
         </div>
 
       </section>
@@ -242,7 +255,7 @@ export default function RequestActions({
 
 
   if (
-    request.status === "completed"
+    status === "completed"
   ) {
 
     return (
@@ -250,7 +263,7 @@ export default function RequestActions({
       <section className={styles.container}>
 
         <div className={styles.statusCard}>
-          ⭐ Swap Completed
+          This swap is already complete.
         </div>
 
       </section>
@@ -262,7 +275,7 @@ export default function RequestActions({
 
 
   if (
-    request.status === "cancelled"
+    status === "cancelled"
   ) {
 
     return (

@@ -5,19 +5,22 @@ import styles from "./NotificationList.module.css";
 import NotificationItem from "../NotificationItem/NotificationItem";
 
 import { Notification } from "@/lib/types/Notification";
+import { BellOff } from "lucide-react";
 
 interface NotificationListProps {
   notifications: Notification[];
+  compact?: boolean;
 }
 
 export default function NotificationList({
   notifications,
+  compact = false,
 }: NotificationListProps) {
   if (notifications.length === 0) {
     return (
-      <section className={styles.empty}>
+      <section className={`${styles.empty} ${compact ? styles.compact : ""}`}>
         <span className={styles.icon}>
-          🔔
+          <BellOff size={48} strokeWidth={1.5} color="#9ca3af" />
         </span>
 
         <h2>

@@ -16,16 +16,23 @@
 .modal {
   width: 90%;
   max-width: 450px;
-
   background: white;
-
-  border-radius: 16px;
-
+  border-radius: 20px;
   padding: 24px;
-
   position: relative;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+}
 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+.title {
+  margin: 0;
+  font-size: 22px;
+  color: #111827;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 14px;
 }
 
 
@@ -59,17 +66,13 @@
 .item,
 .selected {
   width: 100%;
-
   padding: 16px;
-
-  border-radius: 12px;
-
+  border-radius: 14px;
   display: flex;
-
   justify-content: space-between;
-
+  align-items: center;
+  gap: 12px;
   cursor: pointer;
-
   text-align: left;
 }
 

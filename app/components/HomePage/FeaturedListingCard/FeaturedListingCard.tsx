@@ -43,7 +43,7 @@ export default function ListingCard({
 
         <div className={styles.infoRow}>
           <Banknote size={14} />
-          <span>₱{swapValue.toLocaleString()}</span>
+          <span>{swapValue.toLocaleString()}</span>
         </div>
 
         <p className={styles.lookingFor}>

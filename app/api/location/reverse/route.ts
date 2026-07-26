@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { resolveListingLandmark } from "@/lib/services/landmark";
 
 export async function POST(request: Request) {
   try {
-    const { latitude, longitude } =
+    const { latitude, longitude, fallbackCity } =
       await request.json();
 
     if (
@@ -19,38 +20,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`,
-      {
-        headers: {
-          "User-Agent":
-            "SwapSpot/1.0",
-        },
-        cache: "no-store",
-      }
-    );
+    const result = await resolveListingLandmark(latitude, longitude, fallbackCity);
 
-    if (!response.ok) {
-      throw new Error(
-        "Failed to retrieve location."
-      );
-    }
-
-    const data = await response.json();
-
-    const address = data.address ?? {};
-
-    const city =
-      address.city ??
-      address.town ??
-      address.municipality ??
-      address.village ??
-      address.county ??
-      "";
-
-    return NextResponse.json({
-      city,
-    });
+    return NextResponse.json(result);
   } catch (error) {
     console.error(error);
 

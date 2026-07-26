@@ -146,3 +146,29 @@
   line-height: 1.6;
   color: #6b7280;
 }
+
+.menuButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  color: #374151;
+
+  transition: background 0.2s ease;
+}
+
+.menuButton:hover {
+  background: rgba(0, 0, 0, 0.06);
+}

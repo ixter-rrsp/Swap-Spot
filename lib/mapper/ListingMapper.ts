@@ -26,6 +26,11 @@ interface ListingRow {
   swap_value: number;
   looking_for: string;
   boosted: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
+  nearby_landmark?: string | null;
+  landmark_latitude?: number | null;
+  landmark_longitude?: number | null;
 
   owner_id: string;
 
@@ -93,6 +98,16 @@ export function mapListing(
     boosted: listing.boosted,
 
     distance: listing.distance,
+
+    latitude: listing.latitude ?? null,
+
+    longitude: listing.longitude ?? null,
+
+    landmarkLatitude: listing.landmark_latitude ?? null,
+
+    landmarkLongitude: listing.landmark_longitude ?? null,
+
+    nearbyLandmark: listing.nearby_landmark ?? null,
 
     owner,
   };

@@ -1,0 +1,9 @@
+.container {
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.content {
+  padding: 5px;
+}
+

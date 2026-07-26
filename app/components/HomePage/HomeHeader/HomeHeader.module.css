@@ -29,6 +29,12 @@
   top: 4dvh;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .avatarButton {
   border: none;
   background: rgba(255, 255, 255, 0.18);
@@ -72,10 +78,38 @@
   outline-offset: 2px;
 }
 
-.icon{
-  width: 40px;        /* Adjust as needed */
-  height: 40px;       /* Adjust as needed */
-  object-fit: contain; /* or 'cover' */
-  border-radius: 50%;  /* if you want it circular */
+.icon {
+  width: 40px;
+  /* Adjust as needed */
+  height: 40px;
+  /* Adjust as needed */
+  object-fit: contain;
+  /* or 'cover' */
+  border-radius: 50%;
+  /* if you want it circular */
   /* Add any other styles */
+}
+
+.menuButton {
+  border: none;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  cursor: pointer;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  align-self: center;
+
+  transition: background 0.2s ease;
+}
+
+.menuButton:hover {
+  background: rgba(255, 255, 255, 0.28);
 }

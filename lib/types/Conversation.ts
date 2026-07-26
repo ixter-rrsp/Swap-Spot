@@ -18,4 +18,8 @@ export interface Conversation {
         message: string;
         createdAt: string;
     } | null;
+
+    lastMessageRelativeTime?: string;
+
+    unreadCount?: number;
 }

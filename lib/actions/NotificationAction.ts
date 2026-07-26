@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
+import { redirect } from "next/navigation";
+
 import {
   markNotificationAsRead,
   markAllNotificationsAsRead,
@@ -13,10 +15,12 @@ export async function markNotificationAsReadAction(
   await markNotificationAsRead(notificationId);
 
   revalidatePath("/notifications");
+  revalidatePath("/");
 }
 
 export async function markAllNotificationsAsReadAction() {
   await markAllNotificationsAsRead();
 
   revalidatePath("/notifications");
+  revalidatePath("/");
 }

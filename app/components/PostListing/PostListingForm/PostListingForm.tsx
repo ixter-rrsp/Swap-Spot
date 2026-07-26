@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/app/components/UI/Toast/ToastContext";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +23,7 @@ import {
 import {
   listingSchema,
   ListingFormData,
+  ListingFormInput,
 } from "@/lib/validations/ListingSchema";
 
 import type { Listing } from "@/lib/types/Listing";
@@ -50,13 +52,15 @@ export default function PostListingForm({
   });
 
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ListingFormData>({
+    watch,
+  } = useForm<ListingFormInput, unknown, ListingFormData>({
     resolver: zodResolver(listingSchema),
 
     defaultValues: {
@@ -64,6 +68,7 @@ export default function PostListingForm({
       description: listing?.description ?? "",
       lookingFor: listing?.lookingFor ?? "",
       swapValue: listing?.swapValue ?? 0,
+      showOnMap: listing?.showOnMap ?? true,
     },
   });
 
@@ -94,8 +99,10 @@ export default function PostListingForm({
           );
 
 
+        console.log("[PostListingForm] uploading new images", newFiles.length);
         const uploadedImages =
           await uploadListingImages(newFiles);
+        console.log("[PostListingForm] upload complete", uploadedImages);
 
 
         const imageUrls = [
@@ -104,15 +111,22 @@ export default function PostListingForm({
         ];
 
 
+        const payload = {
+          ...data,
+          city: listing.city ?? "",
+        };
+
+        console.log("[PostListingForm] submitting update", { listingId: listing.id, payload, imageUrls });
         await updateListing(
           listing.id,
-          data,
+          payload,
           imageUrls
         );
 
 
-        alert(
-          "Listing updated successfully!"
+        toast(
+          "Listing updated successfully!",
+          "success"
         );
 
 
@@ -147,8 +161,9 @@ export default function PostListingForm({
         );
 
 
-        alert(
-          "Listing posted successfully!"
+        toast(
+          "Listing posted successfully!",
+          "success"
         );
 
 
@@ -175,7 +190,7 @@ export default function PostListingForm({
         return;
       }
 
-      alert(message);
+      toast(message, "error");
     } finally {
 
       setLoading(false);
@@ -192,15 +207,11 @@ export default function PostListingForm({
     >
 
       <div className={styles.ticketHeader}>
-        <small>
-          SwapSpot Barter Ticket
-        </small>
+        <small>SwapSpot Barter Ticket</small>
 
-        <h1>
-          {isEditMode
-            ? "Edit Trade Ticket"
-            : "New Trade Ticket"}
-        </h1>
+        <h2 className={styles.ticketTitle}>
+          {isEditMode ? "Edit Trade Ticket" : "New Trade Ticket"}
+        </h2>
       </div>
 
 
@@ -319,6 +330,32 @@ export default function PostListingForm({
           <p>
             {errors.swapValue?.message}
           </p>
+        </div>
+
+
+
+
+        <div className={styles.toggleContainer}>
+          <div className={styles.toggleLabel}>
+            <label className={styles.label}>
+              Show this listing on the public map
+            </label>
+            <p className={styles.helper}>
+              When enabled, your listing can appear on the Discover map using its approximate location. This helps nearby users find your listing while protecting your privacy.
+            </p>
+          </div>
+          <label
+            className={`${styles.toggle} ${
+              watch("showOnMap") ? styles.enabled : styles.disabled
+            }`}
+          >
+            <input
+              type="checkbox"
+              disabled={loading}
+              {...register("showOnMap")}
+            />
+            <div className={styles.toggleCircle} />
+          </label>
         </div>
 
 

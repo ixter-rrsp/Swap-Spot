@@ -1,0 +1,13 @@
+.container {
+  align-self: center;
+  text-align: center;
+  margin: 8px 0;
+}
+
+.text {
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 12px;
+}

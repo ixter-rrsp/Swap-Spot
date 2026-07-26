@@ -6,6 +6,7 @@ import {
 } from "@/lib/services/ServerSwapRequestService";
 import RequestPageClient from "./RequestPageClient";
 import styles from "./page.module.css";
+import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
 
 export default async function RequestsPage() {
   const supabase = await createClient();
@@ -27,19 +28,7 @@ export default async function RequestsPage() {
 
   return (
     <main className={styles.container}>
-
-      <header className={styles.header}>
-
-        <h1>
-          Swap Requests
-        </h1>
-
-        <p>
-          Manage your incoming and outgoing swap requests.
-        </p>
-
-      </header>
-
+      <PageHeader title="Swap Requests" subtitle="Manage your incoming and outgoing swap requests." />
 
       <RequestPageClient
         incomingRequests={incomingRequests}

@@ -31,7 +31,10 @@ export default function SwapActions({
   return (
     <>
       <section className={styles.container}>
-        <MessageSellerButton listingId={requestedListingId} />
+        <MessageSellerButton 
+          listingId={requestedListingId} 
+          className={styles.secondaryButton} 
+        />
 
         {
           hasPendingRequest ? (
@@ -39,7 +42,7 @@ export default function SwapActions({
               className={styles.primaryButton}
               disabled
             >
-              Request Sent ✓
+              Request Sent
             </button>
           ) : (
             <button

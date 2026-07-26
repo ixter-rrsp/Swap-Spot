@@ -25,6 +25,7 @@ export default function MessageList({
                     isMine={
                         message.senderId === currentUserId
                     }
+                    currentUserId={currentUserId}
                 />
 
             ))}

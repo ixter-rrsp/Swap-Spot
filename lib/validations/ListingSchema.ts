@@ -23,11 +23,9 @@ export const listingSchema = z.object({
       error: "Estimated swap value is required.",
     })
     .positive("Swap value must be greater than zero."),
+
+  showOnMap: z.boolean().default(true),
 });
 
-
-export type ListingFormData =
-  z.output<typeof listingSchema>;
-
-export type ListingFormInput =
-  z.input<typeof listingSchema>;
+export type ListingFormData = z.output<typeof listingSchema>;
+export type ListingFormInput = z.input<typeof listingSchema>;

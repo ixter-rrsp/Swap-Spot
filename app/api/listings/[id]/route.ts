@@ -28,9 +28,11 @@ export async function PATCH(
   }
 
   try {
+    console.log("[PATCH /api/listings] handler start");
     const { id } = await params;
 
     const body = await request.json();
+    console.log("[PATCH /api/listings] body", body);
 
     const listing = await updateListing(
       id,
@@ -40,9 +42,12 @@ export async function PATCH(
         city: body.city,
         lookingFor: body.lookingFor,
         swapValue: body.swapValue,
+        showOnMap: body.showOnMap ?? true,
         images: body.images ?? [],
       }
     );
+
+    console.log("[PATCH /api/listings] response", listing);
 
     return NextResponse.json(listing);
   } catch (error) {

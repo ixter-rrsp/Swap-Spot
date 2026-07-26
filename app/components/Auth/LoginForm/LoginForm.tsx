@@ -15,6 +15,8 @@ import {
   FaFacebookF,
 } from "react-icons/fa6";
 
+import { useToast } from "@/app/components/UI/Toast/ToastContext";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -42,6 +44,8 @@ export default function LoginForm() {
   const [loading, setLoading] =
     useState(false);
 
+  const toast = useToast();
+
   const {
     register,
     handleSubmit,
@@ -59,10 +63,11 @@ export default function LoginForm() {
       router.replace("/home");
       router.refresh();
     } catch (error) {
-      alert(
+      toast(
         error instanceof Error
           ? error.message
-          : "Something went wrong."
+          : "Something went wrong.",
+        "error"
       );
     } finally {
       setLoading(false);
@@ -75,7 +80,7 @@ export default function LoginForm() {
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className={styles.header}>
-        <h1>Welcome Back!</h1>
+        <div className={styles.title}>Welcome Back!</div>
         <p>Sign in to continue swapping.</p>
       </div>
 

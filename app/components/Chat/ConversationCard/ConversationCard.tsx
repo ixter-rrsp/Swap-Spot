@@ -17,10 +17,10 @@ export default function ConversationCard({
 
   const {
     otherUser,
-    listing,
     lastMessage,
   } = conversation;
 
+  const displayName = otherUser.fullName || otherUser.username;
 
   return (
 
@@ -28,8 +28,6 @@ export default function ConversationCard({
       href={`/messages/${conversation.id}`}
       className={styles.card}
     >
-
-      {/* User Avatar */}
 
       <div className={styles.avatar}>
 
@@ -45,7 +43,7 @@ export default function ConversationCard({
 
           <span>
             {
-              otherUser.username
+              displayName
                 .charAt(0)
                 .toUpperCase()
             }
@@ -55,80 +53,11 @@ export default function ConversationCard({
 
       </div>
 
-
-
       <div className={styles.content}>
 
-
-        <div className={styles.top}>
-
-
-          <div>
-
-            <h3>
-              {
-                otherUser.fullName ||
-                otherUser.username
-              }
-            </h3>
-
-
-            <p>
-              @{otherUser.username}
-            </p>
-
-          </div>
-
-
-
-          {
-            lastMessage && (
-
-              <time>
-
-                {
-                  new Date(
-                    lastMessage.createdAt
-                  )
-                    .toLocaleDateString()
-                }
-
-              </time>
-
-            )
-          }
-
-
-        </div>
-
-
-
-        <div className={styles.listing}>
-
-
-          {
-            listing.imageUrl && (
-
-              <Image
-                src={listing.imageUrl}
-                alt={listing.title}
-                width={45}
-                height={45}
-              />
-
-            )
-          }
-
-
-          <span>
-            {listing.title}
-          </span>
-
-
-        </div>
-
-
-
+        <h3>
+          {displayName}
+        </h3>
 
         <p className={styles.message}>
 
@@ -140,10 +69,24 @@ export default function ConversationCard({
 
         </p>
 
-
-
       </div>
 
+      {
+        lastMessage && (
+
+          <time className={styles.time}>
+
+            {
+              new Date(
+                lastMessage.createdAt
+              )
+                .toLocaleDateString()
+            }
+
+          </time>
+
+        )
+      }
 
     </Link>
 

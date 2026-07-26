@@ -6,6 +6,7 @@ import {
   uploadListingImages,
   deleteListingImages,
 } from "./StorageService";
+import { getFallbackCityCoordinates, resolveListingLandmark } from "./landmark";
 
 export async function createListing(
   data: ListingFormData,
@@ -53,6 +54,24 @@ export async function createListing(
     );
   }
 
+  const landmarkInfo = await resolveListingLandmark(
+    profile.latitude,
+    profile.longitude,
+    profile.city
+  );
+  const fallbackCity = landmarkInfo.city || profile.city || "";
+  const fallbackCoordinates = getFallbackCityCoordinates(fallbackCity);
+  const resolvedLandmark = landmarkInfo.landmark || fallbackCity || null;
+  const resolvedLatitude = landmarkInfo.landmarkLatitude ?? fallbackCoordinates?.lat ?? null;
+  const resolvedLongitude = landmarkInfo.landmarkLongitude ?? fallbackCoordinates?.lon ?? null;
+  console.log("[createListing] landmark info", {
+    landmarkInfo,
+    fallbackCity,
+    resolvedLandmark,
+    resolvedLatitude,
+    resolvedLongitude,
+  });
+
   let imageUrls: string[] = [];
   let createdListingId: string | null = null;
 
@@ -74,17 +93,24 @@ export async function createListing(
         title: data.title,
         description: data.description,
 
-        city: profile.city,
+        city: fallbackCity || profile.city,
         latitude: profile.latitude,
         longitude: profile.longitude,
+        nearby_landmark: resolvedLandmark,
+        landmark_latitude: resolvedLatitude,
+        landmark_longitude: resolvedLongitude,
 
         looking_for: data.lookingFor,
         swap_value: data.swapValue,
+
+        show_on_map: data.showOnMap ?? true,
 
         boosted: false,
       })
       .select()
       .single();
+
+    console.log("[createListing] insert result", { listing, listingError });
 
     if (listingError) {
       throw new Error(
@@ -154,9 +180,18 @@ export async function createListing(
 
 export async function updateListing(
   id: string,
-  data: ListingFormData,
+  data: ListingFormData & { city?: string },
   images: string[]
 ) {
+  const payload = {
+    ...data,
+    city: data.city ?? "",
+    showOnMap: data.showOnMap ?? true,
+    images,
+  };
+
+  console.log("[updateListing client] sending", { id, payload });
+
   const response = await fetch(
     `/api/listings/${id}`,
     {
@@ -165,21 +200,31 @@ export async function updateListing(
         "Content-Type":
           "application/json",
       },
-      body: JSON.stringify({
-        ...data,
-        images,
-      }),
+      body: JSON.stringify(payload),
     }
   );
 
-  const result =
-    await response.json();
+  const text = await response.text();
+  let result: unknown = null;
+
+  try {
+    result = text ? JSON.parse(text) : null;
+  } catch {
+    result = { raw: text };
+  }
+
+  console.log("[updateListing client] response", {
+    status: response.status,
+    body: text,
+  });
 
   if (!response.ok) {
-    throw new Error(
-      result.error ||
-        "Failed to update listing."
-    );
+    const errorMessage =
+      typeof result === "object" && result && "error" in result && typeof (result as { error?: unknown }).error === "string"
+        ? (result as { error: string }).error
+        : "Failed to update listing.";
+
+    throw new Error(errorMessage);
   }
 
   return result;

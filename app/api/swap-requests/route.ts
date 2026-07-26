@@ -31,37 +31,26 @@ export async function POST(
   }
 
   try {
+    const body = await request.json();
 
-    const body =
-      await request.json();
-
-
-    const result =
-      await createSwapRequest(
-        body.offeredListingId,
-        body.requestedListingId
+    if (!body?.offeredListingId || !body?.requestedListingId) {
+      return NextResponse.json(
+        { error: "Both listing IDs are required." },
+        { status: 400 }
       );
+    }
 
-
-    return NextResponse.json(
-      result
+    const result = await createSwapRequest(
+      body.offeredListingId,
+      body.requestedListingId
     );
 
-
-  } catch(error) {
-
+    return NextResponse.json(result);
+  } catch (error) {
     console.error(error);
-
-    return NextResponse.json(
-      {
-        error:
-          "Failed",
-      },
-      {
-        status:500,
-      }
-    );
-
+    const message = error instanceof Error ? error.message : "Failed to create swap request.";
+    const status = message === "Unauthorized." || message === "You must be logged in." ? 401 : 400;
+    return NextResponse.json({ error: message }, { status });
   }
 
 }
