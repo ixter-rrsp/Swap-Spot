@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/components/UI/Toast/ToastContext";
 
@@ -52,6 +53,7 @@ export default function PostListingForm({
   });
 
   const [loading, setLoading] = useState(false);
+  const [limitReached, setLimitReached] = useState<string | null>(null);
   const toast = useToast();
 
 
@@ -76,7 +78,7 @@ export default function PostListingForm({
 
   async function onSubmit(data: ListingFormData) {
     if (loading) return;
-
+    setLimitReached(null);
     setLoading(true);
 
     try {
@@ -190,6 +192,12 @@ export default function PostListingForm({
         return;
       }
 
+      // Listing limit reached — show upgrade banner instead of toast
+      if (message.toLowerCase().includes("listing limit")) {
+        setLimitReached(message);
+        return;
+      }
+
       toast(message, "error");
     } finally {
 
@@ -205,6 +213,19 @@ export default function PostListingForm({
       className={styles.form}
       onSubmit={handleSubmit(onSubmit)}
     >
+
+      {limitReached && (
+        <div className={styles.limitBanner}>
+          <div className={styles.limitBannerIcon}>🚀</div>
+          <div className={styles.limitBannerContent}>
+            <strong>Listing Limit Reached</strong>
+            <p>{limitReached}</p>
+            <Link href="/subscriptions" className={styles.limitBannerCta}>
+              View Subscription Plans →
+            </Link>
+          </div>
+        </div>
+      )}
 
       <div className={styles.ticketHeader}>
         <small>SwapSpot Barter Ticket</small>

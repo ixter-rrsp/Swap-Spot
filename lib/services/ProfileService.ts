@@ -182,6 +182,27 @@ export interface ProfileDashboardData {
   };
 }
 
+export interface ProfileDashboardData {
+  profile: Profile;
+  stats: {
+    averageRating: number;
+    totalReviews: number;
+    completedSwaps: number;
+    activeListings: number;
+  };
+  counts: {
+    sentRequests: number;
+    toAccept: number;
+    toConfirm: number;
+    toComplete: number;
+    history: number;
+  };
+  reliability: {
+    accepted: number;
+    completed: number;
+  };
+}
+
 export async function getProfileDashboard(): Promise<ProfileDashboardData | null> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -226,6 +247,22 @@ export async function getProfileDashboard(): Promise<ProfileDashboardData | null
     .eq("receiver_id", user.id)
     .eq("status", "pending");
 
+  // Reliability tracker: how many swap requests this user was part of
+  // ever reached "accepted", versus how many of those went all the way
+  // to "completed". A swap that reached "completed" was, by definition,
+  // accepted at some earlier point — so it counts toward both.
+  const { count: acceptedCount } = await supabase
+    .from("swap_requests")
+    .select("id", { count: "exact", head: true })
+    .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+    .in("status", ["accepted", "completed"]);
+
+  const { count: completedRequestCount } = await supabase
+    .from("swap_requests")
+    .select("id", { count: "exact", head: true })
+    .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+    .eq("status", "completed");
+
   const { data: agreements } = await supabase
     .from("swap_agreements")
     .select("*")
@@ -265,6 +302,10 @@ export async function getProfileDashboard(): Promise<ProfileDashboardData | null
       toConfirm,
       toComplete,
       history,
+    },
+    reliability: {
+      accepted: acceptedCount || 0,
+      completed: completedRequestCount || 0,
     },
   };
 }

@@ -66,12 +66,14 @@
 
   border-radius: 999px;
 
-  background: #65a30d;
-
-  color: white;
+  /* Default neutral — overridden by inline plan colors */
+  background: #f3f4f6;
+  color: #4b5563;
 
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .stats {

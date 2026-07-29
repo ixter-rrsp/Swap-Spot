@@ -1,53 +1,62 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
+import {
+  sendMessage,
+  sendImageMessage,
+  sendVideoMessage,
+} from "@/lib/services/ServerChatService";
+import { uploadChatFile } from "@/lib/services/serverStorageServices";
 
-import { sendChatMessage } from "@/lib/services/ServerChatService";
+export async function POST(request: Request) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-export async function POST(request: NextRequest) {
-    try {
-        const contentType = request.headers.get("content-type") ?? "";
-
-        let conversationId = "";
-        let message = "";
-        let files: File[] = [];
-
-        if (contentType.includes("multipart/form-data")) {
-            const formData = await request.formData();
-            conversationId = String(formData.get("conversationId") ?? "").trim();
-            message = String(formData.get("message") ?? "").trim();
-            files = Array.from(formData.entries())
-                .filter(([, value]) => value instanceof File)
-                .map(([, value]) => value as File);
-        } else {
-            const body = await request.json();
-            conversationId = String(body?.conversationId ?? "").trim();
-            message = String(body?.message ?? "").trim();
-        }
-
-        if (!conversationId) {
-            return NextResponse.json(
-                {
-                    error: "Conversation ID is required.",
-                },
-                {
-                    status: 400,
-                }
-            );
-        }
-
-        await sendChatMessage(conversationId, message, files);
-
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        return NextResponse.json(
-            {
-                error:
-                    error instanceof Error
-                        ? error.message
-                        : "Failed to send message.",
-            },
-            {
-                status: 500,
-            }
-        );
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const formData = await request.formData();
+    const conversationId = formData.get("conversationId") as string;
+    const text = (formData.get("message") as string) || "";
+    const files = formData.getAll("files") as File[];
+
+    if (!conversationId) {
+      return NextResponse.json(
+        { error: "conversationId is required" },
+        { status: 400 }
+      );
+    }
+
+    // Handle file attachments upload if present
+    if (files && files.length > 0) {
+      for (const file of files) {
+        if (!file || typeof file === "string") continue;
+
+        const isVideo = file.type.startsWith("video/");
+        const fileUrl = await uploadChatFile(file, isVideo ? "videos" : "images");
+
+        if (isVideo) {
+          await sendVideoMessage(conversationId, fileUrl);
+        } else {
+          await sendImageMessage(conversationId, fileUrl);
+        }
+      }
+    }
+
+    // Handle text message if present
+    if (text.trim()) {
+      await sendMessage(conversationId, text.trim());
+    }
+
+    return NextResponse.json({ success: true }, { status: 201 });
+  } catch (error: any) {
+    console.error("Error sending message:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to send message." },
+      { status: 500 }
+    );
+  }
 }

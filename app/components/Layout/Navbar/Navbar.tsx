@@ -35,6 +35,7 @@ const navItems = [
 
 interface NavbarProps {
   unreadCount?: number;
+  onNotificationClick?: () => void;
 }
 
 // Drag tuning — mirrors the spec's suggested thresholds.
@@ -47,6 +48,7 @@ const FALLBACK_FOOTER_HEIGHT = 220; // used until the real footer is measured
 
 export default function Navbar({
   unreadCount = 0,
+  onNotificationClick,
 }: NavbarProps) {
 
   const pathname = usePathname();
@@ -272,6 +274,7 @@ export default function Navbar({
                 href={item.href}
                 className={`${styles.navItem} ${active ? styles.active : ""
                   }`}
+                onClick={item.href === "/notifications" ? onNotificationClick : undefined}
               >
                 <div className={styles.iconWrapper}>
                   <Icon size={22} strokeWidth={2} />

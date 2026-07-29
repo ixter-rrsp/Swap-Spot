@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/client";
-
+import { SubscriptionService } from "./SubscriptionService";
 import type { ListingFormData } from "../validations/ListingSchema";
 
 import {
@@ -23,6 +23,33 @@ export async function createListing(
     throw new Error(
       "You must be logged in to post a listing."
     );
+  }
+
+  // Check subscription listing entitlement before creating listing
+  try {
+    const currentSub = await SubscriptionService.getCurrentSubscription();
+    if (
+      currentSub &&
+      currentSub.plan.maxActiveListings !== null &&
+      currentSub.plan.maxActiveListings > 0
+    ) {
+      const { count } = await supabase
+        .from("listings")
+        .select("id", { count: "exact", head: true })
+        .eq("owner_id", user.id)
+        .eq("traded", false);
+
+      if ((count || 0) >= currentSub.plan.maxActiveListings) {
+        throw new Error(
+          `Listing limit reached. Your current plan (${currentSub.plan.name}) is limited to ${currentSub.plan.maxActiveListings} active listings. Please upgrade your subscription to post more items.`
+        );
+      }
+    }
+  } catch (err: any) {
+    if (err.message && err.message.includes("Listing limit reached")) {
+      throw err;
+    }
+    console.warn("Entitlement check warning:", err);
   }
 
   // Get owner's saved location

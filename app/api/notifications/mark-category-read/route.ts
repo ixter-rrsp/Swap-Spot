@@ -1,22 +1,37 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
 import { markNotificationsByCategoryAsRead } from "@/lib/services/ServerNotificationService";
-import { isNotificationCategory } from "@/lib/types/Notification";
+import { NotificationCategory } from "@/lib/types/Notification";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { category } = body ?? {};
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!category || !isNotificationCategory(category)) {
-      return NextResponse.json({ error: "Invalid category." }, { status: 400 });
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { category } = (await request.json()) as {
+      category?: NotificationCategory;
+    };
+
+    if (!category) {
+      return NextResponse.json(
+        { error: "Category is required." },
+        { status: 400 }
+      );
     }
 
     await markNotificationsByCategoryAsRead(category);
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("Error marking category as read:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed" },
+      { error: error.message || "Failed to mark category as read." },
       { status: 500 }
     );
   }

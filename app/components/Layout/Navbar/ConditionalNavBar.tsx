@@ -23,8 +23,18 @@ export default function ConditionalNavbar({
     pathname.startsWith(path)
   );
 
-  if (shouldHide) return null;
-  
+  const handleNotificationClick = () => {
+    setLocalUnread(0);
+    fetch("/api/notifications/unread", { method: "POST" }).catch(() => {});
+  };
+
+  useEffect(() => {
+    if (pathname === "/notifications") {
+      setLocalUnread(0);
+      fetch("/api/notifications/unread", { method: "POST" }).catch(() => {});
+    }
+  }, [pathname]);
+
   // setup realtime subscription to update unreadCount per-user
   useEffect(() => {
     const supabase = createClient();
@@ -54,7 +64,7 @@ export default function ConditionalNavbar({
 
       unsubUnread = subscribeChannel(
         notifChannelName,
-        { event: "*", schema: "public", table: "notifications", filter: `recipient_id=eq.${user.id}` },
+        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
         (payload: any) => {
           const eventType = payload?.eventType || payload?.event || payload?.type;
           const newRow = payload?.new ?? null;
@@ -123,5 +133,7 @@ export default function ConditionalNavbar({
     };
   }, []);
 
-  return <Navbar unreadCount={localUnread} />;
+  if (shouldHide) return null;
+
+  return <Navbar unreadCount={localUnread} onNotificationClick={handleNotificationClick} />;
 }

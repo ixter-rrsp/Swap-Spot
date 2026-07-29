@@ -1,13 +1,37 @@
 import { NextResponse } from "next/server";
-import { getUnreadActivityCount } from "@/lib/services/ServerNotificationService";
+import { createClient } from "@/utils/supabase/server";
+import { getUnreadActivityCount, markAllNotificationsAsRead } from "@/lib/services/ServerNotificationService";
 
 export async function GET() {
   try {
-    const count = await getUnreadActivityCount();
-    return NextResponse.json({ unreadCount: count });
-  } catch (error) {
+    const unreadCount = await getUnreadActivityCount();
+    return NextResponse.json({ unreadCount });
+  } catch (error: any) {
+    console.error("Error fetching unread count:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed" },
+      { error: error.message || "Failed to fetch unread count." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST() {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    await markAllNotificationsAsRead();
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Error marking all notifications as read:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to mark notifications as read." },
       { status: 500 }
     );
   }

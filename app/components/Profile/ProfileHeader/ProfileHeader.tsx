@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Menu } from "lucide-react";
 import MenuDrawer from "@/app/components/UI/MenuDrawer";
+import { SUBSCRIPTION_PLANS } from "@/lib/subscriptions/plans";
 
 import styles from "./ProfileHeader.module.css";
 
@@ -107,9 +108,23 @@ export default function ProfileHeader({
 
       <h2 className={styles.name}>{username}</h2>
 
-      {badge && (
-        <span className={styles.badge}>{badge}</span>
-      )}
+      {badge && (() => {
+        // Find the matching plan by badgeName for correct styling
+        const matchedPlan = Object.values(SUBSCRIPTION_PLANS).find(
+          (p) => p.badgeName.toUpperCase() === badge.toUpperCase()
+        );
+        return (
+          <span
+            className={styles.badge}
+            style={matchedPlan ? {
+              backgroundColor: matchedPlan.badgeBg,
+              color: matchedPlan.badgeColor,
+            } : undefined}
+          >
+            {badge}
+          </span>
+        );
+      })()}
 
       {metaLine && (
         <p className={styles.meta}>{metaLine}</p>
