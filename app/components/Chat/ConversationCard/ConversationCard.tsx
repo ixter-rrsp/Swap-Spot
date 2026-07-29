@@ -18,15 +18,17 @@ export default function ConversationCard({
   const {
     otherUser,
     lastMessage,
+    unreadCount = 0,
   } = conversation;
 
+  const isUnread = unreadCount > 0;
   const displayName = otherUser.fullName || otherUser.username;
 
   return (
 
     <Link
       href={`/messages/${conversation.id}`}
-      className={styles.card}
+      className={`${styles.card} ${isUnread ? styles.unreadCard : ""}`}
     >
 
       <div className={styles.avatar}>
@@ -55,11 +57,11 @@ export default function ConversationCard({
 
       <div className={styles.content}>
 
-        <h3>
+        <h3 className={isUnread ? styles.unreadText : ""}>
           {displayName}
         </h3>
 
-        <p className={styles.message}>
+        <p className={`${styles.message} ${isUnread ? styles.unreadMessage : ""}`}>
 
           {
             lastMessage
@@ -74,7 +76,7 @@ export default function ConversationCard({
       {
         lastMessage && (
 
-          <time className={styles.time}>
+          <time className={`${styles.time} ${isUnread ? styles.unreadTime : ""}`}>
 
             {
               new Date(
@@ -87,6 +89,8 @@ export default function ConversationCard({
 
         )
       }
+
+      {isUnread && <span className={styles.unreadDot} aria-label="Unread message" />}
 
     </Link>
 

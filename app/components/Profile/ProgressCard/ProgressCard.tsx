@@ -1,21 +1,24 @@
+import Link from "next/link";
 import styles from "./ProgressCard.module.css";
 
 interface ProgressCardProps {
   completed: number;
-  confirmed: number;
+  accepted: number;
+  href?: string;
 }
 
 export default function ProgressCard({
   completed,
-  confirmed,
+  accepted,
+  href = "#",
 }: ProgressCardProps) {
   const percentage =
-    confirmed === 0
+    accepted === 0
       ? 0
-      : (completed / confirmed) * 100;
+      : (completed / accepted) * 100;
 
   return (
-    <section className={styles.container}>
+    <Link href={href} className={styles.container}>
       <div
         className={styles.progress}
         style={{
@@ -31,7 +34,7 @@ export default function ProgressCard({
           </span>
 
           <span className={styles.total}>
-            of {confirmed}
+            of {accepted}
           </span>
         </div>
       </div>
@@ -40,9 +43,9 @@ export default function ProgressCard({
         <h3>Finished Transactions</h3>
 
         <p>
-          Tracked over all confirmed swaps.
+          Swaps completed out of swaps accepted.
         </p>
       </div>
-    </section>
+    </Link>
   );
 }

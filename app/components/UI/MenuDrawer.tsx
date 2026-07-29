@@ -1,6 +1,5 @@
 "use client";
 import { X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import styles from "./MenuDrawer.module.css";
@@ -11,7 +10,6 @@ type MenuDrawerProps = {
 };
 
 export default function MenuDrawer({ open, onClose }: MenuDrawerProps) {
-  const router = useRouter();
   const supabase = createClient();
 
   if (!open) return null;
@@ -20,6 +18,7 @@ export default function MenuDrawer({ open, onClose }: MenuDrawerProps) {
   const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
 
   const navigationItems = [
+    { name: "Subscriptions & Plans", href: "/subscriptions" },
     { name: "Edit Profile", href: "/profile/edit" },
     { name: "About Us", href: "/about" },
     { name: "How It Works", href: "/how-it-works" },
@@ -31,9 +30,9 @@ export default function MenuDrawer({ open, onClose }: MenuDrawerProps) {
   ];
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
     onClose();
-    router.push("/login");
+    await supabase.auth.signOut();
+    window.location.href = "/login";
   };
 
   return (

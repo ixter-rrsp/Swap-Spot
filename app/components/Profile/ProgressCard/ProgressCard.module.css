@@ -5,56 +5,7 @@
   gap: 1.5rem;
 
   padding: 1.5rem 1rem;
-}
 
-.progress {
-  width: 84px;
-  height: 84px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  border-radius: 50%;
-}
-
-.inner {
-  width: 68px;
-  height: 68px;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  border-radius: 50%;
-
-  background: white;
-}
-
-.value {
-  font-size: 1.3rem;
-  font-weight: 700;
-
-  color: #111827;
-}
-
-.total {
-  font-size: .75rem;
-
-  color: #6b7280;
-}
-
-.info h3 {
-  margin: 0;
-
-  font-size: 1.1rem;
-}
-
-.info p {
-  margin-top: .35rem;
-
-  color: #6b7280;
-
-  line-height: 1.5;
+  text-decoration: none;
+  color: inherit;
 }

@@ -25,11 +25,24 @@ interface NotificationCenterProps {
   conversations: Conversation[];
 }
 
+// "Messages" is intentionally excluded here — the conversation list
+// already renders below via MessagesSection, so surfacing it again
+// as a notification category would just be a redundant duplicate.
+function excludeMessagesCategory(
+  list: NotificationCategorySummary[]
+): NotificationCategorySummary[] {
+  return list.filter(
+    (summary) => summary.category !== "messages" && summary.icon !== "messages"
+  );
+}
+
 export default function NotificationCenter({
   categories,
   conversations,
 }: NotificationCenterProps) {
-  const [categoriesState, setCategoriesState] = useState(categories);
+  const [categoriesState, setCategoriesState] = useState(
+    excludeMessagesCategory(categories)
+  );
   const [selectedCategory, setSelectedCategory] =
     useState<NotificationCategory | null>(null);
   const [notifications, setNotifications] =
@@ -60,7 +73,7 @@ export default function NotificationCenter({
           return;
         }
 
-        setNotifications(data.notifications ?? []);
+        setNotifications(Array.isArray(data) ? data : []);
       } catch (fetchError) {
         if (!active) {
           return;
@@ -154,7 +167,7 @@ export default function NotificationCenter({
 
       unsubscribeFn = subscribeChannel(
         channelName,
-        { event: "*", schema: "public", table: "notifications", filter: `recipient_id=eq.${user.id}` },
+        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
         (payload: any) => {
           // payload contains { eventType, new, old }
           const eventType = payload?.eventType || payload?.event || payload?.type || payload?.eventType;
@@ -168,6 +181,12 @@ export default function NotificationCenter({
           }
 
           const category = getNotificationCategory(kind as any);
+
+          // Skip updates for the messages category entirely — it's
+          // intentionally not rendered here.
+          if (category === "messages") {
+            return;
+          }
 
           setCategoriesState((prev) => {
             return prev.map((s) => {
@@ -249,7 +268,7 @@ export default function NotificationCenter({
         const res = await fetch(`/api/notifications`);
         if (res.ok) {
           const data = await res.json();
-          if (data?.categories) setCategoriesState(data.categories);
+          if (data?.categories) setCategoriesState(excludeMessagesCategory(data.categories));
         }
       } catch (e) {
         // ignore

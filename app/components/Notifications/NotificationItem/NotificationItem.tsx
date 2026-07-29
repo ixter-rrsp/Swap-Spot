@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import styles from "./NotificationItem.module.css";
 
 import { Notification } from "@/lib/types/Notification";
+import { MessageSquare, Repeat, CheckCircle2, XCircle, Bell } from "lucide-react";
 
 import { markNotificationAsReadAction } from "@/lib/actions/NotificationAction";
 
@@ -24,20 +25,17 @@ export default function NotificationItem({
 
   function getIcon() {
     switch (notification.type) {
-      case "new_message":
-        return "💬";
-
       case "swap_request":
-        return "🔄";
+        return <Repeat size={20} color="#059669" />;
 
       case "swap_accepted":
-        return "✅";
+        return <CheckCircle2 size={20} color="#16a34a" />;
 
       case "swap_declined":
-        return "❌";
+        return <XCircle size={20} color="#dc2626" />;
 
       default:
-        return "📢";
+        return <Bell size={20} color="#d97706" />;
     }
   }
 
@@ -138,8 +136,8 @@ export default function NotificationItem({
           {isPending
             ? "..."
             : getRelativeTime(
-                notification.createdAt
-              )}
+              notification.createdAt
+            )}
         </span>
 
         {!notification.isRead && (

@@ -57,3 +57,32 @@
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+.unreadCard {
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.unreadText {
+  font-weight: 800 !important;
+  color: #0f172a !important;
+}
+
+.unreadMessage {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.unreadTime {
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.unreadDot {
+  width: 10px;
+  height: 10px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-left: 6px;
+  box-shadow: 0 0 0 2px #ffffff;
+}

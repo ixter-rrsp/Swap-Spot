@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import ProfileHeader from "../components/Profile/ProfileHeader/ProfileHeader";
+import ProfileStats from "../components/Profile/ProfileStats/ProfileStats";
+import ProgressCard from "../components/Profile/ProgressCard/ProgressCard";
 import ProfileContent from "../components/Profile/ProfileContent/ProfileContent";
 import DashboardCards from "../components/Profile/DashboardCards/DashboardCards";
 import ProfileReviews from "../components/Profile/ProfileReviews/ProfileReviews";
@@ -27,7 +29,7 @@ export default async function ProfilePage() {
     return <div className={styles.profilePage}>Unable to load profile data.</div>;
   }
 
-  const { profile, stats, counts } = dashboardData;
+  const { profile, stats, counts, reliability } = dashboardData;
 
   const myOffers = await getMyListings();
   
@@ -77,8 +79,15 @@ export default async function ProfilePage() {
         showActions={false}
       />
 
+   
+
       <DashboardCards counts={counts} />
 
+   <ProgressCard
+        completed={reliability.completed}
+        accepted={reliability.accepted}
+      />
+      
       <ProfileContent
         myOffers={myOffers}
         receivedOffers={receivedOffers}
