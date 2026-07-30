@@ -68,7 +68,7 @@ export async function POST(
 
     const cleanOrigin = origin.replace(/\/$/, "");
 
-    const successUrl = `${cleanOrigin}/Listing/${listingId}?session_id={CHECKOUT_SESSION_ID}&boost_status=success`;
+    const successUrl = `${cleanOrigin}/Listing/${listingId}?boost_status=success`;
     const cancelUrl = `${cleanOrigin}/Listing/${listingId}?boost_status=cancelled`;
 
     const checkoutResult = await ServerPaymentService.createCheckoutSession({
