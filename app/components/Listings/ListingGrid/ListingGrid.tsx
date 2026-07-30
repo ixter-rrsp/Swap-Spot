@@ -62,6 +62,7 @@ export default function ListingGrid({
             <ListingCard
               key={listing.id}
               {...listing}
+              rating={listing.owner?.rating}
               showActions={showActions}
             />
           ))}

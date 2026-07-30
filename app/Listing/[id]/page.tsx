@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 
 import { getListingById } from "@/lib/services/ServerListingService";
@@ -11,6 +12,7 @@ import ListingGallery from "@/app/components/Listings/ListingGallery/ListingGall
 import ListingInfo from "@/app/components/Listings/ListingInfo/ListingInfo";
 import OwnerCard from "@/app/components/Listings/OwnerCard/OwnerCard";
 import SwapActions from "@/app/components/Listings/SwapActions/SwapActions";
+import BoostReturnHandler from "@/app/components/Listings/BoostReturnHandler/BoostReturnHandler";
 
 import { createClient } from "@/utils/supabase/server";
 
@@ -87,6 +89,10 @@ export default async function ListingPage({
   return (
 
     <main className={styles.container}>
+
+      <Suspense fallback={null}>
+        <BoostReturnHandler listingId={listing.id} />
+      </Suspense>
 
 
       <ListingGallery

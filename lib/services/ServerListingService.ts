@@ -367,6 +367,63 @@ export async function getListings() {
   });
 }
 
+/**
+ * Boosted listings for the homepage "Boosted Swaps" section. Like
+ * getListings() (used for the browse/swap grids), this excludes the
+ * current user's own listings — boosting is meant to increase visibility
+ * to other browsers, not to yourself.
+ */
+export async function getBoostedListings() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const nowIso = new Date().toISOString();
+
+  let query = supabase
+    .from("listings")
+    .select(`
+      *,
+      listing_images (
+        id,
+        image_url,
+        sort_order
+      ),
+      profiles (
+        id,
+        username,
+        full_name,
+        avatar_url,
+        rating,
+        badge,
+        city,
+        latitude,
+        longitude
+      )
+    `)
+    .eq("traded", false)
+    .eq("boosted", true)
+    .gt("boost_expires_at", nowIso)
+    .order("boost_expires_at", { ascending: false });
+
+  if (user) {
+    query = query.neq("owner_id", user.id);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []).map((row: any) => ({
+    ...row,
+    profiles: row.profiles?.[0] ?? row.profiles ?? null,
+  }));
+}
+
 export async function deleteListing(id: string) {
   const supabase = await createClient();
 

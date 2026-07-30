@@ -18,6 +18,8 @@ interface HomeContentProps {
 
   listings: Listing[];
 
+  boostedListings: Listing[];
+
   nearbyListings: Listing[];
 
 }
@@ -27,6 +29,8 @@ interface HomeContentProps {
 export default function HomeContent({
 
   listings,
+
+  boostedListings,
 
   nearbyListings,
 
@@ -91,11 +95,53 @@ export default function HomeContent({
 
 
 
-  const boostedListings =
-    filteredListings.filter(
-      (listing) =>
-        listing.boosted
-    );
+  const filteredBoostedListings =
+    useMemo(() => {
+
+      const searchTerm =
+        search
+          .trim()
+          .toLowerCase();
+
+
+      if (!searchTerm) {
+
+        return boostedListings;
+
+      }
+
+
+      return boostedListings.filter(
+        (listing) => {
+
+          return (
+
+            listing.title
+              .toLowerCase()
+              .includes(searchTerm)
+
+            ||
+
+            listing.city
+              .toLowerCase()
+              .includes(searchTerm)
+
+            ||
+
+            listing.lookingFor
+              .toLowerCase()
+              .includes(searchTerm)
+
+          );
+
+        }
+      );
+
+
+    }, [
+      boostedListings,
+      search,
+    ]);
 
 
 
@@ -113,7 +159,7 @@ export default function HomeContent({
 
 
       <BoostedSection
-        listings={boostedListings}
+        listings={filteredBoostedListings}
       />
 
 

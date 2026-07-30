@@ -1,7 +1,7 @@
 import styles from "./BoostedSection.module.css";
 import { ChevronRight } from "lucide-react";
 
-import FeaturedListingCard from "@/app/components/HomePage/FeaturedListingCard/FeaturedListingCard";
+import ListingCard from "@/app/components/Listings/ListingCard/ListingCard";
 import { Listing } from "@/lib/types/Listing";
 
 interface BoostedSectionProps {
@@ -32,10 +32,20 @@ export default function BoostedSection({
       </p>
     ) : (
       listings.map((listing) => (
-        <FeaturedListingCard
-          key={listing.id}
-          {...listing}
-        />
+        <div key={listing.id} className={styles.cardItem}>
+          <ListingCard
+            id={listing.id}
+            title={listing.title}
+            imageUrl={listing.imageUrl}
+            city={listing.city}
+            swapValue={listing.swapValue}
+            lookingFor={listing.lookingFor}
+            rating={listing.owner?.rating}
+            boosted={listing.boosted}
+            boostExpiresAt={listing.boostExpiresAt}
+            nearbyLandmark={listing.nearbyLandmark}
+          />
+        </div>
       ))
     )}
   </div>

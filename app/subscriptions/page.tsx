@@ -31,7 +31,7 @@ function SubscriptionsContent() {
             // (it's fixed before the session is created), so fall back to
             // looking up the user's most recent payment attempt.
             if (!idToVerify) {
-              const res = await fetch("/api/payments/latest-pending");
+              const res = await fetch("/api/payments/latest-pending?purpose=subscription");
               if (res.ok) {
                 const latest = await res.json();
                 idToVerify = latest.checkoutSessionId ?? null;
