@@ -4,6 +4,7 @@ import "./globals.css";
 import ConditionalNavbar from "./components/Layout/Navbar/ConditionalNavBar";
 import Providers from "./components/Providers/Providers";
 import { getUnreadActivityCount } from "@/lib/services/ServerNotificationService";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -70,6 +71,7 @@ export default async function RootLayout({
             {children}
           </main>
         </Providers>
+        <SpeedInsights />
       </body>
     </html>
   );
