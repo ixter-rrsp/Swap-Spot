@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import styles from "./ReviewRequestCard.module.css";
+import { Check } from "lucide-react";
 
 interface ReviewRequestCardProps {
   swapAgreementId: string;
@@ -55,11 +56,11 @@ export default function ReviewRequestCard({
       <div className={styles.actions}>
         {status.bothReviewed ? (
           <div className={styles.completedState}>
-            Both Reviews Completed ✓
+            Both Reviews Completed <Check size={16} />
           </div>
         ) : status.currentUserReviewed ? (
           <div className={styles.completedState}>
-            Review Submitted ✓
+            Review Submitted <Check size={16} />
           </div>
         ) : (
           <Link href={`/reviews/${swapAgreementId}`} className={styles.reviewButton}>

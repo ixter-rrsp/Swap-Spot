@@ -23,6 +23,9 @@
   overflow-y: auto;
   position: relative;
 }
+.previewBoosted {
+  border: 1.5px solid #22c55e;
+}
 
 @keyframes slideUp {
   from {

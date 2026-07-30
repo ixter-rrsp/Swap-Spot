@@ -56,7 +56,9 @@ export default function ListingCard({
     return city ? `Near ${city}` : "Nearby";
   };
   return (
-    <article className={styles.card}>
+    <article
+      className={`${styles.card} ${boosted ? styles.boosted : ""}`}
+    >
 
       <Link href={`/Listing/${id}`}>
 

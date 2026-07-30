@@ -32,7 +32,7 @@ export default function ListingPreview({
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div
-        className={styles.preview}
+        className={`${styles.preview} ${listing.boosted ? styles.previewBoosted : ""}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}

@@ -10,6 +10,7 @@ import {
   User,
   Bell,
   Repeat,
+  Recycle,
 } from "lucide-react";
 
 import styles from "./Navbar.module.css";
@@ -306,7 +307,7 @@ export default function Navbar({
         <p className={styles.footerBrand}>SwapSpot</p>
         <p className={styles.footerTagline}>Your Spot to Swap.</p>
         <p className={styles.footerDescription}>
-          ♻ Give great items a second life through trusted bartering.
+          <Recycle size={14} /> Give great items a second life through trusted bartering.
         </p>
 
         <p className={styles.footerMeta}>Version 1.0.0</p>
@@ -322,4 +323,4 @@ export default function Navbar({
       </div>
     </div>
   );
-}
+} 

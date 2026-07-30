@@ -92,6 +92,7 @@ export default async function ListingPage({
       <ListingGallery
         images={listing.images}
         title={listing.title}
+        boosted={listing.boosted}
       />
 
 

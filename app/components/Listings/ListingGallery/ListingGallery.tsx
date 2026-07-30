@@ -11,6 +11,7 @@ import styles from "./ListingGallery.module.css";
 interface ListingGalleryProps {
   images: ListingImage[];
   title: string;
+  boosted?: boolean;
 }
 
 
@@ -20,17 +21,19 @@ const MAX_VISIBLE_THUMBNAILS = 4;
 export default function ListingGallery({
   images,
   title,
+  boosted = false,
 }: ListingGalleryProps) {
 
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const selectedImage = images[selectedIndex]?.url;
 
+  const containerClassName = `${styles.container} ${boosted ? styles.boosted : ""}`;
 
   if (!selectedImage) {
     return (
       <section className={styles.wrapper}>
-        <div className={styles.container}>
+        <div className={containerClassName}>
           <div className={styles.placeholder}>
             <span>No Image Available</span>
           </div>
@@ -48,7 +51,7 @@ export default function ListingGallery({
   return (
     <section className={styles.wrapper}>
 
-      <div className={styles.container}>
+      <div className={containerClassName}>
         <Image
           src={selectedImage}
           alt={title}
