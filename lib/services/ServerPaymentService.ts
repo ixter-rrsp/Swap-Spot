@@ -203,6 +203,26 @@ export class ServerPaymentService {
                 updatedPayment.id
               );
             }
+
+            if (
+              updatedPayment &&
+              updatedPayment.purpose === "listing_boost" &&
+              updatedPayment.metadata?.listing_id &&
+              updatedPayment.metadata?.duration_days
+            ) {
+              const durationDays = Number(updatedPayment.metadata.duration_days);
+              const boostExpiresAt = new Date();
+              boostExpiresAt.setDate(boostExpiresAt.getDate() + durationDays);
+
+              await serviceClient
+                .from("listings")
+                .update({
+                  boosted: true,
+                  boost_expires_at: boostExpiresAt.toISOString(),
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("id", updatedPayment.metadata.listing_id);
+            }
           } catch (subErr) {
             console.error("Failed to activate subscription after payment:", subErr);
           }
@@ -309,6 +329,29 @@ export class ServerPaymentService {
                   );
                 } catch (subErr) {
                   console.error("Subscription activation during fallback verification failed:", subErr);
+                }
+              }
+
+              if (
+                payment.purpose === "listing_boost" &&
+                payment.metadata?.listing_id &&
+                payment.metadata?.duration_days
+              ) {
+                try {
+                  const durationDays = Number(payment.metadata.duration_days);
+                  const boostExpiresAt = new Date();
+                  boostExpiresAt.setDate(boostExpiresAt.getDate() + durationDays);
+
+                  await serviceClient
+                    .from("listings")
+                    .update({
+                      boosted: true,
+                      boost_expires_at: boostExpiresAt.toISOString(),
+                      updated_at: new Date().toISOString(),
+                    })
+                    .eq("id", payment.metadata.listing_id);
+                } catch (boostErr) {
+                  console.error("Boost activation during fallback verification failed:", boostErr);
                 }
               }
             }

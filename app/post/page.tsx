@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { createClient } from "@/utils/supabase/server";
 import styles from "./page.module.css";
 import PostListingForm from "@/app/components/PostListing/PostListingForm/PostListingForm";
@@ -18,7 +19,9 @@ export default async function PostPage() {
     <main className={styles.container}>
       <PageHeader title="Post a Listing" />
 
-      <PostListingForm />
+      <Suspense fallback={null}>
+        <PostListingForm />
+      </Suspense>
     </main>
   );
 }

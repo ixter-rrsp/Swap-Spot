@@ -1,22 +1,30 @@
+.wrapper {
+  position: relative;
+}
+
 .container {
   display: flex;
   gap: 0;
   margin-top: auto;
   padding-left: 7px;
   padding-bottom: 10px;
+  align-items: center;
 }
 
 .edit,
-.delete {
+.delete,
+.boost {
   display: flex;
   align-items: center;
-  gap: 0;
+  gap: 4px;
   padding: 8px 9px;
   border-radius: 8px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.1s ease; /* Smooth transition */
+  border: none;
+  background: transparent;
 }
 
 .edit {
@@ -28,6 +36,78 @@
   border: none;
   background: transparent;
   color: #dc2626;
+}
+
+.boost {
+  color: #d97706;
+}
+
+.boostedStatus {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 9px;
+  border-radius: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #d97706;
+}
+
+.boostPicker {
+  position: absolute;
+  bottom: 100%;
+  left: 7px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  margin-bottom: 6px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  width: 180px;
+}
+
+.boostPickerOption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+
+.boostPickerOption span {
+  flex: 1;
+  color: #374151;
+}
+
+.boostPickerOption strong {
+  color: #111827;
+}
+
+.boostPickerOptionSelected {
+  background: #fef3c7;
+}
+
+.boostConfirm {
+  margin-top: 2px;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  background: #d97706;
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.boostConfirm:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Icon animation */

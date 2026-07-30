@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/app/components/UI/Toast/ToastContext";
 
 import { useForm } from "react-hook-form";
@@ -29,7 +29,11 @@ import {
 
 import type { Listing } from "@/lib/types/Listing";
 
+import { BOOST_OPTIONS, BoostDuration, BoostOption } from "@/lib/pricing/boost";
+
 import styles from "./PostListingForm.module.css";
+
+const DRAFT_STORAGE_KEY = "swapspot_pending_listing_draft";
 
 interface PostListingFormProps {
   listing?: Listing;
@@ -39,6 +43,7 @@ export default function PostListingForm({
   listing,
 }: PostListingFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const isEditMode = !!listing;
 
@@ -54,7 +59,71 @@ export default function PostListingForm({
 
   const [loading, setLoading] = useState(false);
   const [limitReached, setLimitReached] = useState<string | null>(null);
+  const [payingOverage, setPayingOverage] = useState(false);
   const toast = useToast();
+
+  const initialDraft = (() => {
+    if (isEditMode || typeof window === "undefined") return null;
+    if (searchParams.get("overage_status") !== "success") return null;
+    try {
+      const raw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  const [wantBoost, setWantBoost] = useState(initialDraft?.wantBoost ?? false);
+  const [boostDuration, setBoostDuration] = useState<BoostDuration>(
+    initialDraft?.boostDuration ?? 3
+  );
+
+  const hasHandledResume = useRef(false);
+  const pendingOveragePaymentId = useRef<string | null>(null);
+
+  // Resume listing creation after returning from the ₱5 overage checkout.
+  // Images can't survive the redirect (File objects aren't serializable),
+  // so we restore the text fields and ask the user to re-add photos.
+  useEffect(() => {
+    if (isEditMode || hasHandledResume.current) return;
+    if (searchParams.get("overage_status") !== "success") return;
+
+    hasHandledResume.current = true;
+
+    const sessionId = searchParams.get("session_id");
+    const draftRaw = sessionStorage.getItem(DRAFT_STORAGE_KEY);
+
+    if (!sessionId || !draftRaw) return;
+
+    (async () => {
+      try {
+        const verifyResponse = await fetch(
+          `/api/payments/verify?session_id=${encodeURIComponent(sessionId)}`
+        );
+        const verifyResult = await verifyResponse.json();
+
+        if (!verifyResponse.ok || verifyResult.status !== "paid") {
+          toast(
+            "We couldn't confirm your payment yet. Please try posting again.",
+            "error"
+          );
+          return;
+        }
+
+        sessionStorage.removeItem(DRAFT_STORAGE_KEY);
+        toast(
+          "Payment confirmed! Please re-add your photos, then submit to finish posting.",
+          "success"
+        );
+
+        // Text fields are restored via defaultValues below on next render;
+        // store the payment id so onSubmit can pass it through.
+        pendingOveragePaymentId.current = verifyResult.id;
+      } catch (err) {
+        console.error("Failed to verify overage payment:", err);
+      }
+    })();
+  }, [isEditMode, searchParams, toast]);
 
 
   const {
@@ -66,11 +135,11 @@ export default function PostListingForm({
     resolver: zodResolver(listingSchema),
 
     defaultValues: {
-      title: listing?.title ?? "",
-      description: listing?.description ?? "",
-      lookingFor: listing?.lookingFor ?? "",
-      swapValue: listing?.swapValue ?? 0,
-      showOnMap: listing?.showOnMap ?? true,
+      title: initialDraft?.title ?? listing?.title ?? "",
+      description: initialDraft?.description ?? listing?.description ?? "",
+      lookingFor: initialDraft?.lookingFor ?? listing?.lookingFor ?? "",
+      swapValue: initialDraft?.swapValue ?? listing?.swapValue ?? 0,
+      showOnMap: initialDraft?.showOnMap ?? listing?.showOnMap ?? true,
     },
   });
 
@@ -153,8 +222,11 @@ export default function PostListingForm({
         const newListing =
           await createListing(
             data,
-            files
+            files,
+            pendingOveragePaymentId.current || undefined
           );
+
+        pendingOveragePaymentId.current = null;
 
 
         console.log(
@@ -162,11 +234,43 @@ export default function PostListingForm({
           newListing
         );
 
+        // If the user opted to boost this listing, kick off the boost
+        // checkout right after creation instead of going to /home.
+        if (wantBoost) {
+          try {
+            const boostResponse = await fetch(
+              `/api/listings/${newListing.id}/boost`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ durationDays: boostDuration }),
+              }
+            );
+            const boostResult = await boostResponse.json();
 
-        toast(
-          "Listing posted successfully!",
-          "success"
-        );
+            if (boostResponse.ok && boostResult.checkoutUrl) {
+              toast("Listing posted! Redirecting you to pay for your boost...", "success");
+              window.location.href = boostResult.checkoutUrl;
+              return;
+            }
+
+            toast(
+              "Listing posted, but we couldn't start the boost checkout. You can boost it later from your profile.",
+              "error"
+            );
+          } catch (boostErr) {
+            console.error("Failed to start boost checkout:", boostErr);
+            toast(
+              "Listing posted, but we couldn't start the boost checkout. You can boost it later from your profile.",
+              "error"
+            );
+          }
+        } else {
+          toast(
+            "Listing posted successfully!",
+            "success"
+          );
+        }
 
 
         router.replace("/home");
@@ -208,6 +312,43 @@ export default function PostListingForm({
 
 
 
+  async function handlePayOverage() {
+    if (payingOverage) return;
+    setPayingOverage(true);
+
+    try {
+      // Persist the current text-field values so we can restore them after
+      // the redirect to PayMongo and back. Images can't be persisted here.
+      const currentValues = {
+        title: watch("title"),
+        description: watch("description"),
+        lookingFor: watch("lookingFor"),
+        swapValue: watch("swapValue"),
+        showOnMap: watch("showOnMap"),
+        wantBoost,
+        boostDuration,
+      };
+      sessionStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(currentValues));
+
+      const response = await fetch("/api/listings/overage", {
+        method: "POST",
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.checkoutUrl) {
+        toast(result.error || "Failed to start payment.", "error");
+        return;
+      }
+
+      window.location.href = result.checkoutUrl;
+    } catch (err) {
+      console.error("Failed to start overage checkout:", err);
+      toast("Failed to start payment. Please try again.", "error");
+    } finally {
+      setPayingOverage(false);
+    }
+  }
+
   return (
     <form
       className={styles.form}
@@ -220,9 +361,19 @@ export default function PostListingForm({
           <div className={styles.limitBannerContent}>
             <strong>Listing Limit Reached</strong>
             <p>{limitReached}</p>
-            <Link href="/subscriptions" className={styles.limitBannerCta}>
-              View Subscription Plans →
-            </Link>
+            <div className={styles.limitBannerActions}>
+              <Link href="/subscriptions" className={styles.limitBannerCta}>
+                View Subscription Plans →
+              </Link>
+              <button
+                type="button"
+                className={styles.limitBannerPayButton}
+                onClick={handlePayOverage}
+                disabled={payingOverage}
+              >
+                {payingOverage ? "Redirecting..." : "Pay ₱5 to post this one anyway"}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -381,6 +532,57 @@ export default function PostListingForm({
 
 
 
+
+        {!isEditMode && (
+          <div className={styles.toggleContainer}>
+            <div className={styles.toggleLabel}>
+              <label className={styles.label}>
+                Boost this listing
+              </label>
+              <p className={styles.helper}>
+                Boosted listings appear in the Boosted section for extra visibility.
+              </p>
+            </div>
+            <label
+              className={`${styles.toggle} ${
+                wantBoost ? styles.enabled : styles.disabled
+              }`}
+            >
+              <input
+                type="checkbox"
+                disabled={loading}
+                checked={wantBoost}
+                onChange={(e) => setWantBoost(e.target.checked)}
+              />
+              <div className={styles.toggleCircle} />
+            </label>
+          </div>
+        )}
+
+        {!isEditMode && wantBoost && (
+          <div className={styles.boostOptions}>
+            {(Object.values(BOOST_OPTIONS) as BoostOption[]).map(
+              (option) => (
+                <label
+                  key={option.durationDays}
+                  className={`${styles.boostOption} ${
+                    boostDuration === option.durationDays ? styles.boostOptionSelected : ""
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="boostDuration"
+                    disabled={loading}
+                    checked={boostDuration === option.durationDays}
+                    onChange={() => setBoostDuration(option.durationDays)}
+                  />
+                  <span>{option.label}</span>
+                  <strong>₱{option.price}</strong>
+                </label>
+              )
+            )}
+          </div>
+        )}
 
         <button
           className={styles.submitButton}

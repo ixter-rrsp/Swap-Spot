@@ -47,7 +47,11 @@ export async function getMyListings(): Promise<Listing[]> {
     city: listing.city,
     swapValue: listing.swap_value,
     lookingFor: listing.looking_for,
-    boosted: listing.boosted,
+    boosted:
+      listing.boosted &&
+      (!listing.boost_expires_at ||
+        new Date(listing.boost_expires_at) > new Date()),
+    boostExpiresAt: listing.boost_expires_at ?? null,
     images:
       listing.listing_images?.map(
         (image: {
@@ -115,7 +119,11 @@ export async function getMyListingsForSwap(): Promise<Listing[]> {
     city: listing.city,
     swapValue: listing.swap_value,
     lookingFor: listing.looking_for,
-    boosted: listing.boosted,
+    boosted:
+      listing.boosted &&
+      (!listing.boost_expires_at ||
+        new Date(listing.boost_expires_at) > new Date()),
+    boostExpiresAt: listing.boost_expires_at ?? null,
     images:
       listing.listing_images?.map(
         (image: {
@@ -171,7 +179,11 @@ export async function getListingsByOwner(ownerId: string): Promise<Listing[]> {
     city: listing.city,
     swapValue: listing.swap_value,
     lookingFor: listing.looking_for,
-    boosted: listing.boosted,
+    boosted:
+      listing.boosted &&
+      (!listing.boost_expires_at ||
+        new Date(listing.boost_expires_at) > new Date()),
+    boostExpiresAt: listing.boost_expires_at ?? null,
     images:
       listing.listing_images?.map(
         (image: {
@@ -241,7 +253,11 @@ export async function getListingById(id: string) {
     nearbyLandmark: data.nearby_landmark ?? null,
     swapValue: data.swap_value,
     lookingFor: data.looking_for,
-    boosted: data.boosted,
+    boosted:
+      data.boosted &&
+      (!data.boost_expires_at ||
+        new Date(data.boost_expires_at) > new Date()),
+    boostExpiresAt: data.boost_expires_at ?? null,
     images:
       data.listing_images?.map(
         (image: {
