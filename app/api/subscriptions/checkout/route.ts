@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
     const cleanOrigin = origin.replace(/\/$/, "");
 
-    const successUrl = `${cleanOrigin}/subscriptions?session_id={CHECKOUT_SESSION_ID}&status=success`;
+    const successUrl = `${cleanOrigin}/subscriptions?status=success`;
     const cancelUrl = `${cleanOrigin}/subscriptions?status=cancelled`;
 
     const checkoutResult = await ServerPaymentService.createCheckoutSession({

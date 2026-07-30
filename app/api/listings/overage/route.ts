@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
     const cleanOrigin = origin.replace(/\/$/, "");
 
-    const successUrl = `${cleanOrigin}/post?overage_status=success&session_id={CHECKOUT_SESSION_ID}`;
+    const successUrl = `${cleanOrigin}/post?overage_status=success`;
     const cancelUrl = `${cleanOrigin}/post?overage_status=cancelled`;
 
     // No referenceId yet - the listing doesn't exist until after payment.
