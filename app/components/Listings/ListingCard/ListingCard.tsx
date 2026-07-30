@@ -24,6 +24,7 @@ interface ListingCardProps {
   lookingFor: string;
   rating?: number;
   boosted?: boolean;
+  boostExpiresAt?: string | null;
 
   distance?: number;
   nearbyLandmark?: string | null;
@@ -41,6 +42,7 @@ export default function ListingCard({
   lookingFor,
   rating = 0,
   boosted = false,
+  boostExpiresAt = null,
   distance,
   nearbyLandmark,
   showActions = false,
@@ -160,6 +162,8 @@ export default function ListingCard({
       {showActions && (
         <ListingActions
           listingId={id}
+          boosted={boosted}
+          boostExpiresAt={boostExpiresAt}
         />
       )}
 

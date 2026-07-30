@@ -17,6 +17,8 @@ export interface Listing {
 
   boosted?: boolean;
 
+  boostExpiresAt?: string | null;
+
   owner: ListingOwner;
 
   distance?: number;

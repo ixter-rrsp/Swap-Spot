@@ -10,7 +10,8 @@ import { getFallbackCityCoordinates, resolveListingLandmark } from "./landmark";
 
 export async function createListing(
   data: ListingFormData,
-  images: File[]
+  images: File[],
+  overagePaymentId?: string
 ) {
   const supabase = createClient();
 
@@ -40,13 +41,40 @@ export async function createListing(
         .eq("traded", false);
 
       if ((count || 0) >= currentSub.plan.maxActiveListings) {
-        throw new Error(
-          `Listing limit reached. Your current plan (${currentSub.plan.name}) is limited to ${currentSub.plan.maxActiveListings} active listings. Please upgrade your subscription to post more items.`
-        );
+        // Free-plan (or any capped-plan) user can bypass the limit for this
+        // one post by paying the overage fee first (see /post's "Pay ₱5 to
+        // post anyway" flow). The payment must be verified + consumed here.
+        if (overagePaymentId) {
+          const consumeResponse = await fetch(
+            "/api/listings/overage/consume",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ paymentId: overagePaymentId }),
+            }
+          );
+
+          if (!consumeResponse.ok) {
+            const consumeResult = await consumeResponse.json().catch(() => ({}));
+            throw new Error(
+              consumeResult.error ||
+                "Your extra-post payment could not be verified. Please try again."
+            );
+          }
+        } else {
+          throw new Error(
+            `Listing limit reached. Your current plan (${currentSub.plan.name}) is limited to ${currentSub.plan.maxActiveListings} active listings. Please upgrade your subscription to post more items.`
+          );
+        }
       }
     }
   } catch (err: any) {
-    if (err.message && err.message.includes("Listing limit reached")) {
+    if (
+      err.message &&
+      (err.message.includes("Listing limit reached") ||
+        err.message.includes("overage") ||
+        err.message.includes("extra-post payment"))
+    ) {
       throw err;
     }
     console.warn("Entitlement check warning:", err);

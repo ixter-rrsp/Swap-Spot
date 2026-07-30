@@ -26,6 +26,7 @@ interface ListingRow {
   swap_value: number;
   looking_for: string;
   boosted: boolean;
+  boost_expires_at?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   nearby_landmark?: string | null;
@@ -95,7 +96,14 @@ export function mapListing(
 
     lookingFor: listing.looking_for,
 
-    boosted: listing.boosted,
+    // Defensive check: treat an expired boost as inactive even if the
+    // background sweep (expire_stale_boosts) hasn't flipped the flag yet.
+    boosted:
+      listing.boosted &&
+      (!listing.boost_expires_at ||
+        new Date(listing.boost_expires_at) > new Date()),
+
+    boostExpiresAt: listing.boost_expires_at ?? null,
 
     distance: listing.distance,
 

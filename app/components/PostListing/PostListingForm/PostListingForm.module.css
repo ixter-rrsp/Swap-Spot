@@ -374,4 +374,71 @@
 .limitBannerCta:hover {
   background: linear-gradient(135deg, #b45309, #d97706);
   box-shadow: 0 3px 8px rgba(217, 119, 6, 0.3);
+}
+
+.limitBannerActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.limitBannerPayButton {
+  padding: 8px 16px;
+  background: #ffffff;
+  color: #92400e;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1.5px solid #d97706;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.limitBannerPayButton:hover:not(:disabled) {
+  background: #fff7ed;
+}
+
+.limitBannerPayButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.boostOptions {
+  display: flex;
+  gap: 12px;
+  margin: -8px 0 20px;
+}
+
+.boostOption {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.boostOption input {
+  margin-bottom: 2px;
+}
+
+.boostOption span {
+  font-size: 13px;
+  color: #374151;
+}
+
+.boostOption strong {
+  font-size: 15px;
+  color: #111827;
+}
+
+.boostOptionSelected {
+  border-color: #65a30d;
+  background: #f7fee7;
 }
