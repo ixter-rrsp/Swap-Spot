@@ -40,7 +40,7 @@ export default function ProfileReviews({ reviews }: ProfileReviewsProps) {
                 <div>
                   <p className={styles.reviewerName}>{review.reviewer.fullName || review.reviewer.username}</p>
                   <p className={styles.reviewDate}>
-                    {new Date(review.createdAt).toLocaleDateString()}
+                    {new Date(review.createdAt).toLocaleDateString("en-US", { timeZone: "UTC" })}
                   </p>
                 </div>
               </div>

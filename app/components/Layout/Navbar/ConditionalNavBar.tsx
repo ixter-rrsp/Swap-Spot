@@ -17,7 +17,15 @@ export default function ConditionalNavbar({
   unreadCount,
 }: ConditionalNavbarProps) {
   const pathname = usePathname();
-  const [localUnread, setLocalUnread] = useState(unreadCount ?? 0);
+  // Always start at 0 so the very first client render matches the server
+  // render exactly, regardless of session/auth timing. The real count is
+  // synced in immediately after mount via the effect below.
+  const [localUnread, setLocalUnread] = useState(0);
+
+  useEffect(() => {
+    setLocalUnread(unreadCount ?? 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const shouldHide = HIDDEN_ON.some((path) =>
     pathname.startsWith(path)

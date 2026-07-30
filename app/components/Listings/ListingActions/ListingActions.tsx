@@ -98,9 +98,10 @@ export default function ListingActions({
 
   const boostExpiryLabel =
     boosted && boostExpiresAt
-      ? new Date(boostExpiresAt).toLocaleDateString(undefined, {
+      ? new Date(boostExpiresAt).toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
+          timeZone: "UTC",
         })
       : null;
 

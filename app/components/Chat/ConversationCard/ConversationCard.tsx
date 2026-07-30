@@ -82,7 +82,7 @@ export default function ConversationCard({
               new Date(
                 lastMessage.createdAt
               )
-                .toLocaleDateString()
+                .toLocaleDateString("en-US", { timeZone: "UTC" })
             }
 
           </time>

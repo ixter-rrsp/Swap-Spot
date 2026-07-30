@@ -17,17 +17,17 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const paymentId = searchParams.get("payment_id");
+    const checkoutSessionId = searchParams.get("checkout_session_id");
 
-    if (!paymentId) {
+    if (!checkoutSessionId) {
       return NextResponse.json(
-        { error: "Missing required payment_id parameter." },
+        { error: "Missing required checkout_session_id parameter." },
         { status: 400 }
       );
     }
 
     const verificationResult = await ServerPaymentService.verifyPayment(
-      paymentId,
+      checkoutSessionId,
       user.id
     );
 

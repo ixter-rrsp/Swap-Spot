@@ -96,7 +96,7 @@ export default function AgreementCard({ agreement, reviewStatus }: AgreementCard
 
       <div className={styles.details}>
         <p><strong>Method:</strong> {deliveryLabel}</p>
-        <p><strong>Updated:</strong> {new Date(agreement.updatedAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</p>
+        <p><strong>Updated:</strong> {new Date(agreement.updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}</p>
         <p className={styles.metaPill}><MapPin size={14} /> {agreement.meetupLocation || agreement.pickupAddress || "Location shared"}</p>
       </div>
 
