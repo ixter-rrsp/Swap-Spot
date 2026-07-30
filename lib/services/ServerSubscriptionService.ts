@@ -268,7 +268,26 @@ export class ServerSubscriptionService {
       .eq("status", "active")
       .maybeSingle();
 
-    // 2. Insert new active paid subscription
+    // 2. Demote the existing active subscription FIRST. A unique partial
+    // index (idx_one_active_subscription) only allows one status='active'
+    // row per user, so the old row must be moved out of "active" before we
+    // can insert the new one, or the insert will fail with a 23505 conflict.
+    if (currentActive) {
+      const { error: demoteError } = await serviceClient
+        .from("user_subscriptions")
+        .update({
+          status: "replaced",
+          updated_at: now.toISOString(),
+        })
+        .eq("id", currentActive.id);
+
+      if (demoteError) {
+        console.error("Failed to demote previous active subscription:", demoteError);
+        throw new Error(`Subscription demotion error: ${demoteError.message}`);
+      }
+    }
+
+    // 3. Insert new active paid subscription
     const { data: newSub, error: insertError } = await serviceClient
       .from("user_subscriptions")
       .insert({
@@ -288,7 +307,7 @@ export class ServerSubscriptionService {
       throw new Error(`Subscription insertion error: ${insertError?.message || "Unknown error"}`);
     }
 
-    // 3. Mark previous active subscription as replaced
+    // 4. Backfill replaced_by on the demoted row now that we have the new id
     if (currentActive && currentActive.id !== newSub.id) {
       await serviceClient
         .from("user_subscriptions")

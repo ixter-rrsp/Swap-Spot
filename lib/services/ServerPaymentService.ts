@@ -362,6 +362,41 @@ export class ServerPaymentService {
       }
     }
 
+    // 3. Safety net: if this payment is paid but somehow has no matching
+    // active subscription (e.g. the webhook or the fallback check above
+    // updated the status but a subsequent activation step failed), retry
+    // activation here. This makes activation idempotent regardless of
+    // which path (webhook vs. this endpoint) first marked the payment paid.
+    if (
+      payment.status === "paid" &&
+      payment.purpose === "subscription" &&
+      payment.metadata?.plan_id
+    ) {
+      try {
+        const serviceClient = createServiceClient();
+        if (serviceClient) {
+          const { data: existingSub } = await serviceClient
+            .from("user_subscriptions")
+            .select("id")
+            .eq("payment_id", payment.id)
+            .maybeSingle();
+
+          if (!existingSub) {
+            await ServerSubscriptionService.activateSubscription(
+              payment.user_id,
+              payment.metadata.plan_id,
+              payment.id
+            );
+          }
+        }
+      } catch (activationErr) {
+        console.error(
+          "Idempotent subscription activation retry failed:",
+          activationErr
+        );
+      }
+    }
+
     return {
       id: payment.id,
       status: payment.status as PaymentStatus,

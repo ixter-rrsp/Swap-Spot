@@ -23,9 +23,26 @@ function SubscriptionsContent() {
       try {
         setLoading(true);
         // If returning from checkout with session_id, verify payment first
-        if (sessionId && statusParam === "success") {
+        if (statusParam === "success") {
           try {
-            await PaymentService.verifyPayment(sessionId);
+            let idToVerify = sessionId;
+
+            // PayMongo's success_url can't carry the checkout_session_id
+            // (it's fixed before the session is created), so fall back to
+            // looking up the user's most recent payment attempt.
+            if (!idToVerify) {
+              const res = await fetch("/api/payments/latest-pending");
+              if (res.ok) {
+                const latest = await res.json();
+                idToVerify = latest.checkoutSessionId ?? null;
+              }
+            }
+
+            if (!idToVerify) {
+              throw new Error("Could not determine which payment to verify.");
+            }
+
+            await PaymentService.verifyPayment(idToVerify);
             setBannerMessage({
               type: "success",
               text: "🎉 Payment verified! Your new subscription plan has been successfully activated.",
