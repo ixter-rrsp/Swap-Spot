@@ -40,7 +40,7 @@ export default function LocationCard({
     longitude: number
   ) {
     const response = await fetch(
-      "/api/location/reverse",
+      "/api/location/city",
       {
         method: "POST",
         headers: {

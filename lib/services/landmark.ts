@@ -121,6 +121,44 @@ function directValue(value: unknown): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+/**
+ * Plain reverse geocode used for the user's own profile location
+ * (LocationCard "Update Location"). Just resolves the real city name
+ * for the exact coordinates given — no landmark search, no privacy
+ * masking. That heavier behavior is specific to resolveListingLandmark()
+ * below, which is for displaying listings, not for a user's own location.
+ */
+export async function resolveCityName(
+  latitude: number,
+  longitude: number
+): Promise<string> {
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&addressdetails=1&zoom=12`,
+    {
+      headers: {
+        "User-Agent": "SwapSpot/1.0",
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!response.ok) {
+    return "";
+  }
+
+  const data = (await response.json()) as Record<string, unknown>;
+  const address = (data.address ?? {}) as Record<string, unknown>;
+
+  return (
+    directValue(address.city) ??
+    directValue(address.town) ??
+    directValue(address.municipality) ??
+    directValue(address.village) ??
+    directValue(address.county) ??
+    ""
+  );
+}
+
 function normalizeCoordinate(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) {
     return value;

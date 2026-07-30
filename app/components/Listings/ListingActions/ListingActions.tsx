@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2, Rocket } from "lucide-react";
+import { Pencil, Trash2, Rocket, Satellite } from "lucide-react";
 import { useToast } from "@/app/components/UI/Toast/ToastContext";
-import { BOOST_OPTIONS, BoostDuration, BoostOption } from "@/lib/pricing/boost";
+import {
+  BOOST_OPTIONS,
+  BoostDuration,
+  BoostOption,
+} from "@/lib/pricing/boost";
 import styles from "./ListingActions.module.css";
 
 interface ListingActionsProps {
@@ -21,6 +25,7 @@ export default function ListingActions({
 }: ListingActionsProps) {
   const router = useRouter();
   const toast = useToast();
+
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPressing, setIsPressing] = useState(false);
   const [showBoostPicker, setShowBoostPicker] = useState(false);
@@ -32,12 +37,11 @@ export default function ListingActions({
       "Are you sure you want to delete this listing?"
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     try {
       setIsDeleting(true);
+
       const response = await fetch(`/api/listings/${listingId}`, {
         method: "DELETE",
       });
@@ -55,6 +59,7 @@ export default function ListingActions({
       router.refresh();
     } catch (error) {
       console.error("DELETE ERROR:", error);
+
       toast(
         error instanceof Error ? error.message : "Something went wrong.",
         "error"
@@ -66,14 +71,20 @@ export default function ListingActions({
 
   async function handleBoost() {
     if (isBoosting) return;
+
     setIsBoosting(true);
 
     try {
       const response = await fetch(`/api/listings/${listingId}/boost`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ durationDays: boostDuration }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          durationDays: boostDuration,
+        }),
       });
+
       const result = await response.json();
 
       if (response.status === 401) {
@@ -88,10 +99,12 @@ export default function ListingActions({
       window.location.href = result.checkoutUrl;
     } catch (error) {
       console.error("BOOST ERROR:", error);
+
       toast(
         error instanceof Error ? error.message : "Something went wrong.",
         "error"
       );
+
       setIsBoosting(false);
     }
   }
@@ -119,6 +132,7 @@ export default function ListingActions({
             size={16}
             className={`${styles.icon} ${isPressing ? styles.pressed : ""}`}
           />
+          <span className={styles.tooltip}>Edit listing</span>
         </Link>
 
         <button
@@ -134,21 +148,38 @@ export default function ListingActions({
             size={16}
             className={`${styles.icon} ${isPressing ? styles.pressed : ""}`}
           />
+          <span className={styles.tooltip}>Delete listing</span>
         </button>
 
         {boosted ? (
-          <span className={styles.boostedStatus} title={`Boosted until ${boostExpiryLabel}`}>
-            <Rocket size={16} className={styles.icon} />
-            Boosted{boostExpiryLabel ? ` · until ${boostExpiryLabel}` : ""}
+          <span className={styles.boostedStatus}>
+            <Satellite
+              size={16}
+              strokeWidth={2.2}
+              className={styles.icon}
+            />
+
+            <span className={styles.tooltip}>
+              {boostExpiryLabel
+                ? `Boosted until ${boostExpiryLabel}`
+                : "Boosted listing"}
+            </span>
           </span>
         ) : (
           <button
             type="button"
             className={styles.boost}
             onClick={() => setShowBoostPicker((prev) => !prev)}
+            onMouseDown={() => setIsPressing(true)}
+            onMouseUp={() => setIsPressing(false)}
+            onMouseLeave={() => setIsPressing(false)}
           >
-            <Rocket size={16} className={styles.icon} />
-            Boost
+            <Rocket
+              size={16}
+              className={`${styles.icon} ${isPressing ? styles.pressed : ""}`}
+            />
+
+            <span className={styles.tooltip}>Boost listing</span>
           </button>
         )}
       </div>
@@ -170,7 +201,9 @@ export default function ListingActions({
                 checked={boostDuration === option.durationDays}
                 onChange={() => setBoostDuration(option.durationDays)}
               />
+
               <span>{option.label}</span>
+
               <strong>₱{option.price}</strong>
             </label>
           ))}
