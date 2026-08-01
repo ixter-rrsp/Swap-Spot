@@ -22,7 +22,8 @@ export const listingSchema = z.object({
     .number({
       error: "Estimated swap value is required.",
     })
-    .positive("Swap value must be greater than zero."),
+    .positive("Swap value must be greater than zero.")
+    .max(10000000, "Swap value cannot exceed 10,000,000."),
 
   showOnMap: z.boolean().default(true),
 });
