@@ -1,6 +1,5 @@
 import HomeHeader from "../components/HomePage/HomeHeader/HomeHeader";
 import SearchBar from "../components/HomePage/SearchBar/SearchBar";
-import CategoryChips from "../components/HomePage/CategoryChips/CategoryChips";
 
 import PageLoading from "@/app/components/UI/PageLoading/PageLoading";
 
@@ -17,7 +16,11 @@ export default function Loading() {
         </div>
       </section>
 
-      <CategoryChips value="all" onChange={() => {}} />
+      <div className={styles.categoryPlaceholder}>
+        <div className={styles.chipPlaceholder} />
+        <div className={styles.chipPlaceholder} />
+        <div className={styles.chipPlaceholder} />
+      </div>
 
       <PageLoading />
     </div>
