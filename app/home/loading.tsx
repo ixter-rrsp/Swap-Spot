@@ -17,7 +17,7 @@ export default function Loading() {
         </div>
       </section>
 
-      <CategoryChips />
+      <CategoryChips value="all" onChange={() => {}} />
 
       <PageLoading />
     </div>
