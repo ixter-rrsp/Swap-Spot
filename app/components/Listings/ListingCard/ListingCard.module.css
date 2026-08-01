@@ -39,7 +39,8 @@
   background: #f3f4f6;
 }
 
-.image {
+.image,
+.imageContainer img {
   object-fit: cover;
 }
 

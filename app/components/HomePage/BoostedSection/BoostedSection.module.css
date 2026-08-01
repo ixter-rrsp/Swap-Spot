@@ -52,8 +52,14 @@
 }
 
 .cards > * {
-  flex: 0 0 auto;
+  flex: 0 0 260px;
   scroll-snap-align: start;
+}
+
+@media (max-width: 768px) {
+  .cards > * {
+    flex: 0 0 220px;
+  }
 }
 
 /* Hide scrollbar */

@@ -313,9 +313,8 @@ export default function Navbar({
         <p className={styles.footerMeta}>Version 1.0.0</p>
 
         <p className={styles.footerCredit}>
-          Created by <strong>Prince Muncada</strong>
+          Created by <strong>Team SwapSpot</strong>
         </p>
-        <p className={styles.footerCredit}>&amp; Team SwapSpot</p>
 
         <p className={styles.footerQuote}>
           &ldquo;Every great swap starts with a conversation.&rdquo;

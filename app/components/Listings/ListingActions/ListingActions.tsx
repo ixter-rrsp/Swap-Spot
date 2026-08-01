@@ -122,7 +122,7 @@ export default function ListingActions({
     <div className={styles.wrapper}>
       <div className={styles.container}>
         <Link
-          href={`/Listing/${listingId}/edit`}
+          href={`/post?edit=${listingId}`}
           className={styles.edit}
           onMouseDown={() => setIsPressing(true)}
           onMouseUp={() => setIsPressing(false)}

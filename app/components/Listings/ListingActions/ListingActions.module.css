@@ -4,7 +4,7 @@
 
 .container {
   display: flex;
-  gap: 0;
+  gap: 8px;
   margin-top: auto;
   padding-left: 7px;
   padding-bottom: 10px;
@@ -13,28 +13,29 @@
 
 .edit,
 .delete,
-.boost {
-  display: flex;
+.boost,
+.boostedStatus {
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 8px 9px;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.1s ease; /* Smooth transition */
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border-radius: 10px;
   border: none;
   background: transparent;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.1s ease, background-color 0.2s ease;
 }
 
 .edit {
-  background: transparent;
   color: #059669;
 }
 
 .delete {
-  border: none;
-  background: transparent;
   color: #dc2626;
 }
 
@@ -43,9 +44,10 @@
 }
 
 .boostedStatus {
+  color: #2563eb;
   cursor: default;
-  color: blue;
 }
+
 .boostedStatus svg {
   width: 16px;
   height: 16px;
@@ -119,40 +121,17 @@
 }
 
 /* Optional: Add hover effect too */
-.edit:hover .icon {
-  transform: scale(1.1);
-}
-
-.delete:hover .icon {
-  transform: scale(1.1);
-}
-
 .edit:hover .icon,
 .delete:hover .icon,
 .boost:hover .icon,
 .boostedStatus:hover .icon {
   transform: scale(1.1);
 }
-.edit,
-.delete,
-.boost,
-.boostedStatus {
-  width: 34px;
-  height: 34px;
 
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 0;
-  border-radius: 8px;
-}
-
-.edit,
-.delete,
-.boost,
-.boostedStatus {
-  position: relative;
+.edit:hover,
+.delete:hover,
+.boost:hover {
+  background: rgba(15, 23, 42, 0.05);
 }
 
 .tooltip {
