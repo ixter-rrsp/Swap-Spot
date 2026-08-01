@@ -1,6 +1,6 @@
 import { SwapAgreementStatus } from "./SwapAgreementStatus";
 
-export type DeliveryMethod = "meetup" | "lalamove" | "other_courier";
+export type DeliveryMethod = "meetup" | "other_courier";
 export type ItemCondition =
   | "new"
   | "like_new"

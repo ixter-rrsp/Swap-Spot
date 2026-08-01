@@ -163,3 +163,24 @@
 .footer a:hover {
   text-decoration: underline;
 }
+
+.doneState {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.doneText {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.doneText a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.doneText a:hover {
+  text-decoration: underline;
+}

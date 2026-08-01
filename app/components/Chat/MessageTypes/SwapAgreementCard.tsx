@@ -109,7 +109,7 @@ export default function SwapAgreementCard({
         <div>
           <p className={styles.heading}>Swap Agreement</p>
           <p className={styles.deliveryMethod}>
-            {agreement.deliveryMethod === "meetup" ? "Meet Up" : "Lalamove"}
+            {agreement.deliveryMethod === "meetup" ? "Meet Up" : "Courier"}
           </p>
         </div>
       </div>

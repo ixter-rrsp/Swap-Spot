@@ -184,14 +184,14 @@ export async function createSwapAgreement(
       ? swapRequest.receiver_id
       : swapRequest.sender_id;
 
-  if (input.deliveryMethod === "lalamove") {
+  if (input.deliveryMethod === "other_courier") {
     try {
       const serviceSupabase = createServiceClient();
       if (serviceSupabase) {
         await serviceSupabase.from("delivery_bookings").insert({
           agreement_id: data.id,
           user_id: user.id,
-          provider_key: "lalamove",
+          provider_key: "other_courier",
           status: "awaiting_quote",
           normalized_status: "awaiting_quote",
           payload: {

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const swapAgreementSchema = z
   .object({
-    deliveryMethod: z.enum(["meetup", "lalamove", "other_courier"], {
+    deliveryMethod: z.enum(["meetup", "other_courier"], {
       error: "Please choose a delivery method.",
     }),
 
@@ -69,7 +69,7 @@ export const swapAgreementSchema = z
       }
     }
 
-    if (data.deliveryMethod === "lalamove") {
+    if (data.deliveryMethod === "other_courier") {
       if (!data.pickupAddress) {
         ctx.addIssue({
           code: "custom",

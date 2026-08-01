@@ -75,13 +75,16 @@ export async function getNearbyListings(): Promise<Listing[]> {
       swap_radius
     `)
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   if (profileError) {
     throw new Error(profileError.message);
   }
 
+  // Profile may not exist yet for brand-new accounts (trigger hasn't fired)
+  // or the user has no location set — return empty in both cases.
   if (
+    !profile ||
     profile.latitude == null ||
     profile.longitude == null
   ) {

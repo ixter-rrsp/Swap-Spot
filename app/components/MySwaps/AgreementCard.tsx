@@ -37,8 +37,6 @@ function formatDeliveryMethod(method: string) {
   switch (method) {
     case "meetup":
       return "Meetup";
-    case "lalamove":
-      return "Courier";
     case "other_courier":
       return "Courier";
     default:

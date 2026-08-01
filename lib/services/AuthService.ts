@@ -1,52 +1,53 @@
 import { createClient } from "@/utils/supabase/client";
 import { SignupFormData } from "../validations/SignupSchema";
+import { getDeviceFingerprintHash } from "@/lib/utils/fingerprint";
 
 const supabase = createClient();
 
 export async function signUp(
-  data: SignupFormData
+  data: SignupFormData,
+  fingerprintHash?: string,
+  turnstileToken?: string
 ) {
-  const {
-    email,
-    password,
-    fullName,
-    dateOfBirth,
-  } = data;
+  const response = await fetch("/api/auth/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...data,
+      fingerprintHash,
+      turnstileToken,
+    }),
+  });
 
-  const { data: authData, error } =
-    await supabase.auth.signUp({
-      email,
-      password,
-
-      options: {
-        data: {
-          full_name: fullName,
-          date_of_birth: dateOfBirth,
-        },
-      },
-    });
-
-  if (error) {
-    throw new Error(error.message);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.error || "Signup failed.");
   }
 
-  return authData;
+  return resData;
 }
 
 export async function signIn(
   email: string,
-  password: string
+  password: string,
+  fingerprintHash?: string
 ) {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
+  const response = await fetch("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email,
+      password,
+      fingerprintHash,
+    }),
   });
 
-  if (error) {
-    throw new Error(error.message);
+  const resData = await response.json();
+  if (!response.ok) {
+    throw new Error(resData.error || "Sign in failed.");
   }
 
-  return data;
+  return resData;
 }
 
 export async function signOut() {
@@ -68,17 +69,45 @@ export async function getCurrentUser() {
 }
 
 export async function signInWithGoogle() {
-  const { data, error } =
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+  const fingerprintHash = await getDeviceFingerprintHash();
+
+  if (typeof document !== "undefined" && fingerprintHash) {
+    document.cookie = `sb-device-fp=${fingerprintHash}; path=/; max-age=300; SameSite=Lax`;
+  }
+
+  const redirectUrl = new URL(`${window.location.origin}/auth/callback`);
+  if (fingerprintHash) {
+    redirectUrl.searchParams.set("device_fp", fingerprintHash);
+  }
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: redirectUrl.toString(),
+    },
+  });
 
   if (error) {
     throw new Error(error.message);
   }
 
   return data;
+}
+
+/**
+ * Saves latitude, longitude, and city to the authenticated user's profile.
+ * Called after optional location grant during signup.
+ */
+export async function saveUserLocation(
+  latitude: number,
+  longitude: number,
+  city: string
+): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  await supabase
+    .from("profiles")
+    .update({ latitude, longitude, city, updated_at: new Date().toISOString() })
+    .eq("id", user.id);
 }

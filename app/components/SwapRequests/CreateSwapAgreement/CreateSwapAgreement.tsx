@@ -145,7 +145,7 @@ export default function CreateSwapAgreement({
 
       onCreated?.(result.id);
 
-      if (values.deliveryMethod === "lalamove") {
+      if (values.deliveryMethod === "other_courier") {
         onClose();
         router.push(`/agreements/${result.id}/delivery`);
         return;
@@ -201,14 +201,6 @@ export default function CreateSwapAgreement({
                     {...register("deliveryMethod")}
                   />
                   Meet up
-                </label>
-                <label className={styles.radioLabel}>
-                  <input
-                    type="radio"
-                    value="lalamove"
-                    {...register("deliveryMethod")}
-                  />
-                  Lalamove
                 </label>
                 <label className={styles.radioLabel}>
                   <input
@@ -272,7 +264,7 @@ export default function CreateSwapAgreement({
                 </div>
               )}
 
-              {(deliveryMethod === "lalamove" || deliveryMethod === "other_courier") && (
+              {deliveryMethod === "other_courier" && (
                 <div className={styles.fieldGroup}>
                   <label className={styles.label}>
                     Pickup Address

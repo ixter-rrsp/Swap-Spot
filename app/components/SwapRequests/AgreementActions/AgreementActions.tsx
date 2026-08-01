@@ -41,7 +41,7 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
   const deliveryLabel =
     agreement.deliveryMethod === "meetup"
       ? "Meetup handoff"
-      : agreement.deliveryMethod === "lalamove" || agreement.deliveryMethod === "other_courier"
+      : agreement.deliveryMethod === "other_courier"
         ? "Delivery arranged"
         : "Delivery method";
 
@@ -133,7 +133,7 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
       )}
 
       <div className={styles.buttonRow}>
-        {(agreement.deliveryMethod === "lalamove" || agreement.deliveryMethod === "other_courier") && (
+        {agreement.deliveryMethod === "other_courier" && (
           <Link href={`/agreements/${agreement.id}/delivery`} className={styles.confirmButton}>
             Manage Delivery
           </Link>
