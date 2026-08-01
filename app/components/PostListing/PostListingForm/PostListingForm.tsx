@@ -494,6 +494,8 @@ export default function PostListingForm({
             type="number"
             placeholder="45000"
             disabled={loading}
+            min={0}
+            max={10000000}
             {...register("swapValue", {
               valueAsNumber: true,
             })}

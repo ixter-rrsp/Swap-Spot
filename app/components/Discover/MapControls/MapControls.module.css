@@ -1,6 +1,6 @@
 .controls {
   position: absolute;
-  bottom: 20px;
+  bottom: 150px;
   right: 20px;
   display: flex;
   flex-direction: column;
