@@ -1,4 +1,15 @@
 import { z } from "zod";
+import { CATEGORIES, CONDITIONS } from "@/lib/constants/categories";
+
+const categoryValues = CATEGORIES.map((category) => category.value) as [
+  string,
+  ...string[]
+];
+
+const conditionValues = CONDITIONS.map((condition) => condition.value) as [
+  string,
+  ...string[]
+];
 
 export const listingSchema = z.object({
   title: z
@@ -17,6 +28,14 @@ export const listingSchema = z.object({
     .string()
     .trim()
     .min(3, "Tell users what you want in exchange."),
+
+  category: z.enum(categoryValues, {
+    error: "Please select a category.",
+  }),
+
+  condition: z.enum(conditionValues, {
+    error: "Please select the item's condition.",
+  }),
 
   swapValue: z
     .number({

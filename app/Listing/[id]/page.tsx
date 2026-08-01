@@ -109,6 +109,8 @@ export default async function ListingPage({
         swapValue={listing.swapValue}
         lookingFor={listing.lookingFor}
         description={listing.description}
+        category={listing.category}
+        condition={listing.condition}
       />
 
 

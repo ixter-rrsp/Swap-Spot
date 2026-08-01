@@ -1,35 +1,41 @@
 "use client";
 
-import { useState } from "react";
 import styles from "./CategoryChips.module.css";
+import { CATEGORIES } from "@/lib/constants/categories";
 
-const categories = [
-  "All",
-  "Electronics",
-  "Fashion",
-  "Home",
-  "Books",
-  "Sports",
-  "Toys",
-  "Vehicles",
-];
+interface CategoryChipsProps {
+  /** Selected category value, or "all" for no filter. */
+  value: string;
+  onChange: (value: string) => void;
+}
 
-export default function CategoryChips() {
-  const [selected, setSelected] = useState("All");
-
+export default function CategoryChips({
+  value,
+  onChange,
+}: CategoryChipsProps) {
   return (
     <section className={styles.container} aria-label="Categories">
       <div className={styles.scroll}>
-        {categories.map((category) => (
+        <button
+          type="button"
+          className={`${styles.chip} ${
+            value === "all" ? styles.active : ""
+          }`}
+          onClick={() => onChange("all")}
+        >
+          All
+        </button>
+
+        {CATEGORIES.map((category) => (
           <button
-            key={category}
+            key={category.value}
             type="button"
             className={`${styles.chip} ${
-              selected === category ? styles.active : ""
+              value === category.value ? styles.active : ""
             }`}
-            onClick={() => setSelected(category)}
+            onClick={() => onChange(category.value)}
           >
-            {category}
+            {category.label}
           </button>
         ))}
       </div>

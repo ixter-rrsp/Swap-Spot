@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { MapPin } from "lucide-react";
 import styles from "./SwapAgreementCard.module.css";
 import type { SwapAgreement } from "@/lib/types/SwapAgreement";
 
@@ -117,7 +118,11 @@ export default function SwapAgreementCard({
       <div className={styles.detailsBox}>
         {agreement.deliveryMethod === "meetup" ? (
           <p className={styles.detailLine}>
-            📍 {agreement.meetupLocation}
+            <MapPin
+              size={14}
+              style={{ verticalAlign: "-2px", marginRight: "4px" }}
+            />
+            {agreement.meetupLocation}
             {agreement.meetupDate ? ` · ${agreement.meetupDate}` : ""}
             {agreement.meetupTime ? ` · ${agreement.meetupTime}` : ""}
           </p>

@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Listing } from "@/lib/types/Listing";
-import { X } from "lucide-react";
+import { X, MapPin } from "lucide-react";
 import styles from "./ListingPreview.module.css";
 
 interface ListingPreviewProps {
@@ -70,7 +70,11 @@ export default function ListingPreview({
           {/* Location info */}
           <div className={styles.locationInfo}>
             <p className={styles.location}>
-              📍 {getLocationName()}
+              <MapPin
+                size={14}
+                style={{ verticalAlign: "-2px", marginRight: "4px" }}
+              />
+              {getLocationName()}
             </p>
             <p className={styles.distance}>
               {getApproximateDistance(listing.distance)}

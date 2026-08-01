@@ -48,6 +48,8 @@ export default async function ProfilePage() {
       city: "",
       swapValue: 0,
       lookingFor: "",
+      category: "other",
+      condition: "used_good",
       boosted: false,
       images: [],
       owner: {

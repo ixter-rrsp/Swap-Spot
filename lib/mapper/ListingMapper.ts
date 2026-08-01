@@ -25,6 +25,8 @@ interface ListingRow {
   city: string;
   swap_value: number;
   looking_for: string;
+  category: string;
+  condition: string;
   boosted: boolean;
   boost_expires_at?: string | null;
   latitude?: number | null;
@@ -95,6 +97,10 @@ export function mapListing(
     swapValue: listing.swap_value,
 
     lookingFor: listing.looking_for,
+
+    category: listing.category,
+
+    condition: listing.condition,
 
     // Defensive check: treat an expired boost as inactive even if the
     // background sweep (expire_stale_boosts) hasn't flipped the flag yet.

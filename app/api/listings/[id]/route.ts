@@ -48,6 +48,8 @@ export async function PATCH(
       description: body.description,
       city: body.city ?? "",
       lookingFor: body.lookingFor,
+      category: body.category,
+      condition: body.condition,
       swapValue: body.swapValue,
       showOnMap: body.showOnMap ?? true,
       images: body.images ?? [],

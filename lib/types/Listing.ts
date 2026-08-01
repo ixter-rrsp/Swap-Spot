@@ -15,6 +15,10 @@ export interface Listing {
 
   lookingFor: string;
 
+  category: string;
+
+  condition: string;
+
   boosted?: boolean;
 
   boostExpiresAt?: string | null;

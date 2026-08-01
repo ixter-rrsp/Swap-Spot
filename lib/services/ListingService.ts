@@ -158,6 +158,9 @@ export async function createListing(
         looking_for: data.lookingFor,
         swap_value: data.swapValue,
 
+        category: data.category,
+        condition: data.condition,
+
         show_on_map: data.showOnMap ?? true,
 
         boosted: false,

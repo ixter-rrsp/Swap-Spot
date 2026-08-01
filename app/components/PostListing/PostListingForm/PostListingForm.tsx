@@ -10,6 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import Spinner from "@/app/components/UI/Spinner/Spinner";
 
+import { MapPin } from "lucide-react";
+
 import { uploadListingImages } from "@/lib/services/StorageService";
 
 import ImageUploader from "../ImageUploader/ImageUploader";
@@ -30,6 +32,8 @@ import {
 import type { Listing } from "@/lib/types/Listing";
 
 import { BOOST_OPTIONS, BoostDuration, BoostOption } from "@/lib/pricing/boost";
+
+import { CATEGORIES, CONDITIONS } from "@/lib/constants/categories";
 
 import styles from "./PostListingForm.module.css";
 
@@ -138,6 +142,8 @@ export default function PostListingForm({
       title: initialDraft?.title ?? listing?.title ?? "",
       description: initialDraft?.description ?? listing?.description ?? "",
       lookingFor: initialDraft?.lookingFor ?? listing?.lookingFor ?? "",
+      category: initialDraft?.category ?? listing?.category ?? "",
+      condition: initialDraft?.condition ?? listing?.condition ?? "",
       swapValue: initialDraft?.swapValue ?? listing?.swapValue ?? 0,
       showOnMap: initialDraft?.showOnMap ?? listing?.showOnMap ?? true,
     },
@@ -323,6 +329,8 @@ export default function PostListingForm({
         title: watch("title"),
         description: watch("description"),
         lookingFor: watch("lookingFor"),
+        category: watch("category"),
+        condition: watch("condition"),
         swapValue: watch("swapValue"),
         showOnMap: watch("showOnMap"),
         wantBoost,
@@ -472,12 +480,69 @@ export default function PostListingForm({
 
 
         <div className={styles.field}>
+          <label htmlFor="category">
+            Category
+          </label>
+
+          <select
+            id="category"
+            disabled={loading}
+            defaultValue=""
+            {...register("category")}
+          >
+            <option value="" disabled>
+              Select a category
+            </option>
+            {CATEGORIES.map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.label}
+              </option>
+            ))}
+          </select>
+
+          <p>
+            {errors.category?.message}
+          </p>
+        </div>
+
+
+
+        <div className={styles.field}>
+          <label htmlFor="condition">
+            Condition
+          </label>
+
+          <select
+            id="condition"
+            disabled={loading}
+            defaultValue=""
+            {...register("condition")}
+          >
+            <option value="" disabled>
+              Select condition
+            </option>
+            {CONDITIONS.map((condition) => (
+              <option key={condition.value} value={condition.value}>
+                {condition.label}
+              </option>
+            ))}
+          </select>
+
+          <p>
+            {errors.condition?.message}
+          </p>
+        </div>
+
+
+
+        <div className={styles.field}>
           <label>
             Listing Location
           </label>
 
           <div className={styles.locationBox}>
-            📍 Uses your profile location
+            <MapPin size={16} />
+            <span>Uses your profile location</span>
           </div>
         </div>
 

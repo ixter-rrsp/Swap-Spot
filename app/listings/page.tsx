@@ -37,6 +37,8 @@ export default async function ListingsPage() {
     nearbyLandmark: row.nearby_landmark ?? null,
     swapValue: row.swap_value,
     lookingFor: row.looking_for,
+    category: row.category,
+    condition: row.condition,
     boosted: row.boosted,
     owner: {
       id: row.profiles?.id ?? row.owner_id,

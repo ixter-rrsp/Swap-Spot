@@ -157,6 +157,8 @@ export async function getNearbyListings(): Promise<Listing[]> {
         city: listing.city,
         swapValue: listing.swap_value,
         lookingFor: listing.looking_for,
+        category: listing.category,
+        condition: listing.condition,
         boosted:
           listing.boosted &&
           (!listing.boost_expires_at ||

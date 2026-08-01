@@ -47,6 +47,8 @@ export async function getMyListings(): Promise<Listing[]> {
     city: listing.city,
     swapValue: listing.swap_value,
     lookingFor: listing.looking_for,
+    category: listing.category,
+    condition: listing.condition,
     boosted:
       listing.boosted &&
       (!listing.boost_expires_at ||
@@ -119,6 +121,8 @@ export async function getMyListingsForSwap(): Promise<Listing[]> {
     city: listing.city,
     swapValue: listing.swap_value,
     lookingFor: listing.looking_for,
+    category: listing.category,
+    condition: listing.condition,
     boosted:
       listing.boosted &&
       (!listing.boost_expires_at ||
@@ -179,6 +183,8 @@ export async function getListingsByOwner(ownerId: string): Promise<Listing[]> {
     city: listing.city,
     swapValue: listing.swap_value,
     lookingFor: listing.looking_for,
+    category: listing.category,
+    condition: listing.condition,
     boosted:
       listing.boosted &&
       (!listing.boost_expires_at ||
@@ -253,6 +259,8 @@ export async function getListingById(id: string) {
     nearbyLandmark: data.nearby_landmark ?? null,
     swapValue: data.swap_value,
     lookingFor: data.looking_for,
+    category: data.category,
+    condition: data.condition,
     boosted:
       data.boosted &&
       (!data.boost_expires_at ||
@@ -282,7 +290,16 @@ export async function getListingById(id: string) {
   };
 }
 
-export async function getListings() {
+export interface GetListingsOptions {
+  /** Free-text search across title, description, looking_for and category. */
+  search?: string;
+  /** Restrict to a single category value (see lib/constants/categories.ts). */
+  category?: string;
+  /** Restrict to a single condition value (see lib/constants/categories.ts). */
+  condition?: string;
+}
+
+export async function getListings(options: GetListingsOptions = {}) {
   const supabase = await createClient();
 
   const {
@@ -317,6 +334,30 @@ export async function getListings() {
 
   if (user) {
     query = query.neq("owner_id", user.id);
+  }
+
+  if (options.category) {
+    query = query.eq("category", options.category);
+  }
+
+  if (options.condition) {
+    query = query.eq("condition", options.condition);
+  }
+
+  const searchTerm = options.search?.trim();
+
+  if (searchTerm) {
+    // Uses the generated `search_vector` column (see migration
+    // 20260801_add_category_condition_search.sql) for ranked full-text
+    // search across title, category, looking_for and description.
+    const sanitized = searchTerm.replace(/[^\w\s]/g, " ").trim();
+
+    if (sanitized) {
+      query = query.textSearch("search_vector", sanitized, {
+        type: "websearch",
+        config: "english",
+      });
+    }
   }
 
   const { data, error } = await query;
@@ -494,6 +535,8 @@ export async function updateListing(
     description: string;
     city: string;
     lookingFor: string;
+    category?: string;
+    condition?: string;
     swapValue: number;
     showOnMap?: boolean;
     images: string[];
@@ -613,6 +656,8 @@ export async function updateListing(
       description: data.description,
       city: data.city,
       looking_for: data.lookingFor,
+      ...(data.category ? { category: data.category } : {}),
+      ...(data.condition ? { condition: data.condition } : {}),
       swap_value: data.swapValue,
       show_on_map: data.showOnMap ?? true,
       ...landmarkUpdate,

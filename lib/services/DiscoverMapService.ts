@@ -30,6 +30,8 @@ type ListingWithRelations = {
   landmark_longitude: number | null;
   show_on_map: boolean | null;
   swap_value: number;
+  category: string;
+  condition: string;
   boosted: boolean;
   boost_expires_at: string | null;
   listing_images: Array<{
@@ -69,6 +71,8 @@ export async function getMapVisibleListings(): Promise<Listing[]> {
       landmark_longitude,
       show_on_map,
       swap_value,
+      category,
+      condition,
       boosted,
       boost_expires_at,
       listing_images (
@@ -175,6 +179,8 @@ export async function getMapVisibleListings(): Promise<Listing[]> {
       nearbyLandmark: listing.nearby_landmark,
       swapValue: listing.swap_value,
       lookingFor: "",
+      category: listing.category ?? "other",
+      condition: listing.condition ?? "used_good",
       boosted:
         listing.boosted &&
         (!listing.boost_expires_at ||

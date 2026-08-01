@@ -1,4 +1,5 @@
 import styles from "./ListingInfo.module.css";
+import { getCategoryLabel, getConditionLabel } from "@/lib/constants/categories";
 
 interface ListingInfoProps {
   title: string;
@@ -6,6 +7,8 @@ interface ListingInfoProps {
   swapValue: number;
   lookingFor: string;
   description: string;
+  category?: string;
+  condition?: string;
   rating?: number;
 }
 
@@ -15,6 +18,8 @@ export default function ListingInfo({
   swapValue,
   lookingFor,
   description,
+  category,
+  condition,
   rating,
 }: ListingInfoProps) {
 
@@ -33,6 +38,14 @@ export default function ListingInfo({
           <PinIcon />
           {location}
         </span>
+
+        {(category || condition) && (
+          <span className={styles.ratingBadge}>
+            {[getCategoryLabel(category), getConditionLabel(condition)]
+              .filter(Boolean)
+              .join(" · ")}
+          </span>
+        )}
 
         {rating && (
           <span className={styles.ratingBadge}>

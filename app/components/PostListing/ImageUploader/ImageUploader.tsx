@@ -217,7 +217,7 @@ export default function ImageUploader({
 
 
           <small className={styles.counter}>
-            📷 {images.length} of 5 photos selected
+            {images.length} of 5 photos selected
           </small>
 
         </>

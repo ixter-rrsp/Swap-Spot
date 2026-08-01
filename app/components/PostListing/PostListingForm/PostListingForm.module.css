@@ -230,6 +230,10 @@
 }
 
 .locationBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
   padding: 12px;
   border-radius: 8px;
   background: #f3f4f6;

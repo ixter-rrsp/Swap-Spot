@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Listing } from "@/lib/types/Listing";
+import { MapPin } from "lucide-react";
 import styles from "./ListingPin.module.css";
 
 interface ListingPinProps {
@@ -33,7 +34,7 @@ export default function ListingPin({
     >
       <div className={styles.pinOuter}>
         <div className={styles.pinInner}>
-          <span>📍</span>
+          <MapPin size={16} />
         </div>
       </div>
 

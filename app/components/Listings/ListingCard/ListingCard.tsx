@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import ListingActions from "../ListingActions/ListingActions";
+import { getConditionLabel } from "@/lib/constants/categories";
 
 import styles from "./ListingCard.module.css";
 
@@ -22,6 +23,7 @@ interface ListingCardProps {
   city: string;
   swapValue: number;
   lookingFor: string;
+  condition?: string;
   rating?: number;
   boosted?: boolean;
   boostExpiresAt?: string | null;
@@ -40,6 +42,7 @@ export default function ListingCard({
   city,
   swapValue,
   lookingFor,
+  condition,
   rating = 0,
   boosted = false,
   boostExpiresAt = null,
@@ -90,6 +93,12 @@ export default function ListingCard({
           {boosted && (
             <span className={styles.boostBadge}>
               Boosted
+            </span>
+          )}
+
+          {condition && (
+            <span className={styles.conditionBadge}>
+              {getConditionLabel(condition)}
             </span>
           )}
 
