@@ -21,8 +21,8 @@ export const SUBSCRIPTION_PLANS: Record<PlanId, SubscriptionPlanConfig> = {
     durationMonths: null,
     maxActiveListings: 5,
     badgeName: "FREE",
-    badgeColor: "#4b5563", // Gray
-    badgeBg: "#f3f4f6",
+    badgeColor: "white", // Gray
+    badgeBg: "#4b5563",
     description: "Default plan for all SwapSpot members.",
     features: [
       "Up to 5 active item listings",
@@ -55,8 +55,8 @@ export const SUBSCRIPTION_PLANS: Record<PlanId, SubscriptionPlanConfig> = {
     durationMonths: 5,
     maxActiveListings: null, // Unlimited
     badgeName: "Premium",
-    badgeColor: "#475569", // Silver / Slate
-    badgeBg: "#e2e8f0",
+    badgeColor: "white", // Silver / Slate
+    badgeBg: "#A855F7",
     description: "Great value for power users and frequent traders.",
     features: [
       "Unlimited item listings",

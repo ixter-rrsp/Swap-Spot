@@ -8,16 +8,12 @@
   margin-bottom: 32px;
 }
 
-.backButton {
-  display: inline-block;
-  color: var(--primary-color, #007bff);
-  text-decoration: none;
-  font-weight: 600;
-  margin-bottom: 12px;
-}
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 
-.backButton:hover {
-  text-decoration: underline;
+  margin-bottom: 6px;
 }
 
 .headerContent {

@@ -7,6 +7,12 @@
     background: white;
 }
 
+.topRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .user {
     display: flex;
     align-items: center;

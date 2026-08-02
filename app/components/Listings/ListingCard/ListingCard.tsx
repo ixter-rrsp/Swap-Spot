@@ -5,8 +5,6 @@ import {
   Heart,
   MapPin,
   Banknote,
-  RefreshCcw,
-  Star,
   Navigation,
 } from "lucide-react";
 
@@ -35,29 +33,38 @@ interface ListingCardProps {
 }
 
 
+// Distance is only ever populated for nearby listings (see
+// getNearbyListings), so its presence is what distinguishes a nearby
+// card from a regular one — regular listings never carry a distance.
+function getNearbyDistanceLabel(distance: number): string {
+  if (Number.isNaN(distance)) {
+    return "Distance unavailable";
+  }
+
+  if (distance < 1) {
+    const meters = Math.round(distance * 1000);
+    return `${meters}m away`;
+  }
+
+  return `${distance.toFixed(1)}km away`;
+}
+
+
 export default function ListingCard({
   id,
   title,
   imageUrl,
   city,
   swapValue,
-  lookingFor,
   condition,
-  rating = 0,
   boosted = false,
   boostExpiresAt = null,
   distance,
-  nearbyLandmark,
   showActions = false,
 }: ListingCardProps)
  {
-  const getLocationName = (): string => {
-    if (nearbyLandmark) {
-      return `Near ${nearbyLandmark}`;
-    }
+  const isNearby = distance !== undefined;
 
-    return city ? `Near ${city}` : "Nearby";
-  };
   return (
     <article
       className={`${styles.card} ${boosted ? styles.boosted : ""}`}
@@ -112,23 +119,18 @@ export default function ListingCard({
           </h3>
 
 
-          <div className={styles.info}>
-            <MapPin size={16} />
-            <span>
-              {getLocationName()}
-            </span>
-          </div>
-
-
-          {distance !== undefined && (
+          {isNearby ? (
             <div className={styles.info}>
               <Navigation size={16} />
               <span>
-                {distance === undefined || Number.isNaN(distance)
-                  ? "Distance unavailable"
-                  : distance < 0.1
-                  ? "Less than 100m away"
-                  : `${distance.toFixed(1)} km away`}
+                {getNearbyDistanceLabel(distance!)}
+              </span>
+            </div>
+          ) : (
+            <div className={styles.info}>
+              <MapPin size={16} />
+              <span>
+                Location: {city}
               </span>
             </div>
           )}
@@ -139,30 +141,6 @@ export default function ListingCard({
             <span>
               {swapValue.toLocaleString()}
             </span>
-          </div>
-
-
-          <div className={styles.info}>
-            <RefreshCcw size={16} />
-            <span>
-              {lookingFor}
-            </span>
-          </div>
-
-
-          <div className={styles.footer}>
-
-            <div className={styles.rating}>
-              <Star
-                size={15}
-                fill="currentColor"
-              />
-
-              <span>
-                {rating.toFixed(1)}
-              </span>
-            </div>
-
           </div>
 
         </div>

@@ -1,6 +1,6 @@
 .header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
@@ -9,6 +9,12 @@
 .copy {
   display: flex;
   flex-direction: column;
+  gap: 4px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
   gap: 4px;
 }
 
@@ -30,18 +36,5 @@
 }
 
 .backButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: transparent;
-  border: none;
-  color: #374151;
-  margin-right: 8px;
-}
-
-.backButton:hover {
-  background: rgba(0,0,0,0.04);
+  margin-left: -6px;
 }

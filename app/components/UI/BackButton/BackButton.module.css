@@ -1,0 +1,50 @@
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+
+  transition: background 0.2s ease;
+}
+
+.overlay {
+  position: fixed;
+  top: calc(16px + env(safe-area-inset-top));
+  left: 16px;
+
+  z-index: 950;
+
+  width: 40px;
+  height: 40px;
+
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.9);
+  color: #111827;
+
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.overlay:hover {
+  background: #ffffff;
+}
+
+.inline {
+  position: static;
+
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+
+  border-radius: 8px;
+
+  background: transparent;
+  color: #374151;
+}
+
+.inline:hover {
+  background: rgba(0, 0, 0, 0.04);
+}

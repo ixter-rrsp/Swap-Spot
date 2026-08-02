@@ -5,6 +5,7 @@ import HomeContent from "../components/HomePage/HomeContent/HomeContent";
 
 import { getListings, getBoostedListings } from "@/lib/services/ServerListingService";
 import { getNearbyListings } from "@/lib/services/NearbyListingService";
+import { getCurrentProfile } from "@/lib/services/ProfileService";
 
 import type { Listing } from "@/lib/types/Listing";
 
@@ -52,6 +53,9 @@ export default async function HomePage() {
   const nearbyListings =
     await getNearbyListings();
 
+  const profile =
+    await getCurrentProfile();
+
 
   const listings: Listing[] = rows.map(mapRow);
   const boostedListings: Listing[] = boostedRows.map(mapRow);
@@ -61,7 +65,10 @@ export default async function HomePage() {
   return (
     <div className={styles.container}>
 
-      <HomeHeader />
+      <HomeHeader
+        avatarUrl={profile?.avatarUrl ?? null}
+        username={profile?.username ?? null}
+      />
 
 
       <HomeContent

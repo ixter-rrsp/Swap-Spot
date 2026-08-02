@@ -16,6 +16,8 @@ import BoostReturnHandler from "@/app/components/Listings/BoostReturnHandler/Boo
 
 import { createClient } from "@/utils/supabase/server";
 
+import BackButton from "@/app/components/UI/BackButton/BackButton";
+
 import styles from "./page.module.css";
 
 
@@ -89,7 +91,7 @@ export default async function ListingPage({
   return (
 
     <main className={styles.container}>
-
+      <BackButton />
       <Suspense fallback={null}>
         <BoostReturnHandler listingId={listing.id} />
       </Suspense>

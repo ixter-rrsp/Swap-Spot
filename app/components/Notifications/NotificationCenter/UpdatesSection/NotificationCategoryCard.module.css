@@ -30,8 +30,9 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #2563eb;
+  background: transparent;
   font-size: 18px;
+  color: #2563eb;
 }
 
 .textBlock {

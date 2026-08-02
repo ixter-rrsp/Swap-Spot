@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import BackButton from "@/app/components/UI/BackButton/BackButton";
+
 import styles from "./ChatHeader.module.css";
 
 interface HeaderProps {
@@ -26,33 +28,39 @@ export default function Header({
     return (
         <header className={styles.container}>
 
-            <div className={styles.user}>
+            <div className={styles.topRow}>
 
-                <div className={styles.avatar}>
+                <BackButton variant="inline" />
 
-                    {avatarUrl ? (
-                        <Image
-                            src={avatarUrl}
-                            alt={username}
-                            fill
-                        />
-                    ) : (
-                        <span>
-                            {username.charAt(0).toUpperCase()}
-                        </span>
-                    )}
+                <div className={styles.user}>
 
-                </div>
+                    <div className={styles.avatar}>
 
-                <div>
-                    <h3>
-                        {fullName || username}
-                    </h3>
+                        {avatarUrl ? (
+                            <Image
+                                src={avatarUrl}
+                                alt={username}
+                                fill
+                            />
+                        ) : (
+                            <span>
+                                {username.charAt(0).toUpperCase()}
+                            </span>
+                        )}
 
-                    <p className={styles.activeStatus}>
-                        <span className={styles.activeDot} />
-                        Active now
-                    </p>
+                    </div>
+
+                    <div>
+                        <h3>
+                            {fullName || username}
+                        </h3>
+
+                        <p className={styles.activeStatus}>
+                            <span className={styles.activeDot} />
+                            Active now
+                        </p>
+                    </div>
+
                 </div>
 
             </div>

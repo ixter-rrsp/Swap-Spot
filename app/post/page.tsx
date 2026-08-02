@@ -39,7 +39,7 @@ export default async function PostPage({ searchParams }: PostPageProps) {
 
   return (
     <main className={styles.container}>
-      <PageHeader title={listing ? "Edit Listing" : "Post a Listing"} />
+      <PageHeader title={listing ? "Edit Listing" : "Post a Listing"} showBack />
 
       <Suspense fallback={null}>
         <PostListingForm listing={listing} />

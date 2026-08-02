@@ -1,5 +1,5 @@
 import React from "react";
-import Link from "next/link";
+import BackButton from "@/app/components/UI/BackButton/BackButton";
 import styles from "./MySwapList.module.css";
 
 interface MySwapListProps {
@@ -13,11 +13,11 @@ export default function MySwapList({ title, emptyMessage, children, isEmpty }: M
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <Link href="/profile" className={styles.backButton}>
-          ← Back to Dashboard
-        </Link>
-        <div className={styles.headerContent}>
+        <div className={styles.titleRow}>
+          <BackButton href="/profile" variant="inline" />
           <h2 className={styles.title}>{title}</h2>
+        </div>
+        <div className={styles.headerContent}>
           <p className={styles.subtitle}>
             Keep track of the latest status and next step for each swap in one place.
           </p>

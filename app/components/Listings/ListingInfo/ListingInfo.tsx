@@ -31,7 +31,13 @@ export default function ListingInfo({
 
   return (
     <section className={styles.container}>
-      <h2 className={styles.title}>{title}</h2>
+      <div className={styles.titleRow}>
+        <h2 className={styles.title}>{title}</h2>
+
+        <p className={styles.value}>
+          {swapValue.toLocaleString()}
+        </p>
+      </div>
 
       <div className={styles.meta}>
         <span className={styles.location}>
@@ -53,13 +59,6 @@ export default function ListingInfo({
             {rating.toFixed(1)}
           </span>
         )}
-      </div>
-
-      <div className={styles.card}>
-        <h2 className={styles.heading}>Swap Value</h2>
-        <p className={styles.value}>
-          {swapValue.toLocaleString()}
-        </p>
       </div>
 
       <div className={styles.card}>

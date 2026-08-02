@@ -443,7 +443,7 @@ export async function resolveListingLandmark(
       directValue(address.barangay) ??
       directValue(data.name) ??
       directValue(data.display_name) ??
-      (city || null);
+      (city || "Location");
   }
 
   if (landmarkLatitude == null || landmarkLongitude == null) {
