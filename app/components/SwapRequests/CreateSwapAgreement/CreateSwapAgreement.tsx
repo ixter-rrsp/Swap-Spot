@@ -19,13 +19,7 @@ interface Props {
   onCreated?: (agreementId: string) => void;
 }
 
-const CONDITION_OPTIONS = [
-  { value: "new", label: "New" },
-  { value: "like_new", label: "Like New" },
-  { value: "good", label: "Good" },
-  { value: "fair", label: "Fair" },
-  { value: "needs_repair", label: "Needs Repair" },
-] as const;
+import { getConditionLabel } from "@/lib/constants/categories";
 
 export default function CreateSwapAgreement({
   swapRequestId,
@@ -45,13 +39,13 @@ export default function CreateSwapAgreement({
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm<SwapAgreementFormInput, unknown, SwapAgreementFormData>({
     resolver: zodResolver(swapAgreementSchema),
+    defaultValues: {
+      deliveryMethod: "meetup",
+    },
   });
-
-  const deliveryMethod = watch("deliveryMethod");
 
   useEffect(() => {
     async function load() {
@@ -107,12 +101,8 @@ export default function CreateSwapAgreement({
       emailRequester: isRequester ? values.yourEmail : values.theirEmail,
       emailReceiver: isRequester ? values.theirEmail : values.yourEmail,
 
-      requesterCondition: isRequester
-        ? values.yourCondition
-        : values.theirCondition,
-      receiverCondition: isRequester
-        ? values.theirCondition
-        : values.yourCondition,
+      requesterCondition: detail?.offeredListing.condition,
+      receiverCondition: detail?.requestedListing.condition,
 
       requesterAccessories: isRequester
         ? values.yourAccessories
@@ -144,12 +134,6 @@ export default function CreateSwapAgreement({
       const result = await response.json();
 
       onCreated?.(result.id);
-
-      if (values.deliveryMethod === "other_courier") {
-        onClose();
-        router.push(`/agreements/${result.id}/delivery`);
-        return;
-      }
 
       setSent(true);
       setTimeout(() => {
@@ -191,110 +175,52 @@ export default function CreateSwapAgreement({
             </div>
 
             <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>Delivery Method</h3>
+              <h3 className={styles.sectionTitle}>Meetup Details</h3>
 
-              <div className={styles.radioRow}>
-                <label className={styles.radioLabel}>
+              <div className={styles.fieldGroup}>
+                <label className={styles.label}>
+                  Meeting Place
                   <input
-                    type="radio"
-                    value="meetup"
-                    {...register("deliveryMethod")}
+                    className={styles.input}
+                    type="text"
+                    placeholder="e.g. SM North EDSA, near the cinema"
+                    {...register("meetupLocation")}
                   />
-                  Meet up
                 </label>
-                <label className={styles.radioLabel}>
+                {errors.meetupLocation && (
+                  <span className={styles.fieldError}>
+                    {errors.meetupLocation.message}
+                  </span>
+                )}
+
+                <label className={styles.label}>
+                  Meeting Date
                   <input
-                    type="radio"
-                    value="other_courier"
-                    {...register("deliveryMethod")}
+                    className={styles.input}
+                    type="date"
+                    {...register("meetupDate")}
                   />
-                  Other Courier
                 </label>
+                {errors.meetupDate && (
+                  <span className={styles.fieldError}>
+                    {errors.meetupDate.message}
+                  </span>
+                )}
+
+                <label className={styles.label}>
+                  Meeting Time
+                  <input
+                    className={styles.input}
+                    type="time"
+                    {...register("meetupTime")}
+                  />
+                </label>
+                {errors.meetupTime && (
+                  <span className={styles.fieldError}>
+                    {errors.meetupTime.message}
+                  </span>
+                )}
               </div>
-              {errors.deliveryMethod && (
-                <span className={styles.fieldError}>
-                  {errors.deliveryMethod.message}
-                </span>
-              )}
-
-              {deliveryMethod === "meetup" && (
-                <div className={styles.fieldGroup}>
-                  <label className={styles.label}>
-                    Meeting Place
-                    <input
-                      className={styles.input}
-                      type="text"
-                      placeholder="e.g. SM North EDSA, near the cinema"
-                      {...register("meetupLocation")}
-                    />
-                  </label>
-                  {errors.meetupLocation && (
-                    <span className={styles.fieldError}>
-                      {errors.meetupLocation.message}
-                    </span>
-                  )}
-
-                  <label className={styles.label}>
-                    Meeting Date
-                    <input
-                      className={styles.input}
-                      type="date"
-                      {...register("meetupDate")}
-                    />
-                  </label>
-                  {errors.meetupDate && (
-                    <span className={styles.fieldError}>
-                      {errors.meetupDate.message}
-                    </span>
-                  )}
-
-                  <label className={styles.label}>
-                    Meeting Time
-                    <input
-                      className={styles.input}
-                      type="time"
-                      {...register("meetupTime")}
-                    />
-                  </label>
-                  {errors.meetupTime && (
-                    <span className={styles.fieldError}>
-                      {errors.meetupTime.message}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {deliveryMethod === "other_courier" && (
-                <div className={styles.fieldGroup}>
-                  <label className={styles.label}>
-                    Pickup Address
-                    <input
-                      className={styles.input}
-                      type="text"
-                      {...register("pickupAddress")}
-                    />
-                  </label>
-                  {errors.pickupAddress && (
-                    <span className={styles.fieldError}>
-                      {errors.pickupAddress.message}
-                    </span>
-                  )}
-
-                  <label className={styles.label}>
-                    Drop-off Address
-                    <input
-                      className={styles.input}
-                      type="text"
-                      {...register("dropoffAddress")}
-                    />
-                  </label>
-                  {errors.dropoffAddress && (
-                    <span className={styles.fieldError}>
-                      {errors.dropoffAddress.message}
-                    </span>
-                  )}
-                </div>
-              )}
             </div>
 
             <div className={styles.section}>
@@ -357,30 +283,17 @@ export default function CreateSwapAgreement({
               <h3 className={styles.sectionTitle}>Item Condition</h3>
               <div className={styles.fieldGroup}>
                 <label className={styles.label}>
-                  Your Item ({detail.offeredListing.title})
-                  <select className={styles.input} {...register("yourCondition")}>
-                    <option value="">Select condition</option>
-                    {CONDITION_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  {detail.offeredListing.title}
+                  <span className={styles.readOnlyValue}>
+                    {getConditionLabel(detail.offeredListing.condition)}
+                  </span>
                 </label>
 
                 <label className={styles.label}>
-                  Their Item ({detail.requestedListing.title})
-                  <select
-                    className={styles.input}
-                    {...register("theirCondition")}
-                  >
-                    <option value="">Select condition</option>
-                    {CONDITION_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  {detail.requestedListing.title}
+                  <span className={styles.readOnlyValue}>
+                    {getConditionLabel(detail.requestedListing.condition)}
+                  </span>
                 </label>
               </div>
             </div>

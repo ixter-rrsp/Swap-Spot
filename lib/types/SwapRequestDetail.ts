@@ -27,6 +27,7 @@ export interface SwapRequestDetail {
     city: string;
     lookingFor: string;
     swapValue: number;
+    condition: string;
     imageUrl?: string;
   };
 
@@ -37,6 +38,7 @@ export interface SwapRequestDetail {
     city: string;
     lookingFor: string;
     swapValue: number;
+    condition: string;
     imageUrl?: string;
   };
 }

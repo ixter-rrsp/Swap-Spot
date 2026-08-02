@@ -49,6 +49,7 @@ export async function getSwapRequestById(
         city,
         looking_for,
         swap_value,
+        condition,
         listing_images(
           image_url,
           sort_order
@@ -61,6 +62,7 @@ export async function getSwapRequestById(
         city,
         looking_for,
         swap_value,
+        condition,
         listing_images(
           image_url,
           sort_order
@@ -119,6 +121,7 @@ export async function getSwapRequestById(
       city: data.offered_listing.city,
       lookingFor: data.offered_listing.looking_for,
       swapValue: data.offered_listing.swap_value,
+      condition: data.offered_listing.condition,
       imageUrl:
         data.offered_listing.listing_images?.[0]?.image_url,
     },
@@ -130,6 +133,7 @@ export async function getSwapRequestById(
       city: data.requested_listing.city,
       lookingFor: data.requested_listing.looking_for,
       swapValue: data.requested_listing.swap_value,
+      condition: data.requested_listing.condition,
       imageUrl:
         data.requested_listing.listing_images?.[0]?.image_url,
     },

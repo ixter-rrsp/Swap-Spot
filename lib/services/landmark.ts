@@ -341,11 +341,18 @@ export async function resolveListingLandmark(
     });
 
     if (!response.ok) {
+      // If we don't have real coordinates for the fallback city, fall back
+      // to a masked coordinate around the exact point instead of leaving
+      // landmark_latitude/longitude null — nearby_landmark must never be
+      // set without matching coordinates (listings_landmark_consistency).
+      const safeCoordinates =
+        fallbackCoordinates ?? buildMaskedCoordinate(latitude, longitude);
+
       return {
         city: fallbackCityName,
         landmark: fallbackCityName || null,
-        landmarkLatitude: fallbackCoordinates?.lat ?? null,
-        landmarkLongitude: fallbackCoordinates?.lon ?? null,
+        landmarkLatitude: fallbackCityName ? safeCoordinates.lat : null,
+        landmarkLongitude: fallbackCityName ? safeCoordinates.lon : null,
       };
     }
 

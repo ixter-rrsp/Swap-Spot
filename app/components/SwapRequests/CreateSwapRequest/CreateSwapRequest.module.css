@@ -74,7 +74,9 @@
   gap: 12px;
   cursor: pointer;
   text-align: left;
+  color:#111827;
 }
+
 
 
 .item {
@@ -83,6 +85,11 @@
   border: 1px solid #ddd;
 }
 
+.itemValue {
+  color: #16a34a;
+  font-weight: 700;
+  white-space: nowrap;
+}
 
 .selected {
   background: #dcfce7;
