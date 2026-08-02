@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "./AgreementActions.module.css";
 import { SwapAgreementDetail } from "@/lib/types/SwapAgreementDetail";
@@ -39,6 +38,10 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
 
   const canComplete = agreement.status === "confirmed" && !hasCompleted;
 
+  const pickupMissing =
+    agreement.deliveryMethod === "other_courier" &&
+    agreement.myItemPickedUp === false;
+
   const canCancel =
     agreement.status !== "completed" && agreement.status !== "cancelled";
 
@@ -53,9 +56,11 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
     ? "Fill in your delivery details"
     : canConfirm
       ? "Ready to confirm the agreement"
-      : canComplete
-        ? "Ready to mark the swap as complete"
-        : "Next step is to keep the handoff clear";
+      : pickupMissing
+        ? "Mark your item as picked up first"
+        : canComplete
+          ? "Ready to mark the swap as complete"
+          : "Next step is to keep the handoff clear";
 
   async function runAction(kind: ActionKind) {
     setError(null);
@@ -136,17 +141,13 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
         <p className={styles.hint}>
           {hasCompleted
             ? "Waiting for the other party to mark this as completed."
-            : "Once the exchange has happened, mark it as completed."}
+            : pickupMissing
+              ? "Mark your item as picked up in Manage Delivery before you can complete this swap."
+              : "Once the exchange has happened, mark it as completed."}
         </p>
       )}
 
       <div className={styles.buttonRow}>
-        {agreement.deliveryMethod === "other_courier" && (
-          <Link href={`/agreements/${agreement.id}/delivery`} className={styles.confirmButton}>
-            Manage Delivery
-          </Link>
-        )}
-
         {canConfirm && (
           <button
             className={styles.confirmButton}
@@ -164,10 +165,14 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
         {canComplete && (
           <button
             className={styles.completeButton}
-            disabled={pendingAction !== null}
+            disabled={pendingAction !== null || pickupMissing}
             onClick={() => confirmAction("complete")}
           >
-            {pendingAction === "complete" ? "Completing..." : "Complete Swap"}
+            {pendingAction === "complete"
+              ? "Completing..."
+              : pickupMissing
+                ? "Mark Item Picked Up First"
+                : "Complete Swap"}
           </button>
         )}
 

@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
 import AgreementStatus from "@/app/components/SwapRequests/AgreementStatus/AgreementStatus";
 import AgreementDeliveryDetails from "@/app/components/SwapRequests/AgreementDeliveryDetails/AgreementDeliveryDetails";
+import DeliveryAgreementCard from "@/app/components/SwapRequests/DeliveryAgreement/DeliveryAgreementCard";
 import AgreementActions from "@/app/components/SwapRequests/AgreementActions/AgreementActions";
 import { SwapAgreementDetail } from "@/lib/types/SwapAgreementDetail";
 import styles from "./page.module.css";
@@ -67,6 +68,10 @@ export default function AgreementPage() {
         <AgreementStatus status={agreement.status} />
         <AgreementDeliveryDetails agreement={agreement} />
       </div>
+
+      {agreement.deliveryMethod === "other_courier" && (
+        <DeliveryAgreementCard swapAgreementId={id!} />
+      )}
 
       <AgreementActions agreement={agreement} />
     </main>

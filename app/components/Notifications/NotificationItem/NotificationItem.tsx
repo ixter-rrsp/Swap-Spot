@@ -114,7 +114,7 @@ export default function NotificationItem({
           notification.type === "delivery_ready_to_book" ||
           notification.type === "delivery_booked"
         ) {
-          router.push(`/agreements/${notification.referenceId}/delivery`);
+          router.push(`/agreements/${notification.referenceId}`);
           return;
         }
       }
