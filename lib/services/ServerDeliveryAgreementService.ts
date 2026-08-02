@@ -280,8 +280,6 @@ export async function submitDeliveryInfo(
   if (error) throw new Error(error.message);
 
   const otherUserId = isRequester ? row.receiver_id : row.requester_id;
-  const myName = isRequester ? "Requester" : "Receiver";
-
   try {
     if (otherSubmitted) {
       await sendSystemMessage(
@@ -305,7 +303,7 @@ export async function submitDeliveryInfo(
     } else {
       await sendSystemMessage(
         row.conversation_id,
-        `${myName} completed delivery information.\n\nWaiting for the other party.`
+        "{{actor}} completed delivery information.\n\nWaiting for the other party."
       );
       await createNotification({
         userId: otherUserId,
@@ -373,8 +371,6 @@ export async function submitCourierBooking(
   if (error) throw new Error(error.message);
 
   const otherUserId = isRequester ? row.receiver_id : row.requester_id;
-  const myName = isRequester ? "Requester" : "Receiver";
-
   try {
     if (otherBooked) {
       await sendSystemMessage(
@@ -398,7 +394,7 @@ export async function submitCourierBooking(
     } else {
       await sendSystemMessage(
         row.conversation_id,
-        `${myName} submitted courier booking.\n\nWaiting for the other party.`
+        "{{actor}} submitted courier booking.\n\nWaiting for the other party."
       );
       await createNotification({
         userId: otherUserId,
@@ -465,6 +461,15 @@ export async function markDeliveryPickedUp(
       await sendSystemMessage(
         row.conversation_id,
         "Both items have been picked up by the courier."
+      );
+    } catch (sideEffectError) {
+      console.error("Failed to send pickup side effect:", sideEffectError);
+    }
+  } else {
+    try {
+      await sendSystemMessage(
+        row.conversation_id,
+        "{{actor}} marked their item as picked up.\n\nWaiting for the other party."
       );
     } catch (sideEffectError) {
       console.error("Failed to send pickup side effect:", sideEffectError);

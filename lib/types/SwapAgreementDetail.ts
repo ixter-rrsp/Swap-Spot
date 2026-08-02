@@ -10,4 +10,10 @@ export interface SwapAgreementDetail extends SwapAgreement {
   // current user has submitted their own pickup details in the Delivery
   // Agreement yet. Null for meetup swaps, where this doesn't apply.
   myDeliveryInfoSubmitted: boolean | null;
+
+  // Only meaningful when deliveryMethod is "other_courier": whether the
+  // current user has marked their item as picked up in the Delivery
+  // Agreement yet. Null for meetup swaps, where this doesn't apply.
+  // A swap can't be completed by this user until this is true.
+  myItemPickedUp: boolean | null;
 }

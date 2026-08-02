@@ -23,7 +23,7 @@ export default function MessageBubble({
 
     // System messages render centered, without the mine/theirs bubble wrapper.
     if (message.messageType === "system") {
-        return <SystemMessage text={message.message} />;
+        return <SystemMessage text={message.message} isMine={isMine} />;
     }
 
     return (

@@ -59,6 +59,7 @@
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
+  text-align: center;
 }
 
 .statusGray {
@@ -68,7 +69,7 @@
 
 .statusAmber {
   background: #fef3c7;
-  color: #78350f;
+  color: #604d4d;
 }
 
 .statusBlue {

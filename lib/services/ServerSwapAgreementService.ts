@@ -228,25 +228,33 @@ export async function getSwapAgreementById(
   );
 
   let myDeliveryInfoSubmitted: boolean | null = null;
+  let myItemPickedUp: boolean | null = null;
 
   if (agreement.delivery_method === "other_courier") {
     const isRequester = user.id === agreement.requester_id;
 
     const { data: deliveryAgreement } = await supabase
       .from("delivery_agreements")
-      .select("requester_info_submitted_at, receiver_info_submitted_at")
+      .select(
+        "requester_info_submitted_at, receiver_info_submitted_at, requester_picked_up_at, receiver_picked_up_at"
+      )
       .eq("swap_agreement_id", agreementId)
       .maybeSingle();
 
     myDeliveryInfoSubmitted = isRequester
       ? !!deliveryAgreement?.requester_info_submitted_at
       : !!deliveryAgreement?.receiver_info_submitted_at;
+
+    myItemPickedUp = isRequester
+      ? !!deliveryAgreement?.requester_picked_up_at
+      : !!deliveryAgreement?.receiver_picked_up_at;
   }
 
   return {
     ...mapSwapAgreement(agreement),
     currentUserId: user.id,
     myDeliveryInfoSubmitted,
+    myItemPickedUp,
   };
 }
 
@@ -380,6 +388,28 @@ export async function completeSwapAgreement(
 
   if (alreadyCompleted) {
     throw new Error("You have already marked this swap as completed.");
+  }
+
+  if (agreement.delivery_method === "other_courier") {
+    const { data: deliveryAgreement, error: deliveryError } = await supabase
+      .from("delivery_agreements")
+      .select("requester_picked_up_at, receiver_picked_up_at")
+      .eq("swap_agreement_id", agreementId)
+      .maybeSingle();
+
+    if (deliveryError) {
+      throw new Error(deliveryError.message);
+    }
+
+    const myItemPickedUp = isRequester
+      ? !!deliveryAgreement?.requester_picked_up_at
+      : !!deliveryAgreement?.receiver_picked_up_at;
+
+    if (!myItemPickedUp) {
+      throw new Error(
+        "You must mark your item as picked up before completing this swap."
+      );
+    }
   }
 
   const now = new Date().toISOString();
