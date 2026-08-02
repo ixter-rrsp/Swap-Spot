@@ -69,22 +69,9 @@ export const swapAgreementSchema = z
       }
     }
 
-    if (data.deliveryMethod === "other_courier") {
-      if (!data.pickupAddress) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["pickupAddress"],
-          message: "Pickup address is required.",
-        });
-      }
-      if (!data.dropoffAddress) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["dropoffAddress"],
-          message: "Drop-off address is required.",
-        });
-      }
-    }
+    // For "other_courier" no address is collected here — each party fills
+    // in their own pickup address separately in the Delivery Agreement
+    // once the swap agreement itself has been created.
   });
 
 export type SwapAgreementFormData = z.output<typeof swapAgreementSchema>;

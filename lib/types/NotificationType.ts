@@ -8,4 +8,7 @@ export type NotificationType =
   | "agreement_confirmed"
   | "agreement_completed"
   | "agreement_cancelled"
+  | "delivery_info_needed"
+  | "delivery_ready_to_book"
+  | "delivery_booked"
   | "new_review";

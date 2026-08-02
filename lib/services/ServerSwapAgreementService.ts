@@ -1,5 +1,4 @@
 import { createClient } from "@/utils/supabase/server";
-import createServiceClient from "@/utils/supabase/service";
 
 import { SwapAgreement, CreateSwapAgreementInput } from "@/lib/types/SwapAgreement";
 import { SwapAgreementDetail } from "@/lib/types/SwapAgreementDetail";
@@ -10,6 +9,7 @@ import {
   sendSystemMessage,
   sendReviewRequestMessage,
 } from "@/lib/services/ServerChatService";
+import { createDeliveryAgreementForSwapAgreement } from "@/lib/services/ServerDeliveryAgreementService";
 
 function mapSwapAgreement(row: any): SwapAgreement {
   return {
@@ -186,23 +186,14 @@ export async function createSwapAgreement(
 
   if (input.deliveryMethod === "other_courier") {
     try {
-      const serviceSupabase = createServiceClient();
-      if (serviceSupabase) {
-        await serviceSupabase.from("delivery_bookings").insert({
-          agreement_id: data.id,
-          user_id: user.id,
-          provider_key: "other_courier",
-          status: "awaiting_quote",
-          normalized_status: "awaiting_quote",
-          payload: {
-            source: "agreement_created",
-            pickup_address: input.pickupAddress ?? null,
-            dropoff_address: input.dropoffAddress ?? null,
-          },
-        });
-      }
-    } catch (bookingError) {
-      console.error("Failed to create initial delivery booking:", bookingError);
+      await createDeliveryAgreementForSwapAgreement({
+        swapAgreementId: data.id,
+        conversationId: input.conversationId,
+        requesterId: swapRequest.sender_id,
+        receiverId: swapRequest.receiver_id,
+      });
+    } catch (deliveryAgreementError) {
+      console.error("Failed to create delivery agreement:", deliveryAgreementError);
     }
   }
 

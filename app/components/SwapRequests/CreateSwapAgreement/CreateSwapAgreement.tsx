@@ -39,6 +39,7 @@ export default function CreateSwapAgreement({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<SwapAgreementFormInput, unknown, SwapAgreementFormData>({
     resolver: zodResolver(swapAgreementSchema),
@@ -46,6 +47,8 @@ export default function CreateSwapAgreement({
       deliveryMethod: "meetup",
     },
   });
+
+  const deliveryMethod = watch("deliveryMethod");
 
   useEffect(() => {
     async function load() {
@@ -84,17 +87,24 @@ export default function CreateSwapAgreement({
 
     // Map the generic "your" / "their" fields collected in the form onto
     // requester/receiver based on the current user's actual role.
+    //
+    // The meetup fields are hidden (and thus empty strings) when the
+    // delivery method is "other_courier" — Postgres rejects "" for
+    // date/time columns, so send null instead whenever a value is blank.
+    const blankToNull = (value?: string | null) =>
+      value && value.trim() !== "" ? value : null;
+
     const payload = {
       swapRequestId,
       conversationId,
       deliveryMethod: values.deliveryMethod,
 
-      meetupLocation: values.meetupLocation,
-      meetupDate: values.meetupDate,
-      meetupTime: values.meetupTime,
+      meetupLocation: blankToNull(values.meetupLocation),
+      meetupDate: blankToNull(values.meetupDate),
+      meetupTime: blankToNull(values.meetupTime),
 
-      pickupAddress: values.pickupAddress,
-      dropoffAddress: values.dropoffAddress,
+      pickupAddress: blankToNull(values.pickupAddress),
+      dropoffAddress: blankToNull(values.dropoffAddress),
 
       phoneRequester: isRequester ? values.yourPhone : values.theirPhone,
       phoneReceiver: isRequester ? values.theirPhone : values.yourPhone,
@@ -175,6 +185,46 @@ export default function CreateSwapAgreement({
             </div>
 
             <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>Delivery Method</h3>
+
+              <div className={styles.radioRow}>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    value="meetup"
+                    {...register("deliveryMethod")}
+                  />
+                  Meet-up
+                </label>
+                <label className={styles.radioLabel}>
+                  <input
+                    type="radio"
+                    value="other_courier"
+                    {...register("deliveryMethod")}
+                  />
+                  Other Courier
+                </label>
+              </div>
+              {errors.deliveryMethod && (
+                <span className={styles.fieldError}>
+                  {errors.deliveryMethod.message}
+                </span>
+              )}
+            </div>
+
+            {deliveryMethod === "other_courier" && (
+              <div className={styles.section}>
+                <p className={styles.summaryText}>
+                  Once this agreement is sent and confirmed, you and the
+                  other party will each fill in your own pickup details in
+                  the Delivery Agreement, and courier booking instructions
+                  will be generated automatically.
+                </p>
+              </div>
+            )}
+
+            {deliveryMethod === "meetup" && (
+            <div className={styles.section}>
               <h3 className={styles.sectionTitle}>Meetup Details</h3>
 
               <div className={styles.fieldGroup}>
@@ -222,6 +272,7 @@ export default function CreateSwapAgreement({
                 )}
               </div>
             </div>
+            )}
 
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>Your Contact Info</h3>

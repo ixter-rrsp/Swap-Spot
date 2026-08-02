@@ -51,16 +51,11 @@ export default function AgreementDeliveryDetails({
           </div>
         </div>
       ) : (
-        <div className={styles.grid}>
-          <div>
-            <p className={styles.label}>Pickup Address</p>
-            <p className={styles.value}>{formatOptionalValue(agreement.pickupAddress)}</p>
-          </div>
-          <div>
-            <p className={styles.label}>Drop-off Address</p>
-            <p className={styles.value}>{formatOptionalValue(agreement.dropoffAddress)}</p>
-          </div>
-        </div>
+        <p className={styles.value}>
+          Each of you fills in your own pickup details in the Delivery
+          Agreement below. Once both are in, courier booking instructions
+          are generated automatically.
+        </p>
       )}
 
       <h3 className={styles.heading}>Contact Info</h3>

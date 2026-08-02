@@ -108,6 +108,15 @@ export default function NotificationItem({
           router.push(`/agreements/${notification.referenceId}`);
           return;
         }
+
+        if (
+          notification.type === "delivery_info_needed" ||
+          notification.type === "delivery_ready_to_book" ||
+          notification.type === "delivery_booked"
+        ) {
+          router.push(`/agreements/${notification.referenceId}/delivery`);
+          return;
+        }
       }
 
       router.push("/notifications");

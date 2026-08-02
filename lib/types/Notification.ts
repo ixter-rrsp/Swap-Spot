@@ -9,6 +9,9 @@ export type NotificationType =
   | "agreement_confirmed"
   | "agreement_completed"
   | "agreement_cancelled"
+  | "delivery_info_needed"
+  | "delivery_ready_to_book"
+  | "delivery_booked"
   | "swap_completed";
 
 export type NotificationCategory =
@@ -54,6 +57,9 @@ export const notificationCategoryTypes: Record<
     "agreement_confirmed",
     "agreement_completed",
     "agreement_cancelled",
+    "delivery_info_needed",
+    "delivery_ready_to_book",
+    "delivery_booked",
   ],
   completed: ["swap_completed"],
   cancelled: ["swap_cancelled"],
@@ -98,7 +104,10 @@ export function getNotificationCategory(
     type === "agreement_updated" ||
     type === "agreement_confirmed" ||
     type === "agreement_completed" ||
-    type === "agreement_cancelled"
+    type === "agreement_cancelled" ||
+    type === "delivery_info_needed" ||
+    type === "delivery_ready_to_book" ||
+    type === "delivery_booked"
   ) {
     return "agreements";
   }
