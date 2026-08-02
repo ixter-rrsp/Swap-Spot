@@ -32,11 +32,14 @@ export const swapAgreementSchema = z
       .optional()
       .or(z.literal("")),
 
+    // Not currently collected via form inputs (Item Condition is read-only,
+    // pulled straight from the listing), but kept aligned with
+    // lib/constants/categories.ts CONDITIONS in case this becomes editable.
     yourCondition: z
-      .enum(["new", "like_new", "good", "fair", "needs_repair"])
+      .enum(["new", "like_new", "used_good", "used_fair", "for_parts"])
       .optional(),
     theirCondition: z
-      .enum(["new", "like_new", "good", "fair", "needs_repair"])
+      .enum(["new", "like_new", "used_good", "used_fair", "for_parts"])
       .optional(),
 
     yourAccessories: z.string().trim().max(500).optional(),

@@ -7,21 +7,7 @@
 }
 
 .topRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
   margin-bottom: 12px;
-}
-
-.icon {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #16a34a;
-  font-size: 18px;
 }
 
 .heading {
@@ -38,6 +24,13 @@
   font-size: 16px;
   font-weight: 700;
   color: #111827;
+}
+
+.courierNote {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
 }
 
 .detailsBox {

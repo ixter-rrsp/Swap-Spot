@@ -176,8 +176,7 @@ export default function DeliveryAgreementCard({
       }
 
       toast("Marked as picked up.", "success");
-      await load();
-      router.refresh();
+      router.push(`/messages/${agreement.conversationId}`);
     } catch (err) {
       console.error(err);
       const message =

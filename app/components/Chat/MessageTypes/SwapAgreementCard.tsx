@@ -106,17 +106,14 @@ export default function SwapAgreementCard({
   return (
     <div className={styles.card}>
       <div className={styles.topRow}>
-        <span className={styles.icon}>📦</span>
-        <div>
-          <p className={styles.heading}>Swap Agreement</p>
-          <p className={styles.deliveryMethod}>
-            {agreement.deliveryMethod === "meetup" ? "Meet Up" : "Courier"}
-          </p>
-        </div>
+        <p className={styles.heading}>Swap Agreement</p>
+        <p className={styles.deliveryMethod}>
+          {agreement.deliveryMethod === "meetup" ? "Meet Up" : "Courier"}
+        </p>
       </div>
 
-      <div className={styles.detailsBox}>
-        {agreement.deliveryMethod === "meetup" ? (
+      {agreement.deliveryMethod === "meetup" && (
+        <div className={styles.detailsBox}>
           <p className={styles.detailLine}>
             <MapPin
               size={14}
@@ -126,12 +123,14 @@ export default function SwapAgreementCard({
             {agreement.meetupDate ? ` · ${agreement.meetupDate}` : ""}
             {agreement.meetupTime ? ` · ${agreement.meetupTime}` : ""}
           </p>
-        ) : (
-          <p className={styles.detailLine}>
-            🚚 {agreement.pickupAddress} → {agreement.dropoffAddress}
-          </p>
-        )}
-      </div>
+        </div>
+      )}
+
+      {agreement.deliveryMethod === "other_courier" && (
+        <p className={styles.courierNote}>
+          Pickup details will be added once this agreement is confirmed.
+        </p>
+      )}
 
       <div className={styles.statusRow}>
         <span className={`${styles.statusBadge} ${styles[STATUS_STYLES[agreement.status]]}`}>

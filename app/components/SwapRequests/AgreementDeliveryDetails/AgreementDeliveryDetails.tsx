@@ -1,17 +1,10 @@
 import { SwapAgreement } from "@/lib/types/SwapAgreement";
+import { CONDITION_LABELS } from "@/lib/constants/categories";
 import styles from "./AgreementDeliveryDetails.module.css";
 
 interface AgreementDeliveryDetailsProps {
   agreement: SwapAgreement;
 }
-
-const CONDITION_LABELS: Record<string, string> = {
-  new: "New",
-  like_new: "Like New",
-  good: "Good",
-  fair: "Fair",
-  needs_repair: "Needs Repair",
-};
 
 function formatOptionalValue(value?: string | null) {
   return value?.trim() ? value : "To be shared";

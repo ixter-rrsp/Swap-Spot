@@ -68,9 +68,7 @@ export default function AgreementPage() {
         <AgreementDeliveryDetails agreement={agreement} />
       </div>
 
-      <div className={styles.card}>
-        <AgreementActions agreement={agreement} />
-      </div>
+      <AgreementActions agreement={agreement} />
     </main>
   );
 }

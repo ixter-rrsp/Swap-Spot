@@ -33,6 +33,10 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
   const canConfirm =
     agreement.status === "pending_confirmation" && !hasConfirmed;
 
+  const deliveryInfoMissing =
+    agreement.deliveryMethod === "other_courier" &&
+    agreement.myDeliveryInfoSubmitted === false;
+
   const canComplete = agreement.status === "confirmed" && !hasCompleted;
 
   const canCancel =
@@ -45,11 +49,13 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
         ? "Delivery arranged"
         : "Delivery method";
 
-  const nextStepLabel = canConfirm
-    ? "Ready to confirm the agreement"
-    : canComplete
-      ? "Ready to mark the swap as complete"
-      : "Next step is to keep the handoff clear";
+  const nextStepLabel = deliveryInfoMissing
+    ? "Fill in your delivery details"
+    : canConfirm
+      ? "Ready to confirm the agreement"
+      : canComplete
+        ? "Ready to mark the swap as complete"
+        : "Next step is to keep the handoff clear";
 
   async function runAction(kind: ActionKind) {
     setError(null);
@@ -79,7 +85,7 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
             : "Agreement cancelled. The swap is no longer active.";
 
       toast(successMessage, "success");
-      router.refresh();
+      router.push(`/messages/${agreement.conversationId}`);
     } catch (err) {
       console.error(err);
       const message = err instanceof Error ? err.message : `Failed to ${kind} agreement.`;
@@ -120,7 +126,9 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
         <p className={styles.hint}>
           {hasConfirmed
             ? "Waiting for the other party to confirm."
-            : "Review the details above, then confirm to proceed."}
+            : deliveryInfoMissing
+              ? "Fill in your delivery details in Manage Delivery before you can confirm."
+              : "Review the details above, then confirm to proceed."}
         </p>
       )}
 
@@ -142,10 +150,14 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
         {canConfirm && (
           <button
             className={styles.confirmButton}
-            disabled={pendingAction !== null}
+            disabled={pendingAction !== null || deliveryInfoMissing}
             onClick={() => confirmAction("confirm")}
           >
-            {pendingAction === "confirm" ? "Confirming..." : "Confirm Agreement"}
+            {pendingAction === "confirm"
+              ? "Confirming..."
+              : deliveryInfoMissing
+                ? "Fill In Delivery Details First"
+                : "Confirm Agreement"}
           </button>
         )}
 

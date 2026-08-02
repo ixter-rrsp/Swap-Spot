@@ -227,9 +227,26 @@ export async function getSwapAgreementById(
     agreementId
   );
 
+  let myDeliveryInfoSubmitted: boolean | null = null;
+
+  if (agreement.delivery_method === "other_courier") {
+    const isRequester = user.id === agreement.requester_id;
+
+    const { data: deliveryAgreement } = await supabase
+      .from("delivery_agreements")
+      .select("requester_info_submitted_at, receiver_info_submitted_at")
+      .eq("swap_agreement_id", agreementId)
+      .maybeSingle();
+
+    myDeliveryInfoSubmitted = isRequester
+      ? !!deliveryAgreement?.requester_info_submitted_at
+      : !!deliveryAgreement?.receiver_info_submitted_at;
+  }
+
   return {
     ...mapSwapAgreement(agreement),
     currentUserId: user.id,
+    myDeliveryInfoSubmitted,
   };
 }
 
@@ -255,6 +272,28 @@ export async function confirmSwapAgreement(
 
   if (alreadyConfirmed) {
     throw new Error("You have already confirmed this agreement.");
+  }
+
+  if (agreement.delivery_method === "other_courier") {
+    const { data: deliveryAgreement, error: deliveryError } = await supabase
+      .from("delivery_agreements")
+      .select("requester_info_submitted_at, receiver_info_submitted_at")
+      .eq("swap_agreement_id", agreementId)
+      .maybeSingle();
+
+    if (deliveryError) {
+      throw new Error(deliveryError.message);
+    }
+
+    const myDeliveryInfoSubmitted = isRequester
+      ? !!deliveryAgreement?.requester_info_submitted_at
+      : !!deliveryAgreement?.receiver_info_submitted_at;
+
+    if (!myDeliveryInfoSubmitted) {
+      throw new Error(
+        "Please fill in your delivery details in Manage Delivery before confirming this agreement."
+      );
+    }
   }
 
   const now = new Date().toISOString();
