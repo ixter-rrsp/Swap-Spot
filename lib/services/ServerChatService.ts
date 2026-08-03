@@ -833,13 +833,15 @@ export async function getConversationById(conversationId: string) {
         id,
         username,
         full_name,
-        avatar_url
+        avatar_url,
+        last_seen_at
       ),
       buyer:profiles!conversations_buyer_fkey (
         id,
         username,
         full_name,
-        avatar_url
+        avatar_url,
+        last_seen_at
       )
     `)
         .eq("id", conversationId)
@@ -876,6 +878,7 @@ export async function getConversationById(conversationId: string) {
             username: otherUser.username,
             fullName: otherUser.full_name,
             avatarUrl: otherUser.avatar_url,
+            lastSeenAt: otherUser.last_seen_at,
         },
     };
 }

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, Heart } from "lucide-react";
 import MenuDrawer from "@/app/components/UI/MenuDrawer";
 import styles from "./HomeHeader.module.css";
 import icon from '../../../../public/src/icon.png'; // or wherever it is
@@ -29,17 +29,13 @@ export default function HomeHeader({
 
           <div className={styles.headerActions}>
             <Link
-              href="/profile"
+              href="/saved"
               className={styles.avatarButton}
-              aria-label="Profile"
+              aria-label="Saved listings"
             >
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="Profile" />
-              ) : (
-                <span className={styles.avatar}>
-                  {username ? username.charAt(0).toUpperCase() : "?"}
-                </span>
-              )}
+              <span className={styles.avatar}>
+                <Heart size={20} />
+              </span>
             </Link>
             <button
               type="button"

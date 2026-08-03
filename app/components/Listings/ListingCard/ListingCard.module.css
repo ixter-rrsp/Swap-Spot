@@ -37,11 +37,15 @@
   overflow: hidden;
 
   background: #f3f4f6;
+
+  border-radius: 16px 16px 0 0;
+
 }
 
 .image,
 .imageContainer img {
   object-fit: cover;
+  border-radius: 16px 16px 0 0;
 }
 
 .imagePlaceholder {
@@ -73,11 +77,23 @@
 
   background: rgba(255, 255, 255, 0.9);
 
+  color: #4b5563;
+
   cursor: pointer;
+
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
 }
 
 .favoriteButton:hover {
   background: #ffffff;
+}
+
+.favoriteButton:active {
+  transform: scale(0.9);
+}
+
+.favoriteButtonSaved {
+  color: #ef4444;
 }
 
 .boostBadge {

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 
@@ -10,6 +12,7 @@ import {
 
 import ListingActions from "../ListingActions/ListingActions";
 import { getConditionLabel } from "@/lib/constants/categories";
+import { useSavedListings } from "@/app/components/Providers/SavedListingsContext";
 
 import styles from "./ListingCard.module.css";
 
@@ -64,6 +67,16 @@ export default function ListingCard({
 }: ListingCardProps)
  {
   const isNearby = distance !== undefined;
+  const { isSaved, toggleSaved } = useSavedListings();
+  const saved = isSaved(id);
+
+  function handleFavoriteClick(event: React.MouseEvent<HTMLButtonElement>) {
+    // The button lives inside the card's <Link> — stop the click from
+    // also triggering navigation to the listing page.
+    event.preventDefault();
+    event.stopPropagation();
+    toggleSaved(id);
+  }
 
   return (
     <article
@@ -89,11 +102,13 @@ export default function ListingCard({
 
 
           <button
-            className={styles.favoriteButton}
-            aria-label="Add to favorites"
+            className={`${styles.favoriteButton} ${saved ? styles.favoriteButtonSaved : ""}`}
+            aria-label={saved ? "Remove from saved" : "Add to saved"}
+            aria-pressed={saved}
             type="button"
+            onClick={handleFavoriteClick}
           >
-            <Heart size={18} />
+            <Heart size={18} fill={saved ? "currentColor" : "none"} />
           </button>
 
 

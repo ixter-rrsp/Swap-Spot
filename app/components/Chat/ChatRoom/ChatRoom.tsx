@@ -22,9 +22,11 @@ interface ChatRoomProps {
     initialMessages: Message[];
 
     otherUser: {
+        id: string;
         username: string;
         fullName: string | null;
         avatarUrl: string | null;
+        lastSeenAt: string | null;
     };
 
     listing: {
@@ -262,9 +264,11 @@ export default function ChatRoom({
         <section className={styles.container}>
 
             <ChatHeader
+                otherUserId={otherUser.id}
                 username={otherUser.username}
                 fullName={otherUser.fullName}
                 avatarUrl={otherUser.avatarUrl}
+                lastSeenAt={otherUser.lastSeenAt}
                 listingId={listing.id}
                 listingTitle={listing.title}
                 listingImage={listing.imageUrl}

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Menu } from "lucide-react";
 import MenuDrawer from "@/app/components/UI/MenuDrawer";
 import { SUBSCRIPTION_PLANS } from "@/lib/subscriptions/plans";
+import MessageUserModal from "@/app/components/Profile/MessageUserModal/MessageUserModal";
 
 import styles from "./ProfileHeader.module.css";
 
@@ -17,10 +18,11 @@ interface ProfileHeaderProps {
   swapsCount?: number;
   bio?: string;
   badge?: string;
-  isFollowing?: boolean;
   showActions?: boolean;
-  onMessage?: () => void;
-  onToggleFollow?: (next: boolean) => void;
+  // The profile owner's id — conversations are attached to one of
+  // their listings, so the Message button opens a picker asking which
+  // listing you're messaging about (same pattern as Propose a Swap).
+  profileUserId?: string;
 }
 
 export default function ProfileHeader({
@@ -33,14 +35,12 @@ export default function ProfileHeader({
   swapsCount,
   bio,
   badge,
-  isFollowing = false,
   showActions = true,
-  onMessage,
-  onToggleFollow,
+  profileUserId,
 }: ProfileHeaderProps) {
 
-  const [following, setFollowing] = useState(isFollowing);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
   const [localAvatar, setLocalAvatar] = useState<string | null | undefined>(avatarUrl ?? null);
 
   const memberSinceYear =
@@ -60,12 +60,6 @@ export default function ProfileHeader({
   const hasStats =
     typeof rating === "number" ||
     typeof swapsCount === "number";
-
-  const handleFollowClick = () => {
-    const next = !following;
-    setFollowing(next);
-    onToggleFollow?.(next);
-  };
 
   // Listen for optimistic avatar updates
   useEffect(() => {
@@ -156,21 +150,10 @@ export default function ProfileHeader({
           <button
             type="button"
             className={styles.messageButton}
-            onClick={onMessage}
+            onClick={() => setMessageModalOpen(true)}
+            disabled={!profileUserId}
           >
             Message
-          </button>
-
-          <button
-            type="button"
-            className={
-              following
-                ? styles.followingButton
-                : styles.followButton
-            }
-            onClick={handleFollowClick}
-          >
-            {following ? "Following" : "Follow"}
           </button>
         </div>
       )}
@@ -181,6 +164,14 @@ export default function ProfileHeader({
 
     </section>
     <MenuDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+
+    {messageModalOpen && profileUserId && (
+      <MessageUserModal
+        profileUserId={profileUserId}
+        profileUsername={username}
+        onClose={() => setMessageModalOpen(false)}
+      />
+    )}
     </>
   );
 }
