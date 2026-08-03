@@ -229,6 +229,7 @@ export async function getSwapAgreementById(
 
   let myDeliveryInfoSubmitted: boolean | null = null;
   let myItemPickedUp: boolean | null = null;
+  let otherItemPickedUp: boolean | null = null;
 
   if (agreement.delivery_method === "other_courier") {
     const isRequester = user.id === agreement.requester_id;
@@ -248,6 +249,10 @@ export async function getSwapAgreementById(
     myItemPickedUp = isRequester
       ? !!deliveryAgreement?.requester_picked_up_at
       : !!deliveryAgreement?.receiver_picked_up_at;
+
+    otherItemPickedUp = isRequester
+      ? !!deliveryAgreement?.receiver_picked_up_at
+      : !!deliveryAgreement?.requester_picked_up_at;
   }
 
   return {
@@ -255,6 +260,7 @@ export async function getSwapAgreementById(
     currentUserId: user.id,
     myDeliveryInfoSubmitted,
     myItemPickedUp,
+    otherItemPickedUp,
   };
 }
 
@@ -405,9 +411,19 @@ export async function completeSwapAgreement(
       ? !!deliveryAgreement?.requester_picked_up_at
       : !!deliveryAgreement?.receiver_picked_up_at;
 
+    const otherItemPickedUp = isRequester
+      ? !!deliveryAgreement?.receiver_picked_up_at
+      : !!deliveryAgreement?.requester_picked_up_at;
+
     if (!myItemPickedUp) {
       throw new Error(
         "You must mark your item as picked up before completing this swap."
+      );
+    }
+
+    if (!otherItemPickedUp) {
+      throw new Error(
+        "The other party must mark their item as picked up before this swap can be completed."
       );
     }
   }

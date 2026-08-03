@@ -10,4 +10,13 @@
   font-size: 12px;
   padding: 4px 12px;
   border-radius: 12px;
+  /* Without this, a span that wraps to a second line gets a single
+     bounding box painted per-line-fragment, and only the very first
+     and very last fragment corners are rounded — the seam between
+     lines renders as a hard straight edge. box-decoration-break makes
+     each wrapped line its own fully rounded box instead. */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  line-height: 1.6;
+  white-space: pre-line;
 }

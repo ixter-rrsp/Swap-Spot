@@ -38,9 +38,16 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
 
   const canComplete = agreement.status === "confirmed" && !hasCompleted;
 
-  const pickupMissing =
+  const myPickupMissing =
     agreement.deliveryMethod === "other_courier" &&
     agreement.myItemPickedUp === false;
+
+  const otherPickupMissing =
+    agreement.deliveryMethod === "other_courier" &&
+    agreement.myItemPickedUp !== false &&
+    agreement.otherItemPickedUp === false;
+
+  const pickupMissing = myPickupMissing || otherPickupMissing;
 
   const canCancel =
     agreement.status !== "completed" && agreement.status !== "cancelled";
@@ -56,11 +63,13 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
     ? "Fill in your delivery details"
     : canConfirm
       ? "Ready to confirm the agreement"
-      : pickupMissing
+      : myPickupMissing
         ? "Mark your item as picked up first"
-        : canComplete
-          ? "Ready to mark the swap as complete"
-          : "Next step is to keep the handoff clear";
+        : otherPickupMissing
+          ? "Waiting on the other party's pickup"
+          : canComplete
+            ? "Ready to mark the swap as complete"
+            : "Next step is to keep the handoff clear";
 
   async function runAction(kind: ActionKind) {
     setError(null);
@@ -141,9 +150,11 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
         <p className={styles.hint}>
           {hasCompleted
             ? "Waiting for the other party to mark this as completed."
-            : pickupMissing
+            : myPickupMissing
               ? "Mark your item as picked up in Manage Delivery before you can complete this swap."
-              : "Once the exchange has happened, mark it as completed."}
+              : otherPickupMissing
+                ? "Waiting for the other party to mark their item as picked up before this swap can be completed."
+                : "Once the exchange has happened, mark it as completed."}
         </p>
       )}
 
@@ -170,9 +181,11 @@ export default function AgreementActions({ agreement }: AgreementActionsProps) {
           >
             {pendingAction === "complete"
               ? "Completing..."
-              : pickupMissing
+              : myPickupMissing
                 ? "Mark Item Picked Up First"
-                : "Complete Swap"}
+                : otherPickupMissing
+                  ? "Waiting on Other Party's Pickup"
+                  : "Complete Swap"}
           </button>
         )}
 

@@ -16,4 +16,9 @@ export interface SwapAgreementDetail extends SwapAgreement {
   // Agreement yet. Null for meetup swaps, where this doesn't apply.
   // A swap can't be completed by this user until this is true.
   myItemPickedUp: boolean | null;
+
+  // Only meaningful when deliveryMethod is "other_courier": whether the
+  // OTHER party has marked their item as picked up. Both sides must be
+  // true before the swap can be completed by either party.
+  otherItemPickedUp: boolean | null;
 }
