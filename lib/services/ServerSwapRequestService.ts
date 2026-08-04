@@ -242,6 +242,41 @@ export async function createSwapRequest(
   }
 
 
+  // Also guard the reverse case: the other party may have independently
+  // sent a request for this exact same pair of items, just with the
+  // offer/request roles flipped (e.g. B offers item B for item A, while
+  // A already offered item A for item B). Both requests point at the
+  // same underlying trade, so block the second one rather than letting
+  // two redundant pending requests exist for the same two items.
+  const {
+    data: reverseRequest,
+  } =
+    await supabase
+      .from("swap_requests")
+      .select("id")
+      .eq(
+        "offered_listing_id",
+        requestedListingId
+      )
+      .eq(
+        "requested_listing_id",
+        offeredListingId
+      )
+      .eq(
+        "status",
+        "pending"
+      )
+      .maybeSingle();
+
+  if (reverseRequest) {
+
+    throw new Error(
+      "A request that points to this item already exists. Check your inbox."
+    );
+
+  }
+
+
 
   const {
     data,
