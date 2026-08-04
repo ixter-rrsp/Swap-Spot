@@ -115,6 +115,8 @@ export async function getNearbyListings(): Promise<Listing[]> {
         longitude
       )
     `)
+    .eq("traded", false)
+    .is("locked_at", null)
     .neq("owner_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -149,7 +151,8 @@ export async function getNearbyListings(): Promise<Listing[]> {
         description: listing.description,
         imageUrl: listing.listing_images?.[0]?.image_url,
         images:
-          listing.listing_images?.map((image: any) => ({
+          listing.listing_images?.map(
+            (image: { id: string; image_url: string; sort_order: number }) => ({
             id: image.id,
             url: image.image_url,
             sortOrder: image.sort_order,
