@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styles from "./CreateSwapRequest.module.css";
 import { Listing } from "@/lib/types/Listing";
 import { createSwapRequest } from "@/lib/services/SwapRequestService";
+import ConfirmDialog from "@/app/components/UI/ConfirmDialog/ConfirmDialog";
 
 interface Props {
   requestedListingId: string;
@@ -23,6 +24,7 @@ export default function CreateSwapRequest({
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lockedError, setLockedError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadListings() {
@@ -69,8 +71,30 @@ export default function CreateSwapRequest({
       }, 1500);
     } catch (error) {
       console.error(error);
-      setError(error instanceof Error ? error.message : "Failed to send swap request.");
+      const message = error instanceof Error ? error.message : "Failed to send swap request.";
       setSubmitting(false);
+
+      // The listing picker only shows listings that were available when
+      // this modal loaded — but the item could get locked into someone
+      // else's accepted swap in the moment between then and hitting
+      // Send. Surface that specific case as a pop-up instead of the
+      // inline error strip, since it's a meaningfully different
+      // situation from a generic failure.
+      if (message.toLowerCase().includes("accepted swap")) {
+        setLockedError(message);
+        setSelectedListing("");
+        // Re-fetch so the now-locked listing (correctly excluded server
+        // side) drops out of the picker instead of staying selectable.
+        try {
+          const response = await fetch("/api/listings/my");
+          const data = await response.json();
+          setListings(Array.isArray(data) ? data : []);
+        } catch (refreshError) {
+          console.error(refreshError);
+        }
+      } else {
+        setError(message);
+      }
     }
   }
 
@@ -148,6 +172,17 @@ export default function CreateSwapRequest({
           }
         </button>
       </div>
+
+      {lockedError && (
+        <ConfirmDialog
+          title="Item Unavailable"
+          message={lockedError}
+          confirmLabel="OK"
+          hideCancel
+          onConfirm={() => setLockedError(null)}
+          onCancel={() => setLockedError(null)}
+        />
+      )}
     </div>
   );
 }

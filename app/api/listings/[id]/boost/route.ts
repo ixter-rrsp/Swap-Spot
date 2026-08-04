@@ -36,7 +36,7 @@ export async function POST(
     // Confirm the listing exists and belongs to this user
     const { data: listing, error: listingError } = await supabase
       .from("listings")
-      .select("id, owner_id, title, traded")
+      .select("id, owner_id, title, traded, locked_at")
       .eq("id", listingId)
       .single();
 
@@ -57,6 +57,13 @@ export async function POST(
     if (listing.traded) {
       return NextResponse.json(
         { error: "Traded listings cannot be boosted." },
+        { status: 400 }
+      );
+    }
+
+    if (listing.locked_at) {
+      return NextResponse.json(
+        { error: "This listing is involved in an accepted swap and can't be boosted right now." },
         { status: 400 }
       );
     }

@@ -105,6 +105,8 @@ export async function getMyListingsForSwap(): Promise<Listing[]> {
       )
     `)
     .eq("owner_id", user.id)
+    .eq("traded", false)
+    .is("locked_at", null)
     .order("created_at", {
       ascending: false,
     });
@@ -167,6 +169,7 @@ export async function getListingsByOwner(ownerId: string): Promise<Listing[]> {
     `)
     .eq("owner_id", ownerId)
     .eq("traded", false)
+    .is("locked_at", null)
     .order("created_at", {
       ascending: false,
     });
@@ -328,6 +331,7 @@ export async function getListings(options: GetListingsOptions = {}) {
         )
     `)
     .eq("traded", false)
+    .is("locked_at", null)
     .order("created_at", {
       ascending: false,
     });
@@ -445,6 +449,7 @@ export async function getBoostedListings() {
       )
     `)
     .eq("traded", false)
+    .is("locked_at", null)
     .eq("boosted", true)
     .gt("boost_expires_at", nowIso)
     .order("boost_expires_at", { ascending: false });

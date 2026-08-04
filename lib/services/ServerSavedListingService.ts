@@ -75,9 +75,10 @@ export async function getSavedListings(): Promise<Listing[]> {
   return data
     .map((row) => row.listings)
     .filter((listing): listing is NonNullable<typeof listing> => Boolean(listing))
-    // A listing can be saved and later deleted or marked traded —
-    // don't show those on the saved page.
-    .filter((listing: any) => !listing.traded)
+    // A listing can be saved and later deleted, marked traded, or
+    // locked into someone else's accepted swap — don't show those on
+    // the saved page.
+    .filter((listing: any) => !listing.traded && !listing.locked_at)
     .map(
       (listing: any): Listing => ({
         id: listing.id,

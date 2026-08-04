@@ -588,7 +588,7 @@ export async function completeSwapAgreement(
         if (listingIds.length > 0) {
           const { error: tradeUpdateError } = await supabase
             .from("listings")
-            .update({ traded: true, updated_at: now })
+            .update({ traded: true, locked_at: null, updated_at: now })
             .in("id", listingIds);
 
           if (tradeUpdateError) {
@@ -675,7 +675,7 @@ export async function cancelSwapAgreement(
   }
 
   // An agreement only exists for a request that was accepted, which
-  // means both listings were locked (traded: true) at that point — see
+  // means both listings were locked (locked_at set) at that point — see
   // acceptSwapRequest. Unlock them now that this swap is off, so they
   // become available for other offers again.
   try {
@@ -693,7 +693,7 @@ export async function cancelSwapAgreement(
     if (listingIds.length > 0) {
       const { error: unlockError } = await supabase
         .from("listings")
-        .update({ traded: false, updated_at: new Date().toISOString() })
+        .update({ locked_at: null, updated_at: new Date().toISOString() })
         .in("id", listingIds);
 
       if (unlockError) {

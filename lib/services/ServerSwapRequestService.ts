@@ -115,7 +115,8 @@ export async function createSwapRequest(
       .select(`
         id,
         owner_id,
-        traded
+        traded,
+        locked_at
       `)
       .eq(
         "id",
@@ -149,9 +150,9 @@ export async function createSwapRequest(
   }
 
 
-  if (requestedListing.traded) {
+  if (requestedListing.traded || requestedListing.locked_at) {
     throw new Error(
-      "This listing is no longer available — it's already part of another swap."
+      "This listing is involved in an accepted swap and can't be requested right now."
     );
   }
 
@@ -166,7 +167,8 @@ export async function createSwapRequest(
       .select(`
         id,
         owner_id,
-        traded
+        traded,
+        locked_at
       `)
       .eq(
         "id",
@@ -200,9 +202,9 @@ export async function createSwapRequest(
   }
 
 
-  if (offeredListing.traded) {
+  if (offeredListing.traded || offeredListing.locked_at) {
     throw new Error(
-      "The item you're trying to offer is no longer available — it's already part of another swap."
+      "The item you're trying to offer is involved in an accepted swap and can't be offered right now."
     );
   }
 
@@ -425,19 +427,27 @@ export async function acceptSwapRequest(
   ].filter(Boolean);
 
   // Lock both listings FIRST, conditioned on them still being unlocked
-  // (traded: false). This has to happen before touching swap_requests at
-  // all, and the condition has to be checked in the same query as the
-  // write — reading traded first and writing after leaves a window where
-  // two accepts (for two different offers on the same listing) can both
-  // pass the check before either commits. Requiring traded: false in the
-  // WHERE clause makes Postgres do that check-and-set atomically, so only
-  // one of two concurrent accepts can ever win.
+  // (locked_at: null). This has to happen before touching swap_requests
+  // at all, and the condition has to be checked in the same query as the
+  // write — reading locked_at first and writing after leaves a window
+  // where two accepts (for two different offers on the same listing) can
+  // both pass the check before either commits. Requiring locked_at IS
+  // NULL in the WHERE clause makes Postgres do that check-and-set
+  // atomically, so only one of two concurrent accepts can ever win.
+  //
+  // locked_at is a dedicated column, separate from `traded` — locking
+  // only hides a listing from PUBLIC browsing (see getListings,
+  // getBoostedListings, getListingsByOwner), never from the owner's own
+  // profile. `traded` still means "swap fully completed" and is set
+  // separately, at completion time.
+  const nowIso = new Date().toISOString();
+
   if (listingIds.length > 0) {
     const { data: lockedRows, error: lockError } = await supabase
       .from("listings")
-      .update({ traded: true, updated_at: new Date().toISOString() })
+      .update({ locked_at: nowIso, updated_at: nowIso })
       .in("id", listingIds)
-      .eq("traded", false)
+      .is("locked_at", null)
       .select("id");
 
     if (lockError) {
@@ -458,7 +468,7 @@ export async function acceptSwapRequest(
     .from("swap_requests")
     .update({
       status: "accepted",
-      updated_at: new Date().toISOString(),
+      updated_at: nowIso,
     })
     .eq("id", requestId)
     .eq("status", "pending")
@@ -474,7 +484,7 @@ export async function acceptSwapRequest(
     if (listingIds.length > 0) {
       await supabase
         .from("listings")
-        .update({ traded: false, updated_at: new Date().toISOString() })
+        .update({ locked_at: null, updated_at: new Date().toISOString() })
         .in("id", listingIds);
     }
     throw new Error("This swap request is no longer pending.");
@@ -724,7 +734,7 @@ export async function cancelSwapRequest(
     if (listingIds.length > 0) {
       const { error: unlockError } = await supabase
         .from("listings")
-        .update({ traded: false, updated_at: new Date().toISOString() })
+        .update({ locked_at: null, updated_at: new Date().toISOString() })
         .in("id", listingIds);
 
       if (unlockError) {

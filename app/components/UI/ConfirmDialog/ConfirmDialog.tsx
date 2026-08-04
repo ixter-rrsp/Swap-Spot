@@ -8,6 +8,8 @@ interface ConfirmDialogProps {
   confirmLabel?: string;
   cancelLabel?: string;
   confirmDisabled?: boolean;
+  /** Alert mode: hides the cancel button, showing only a single dismiss action. */
+  hideCancel?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -18,6 +20,7 @@ export default function ConfirmDialog({
   confirmLabel = "Confirm",
   cancelLabel = "Cancel",
   confirmDisabled = false,
+  hideCancel = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -28,9 +31,11 @@ export default function ConfirmDialog({
         <p className={styles.message}>{message}</p>
 
         <div className={styles.actions}>
-          <button className={styles.cancelButton} onClick={onCancel}>
-            {cancelLabel}
-          </button>
+          {!hideCancel && (
+            <button className={styles.cancelButton} onClick={onCancel}>
+              {cancelLabel}
+            </button>
+          )}
           <button
             className={styles.confirmButton}
             onClick={onConfirm}
