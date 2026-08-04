@@ -92,6 +92,13 @@ export default function CreateSwapRequest({
         } catch (refreshError) {
           console.error(refreshError);
         }
+      } else if (message.toLowerCase().includes("already exists")) {
+        // Covers both the same-direction duplicate and the reverse-swap
+        // case (the other party beat them to proposing this same pair
+        // of items) — both are resolved by checking the inbox, not by
+        // retrying, so they get the same pop-up treatment.
+        setLockedError(message);
+        setSelectedListing("");
       } else {
         setError(message);
       }
@@ -175,7 +182,11 @@ export default function CreateSwapRequest({
 
       {lockedError && (
         <ConfirmDialog
-          title="Item Unavailable"
+          title={
+            lockedError.toLowerCase().includes("already exists")
+              ? "Request Already Exists"
+              : "Item Unavailable"
+          }
           message={lockedError}
           confirmLabel="OK"
           hideCancel
