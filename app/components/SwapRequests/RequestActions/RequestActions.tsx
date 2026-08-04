@@ -53,8 +53,9 @@ export default function RequestActions({
     }
 
     if (!response.ok) {
+      const body = await response.json().catch(() => null);
       throw new Error(
-        "Request failed."
+        body?.error || "Request failed."
       );
     }
   }
@@ -84,9 +85,14 @@ export default function RequestActions({
         console.error(error);
 
         toast(
-          "Failed to accept swap request.",
+          error instanceof Error ? error.message : "Failed to accept swap request.",
           "error"
         );
+
+        // The listing may have just been locked by someone else's accept,
+        // or this request may no longer be pending — refresh to reflect
+        // the real current state instead of leaving stale buttons up.
+        router.refresh();
 
       }
 

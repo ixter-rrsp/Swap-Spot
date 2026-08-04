@@ -114,7 +114,8 @@ export async function createSwapRequest(
       .from("listings")
       .select(`
         id,
-        owner_id
+        owner_id,
+        traded
       `)
       .eq(
         "id",
@@ -148,6 +149,13 @@ export async function createSwapRequest(
   }
 
 
+  if (requestedListing.traded) {
+    throw new Error(
+      "This listing is no longer available — it's already part of another swap."
+    );
+  }
+
+
 
   const {
     data: offeredListing,
@@ -157,7 +165,8 @@ export async function createSwapRequest(
       .from("listings")
       .select(`
         id,
-        owner_id
+        owner_id,
+        traded
       `)
       .eq(
         "id",
@@ -188,6 +197,13 @@ export async function createSwapRequest(
       "You can only offer your own listing."
     );
 
+  }
+
+
+  if (offeredListing.traded) {
+    throw new Error(
+      "The item you're trying to offer is no longer available — it's already part of another swap."
+    );
   }
 
 
@@ -378,6 +394,7 @@ export async function acceptSwapRequest(
     await supabase
       .from("swap_requests")
       .select(`
+        status,
         sender_id,
         receiver_id,
         offered_listing_id,
@@ -394,46 +411,80 @@ export async function acceptSwapRequest(
     throw new Error("Unauthorized.");
   }
 
-  const { error } = await supabase
-    .from("swap_requests")
-    .update({
-      status: "accepted",
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", requestId);
-
-  if (error) {
-    throw new Error(error.message);
+  if (request.status !== "pending") {
+    throw new Error(
+      request.status === "accepted"
+        ? "This swap request has already been accepted."
+        : "This swap request is no longer pending."
+    );
   }
 
-  // Lock both listings out of any other swap the moment this offer is
-  // accepted — not just once the swap fully completes — since accepting
-  // one offer means neither item is available for anyone else anymore.
-  // Reusing the existing `traded` flag: every listing-visibility query in
-  // the app already filters on it, so this hides both listings everywhere
-  // (browse, search, saved, etc.) with no other code changes needed.
-  // Unlocked again (traded: false) if this swap gets cancelled later —
-  // see cancelSwapRequest and cancelSwapAgreement.
   const listingIds = [
     request.offered_listing_id,
     request.requested_listing_id,
   ].filter(Boolean);
 
+  // Lock both listings FIRST, conditioned on them still being unlocked
+  // (traded: false). This has to happen before touching swap_requests at
+  // all, and the condition has to be checked in the same query as the
+  // write — reading traded first and writing after leaves a window where
+  // two accepts (for two different offers on the same listing) can both
+  // pass the check before either commits. Requiring traded: false in the
+  // WHERE clause makes Postgres do that check-and-set atomically, so only
+  // one of two concurrent accepts can ever win.
   if (listingIds.length > 0) {
-    const { error: lockError } = await supabase
+    const { data: lockedRows, error: lockError } = await supabase
       .from("listings")
       .update({ traded: true, updated_at: new Date().toISOString() })
-      .in("id", listingIds);
+      .in("id", listingIds)
+      .eq("traded", false)
+      .select("id");
 
     if (lockError) {
-      console.error("Failed to lock listings after accepting swap request:", lockError);
-    } else {
-      // Any other pending/accepted offer touching either listing can no
-      // longer go anywhere — auto-cancel those and let the affected
-      // users know, both as a notification and as an in-chat system
-      // message.
-      await cancelCompetingSwapRequests(listingIds, requestId);
+      throw new Error(lockError.message);
     }
+
+    if (!lockedRows || lockedRows.length !== listingIds.length) {
+      throw new Error(
+        "One of these items was just locked into another swap. Please refresh — this offer may need to be declined."
+      );
+    }
+  }
+
+  // Now flip the request itself, conditioned on it still being pending —
+  // same atomicity reasoning as above, in case two accept calls for this
+  // exact request landed at the same time.
+  const { data: acceptedRows, error } = await supabase
+    .from("swap_requests")
+    .update({
+      status: "accepted",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", requestId)
+    .eq("status", "pending")
+    .select("id");
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!acceptedRows || acceptedRows.length === 0) {
+    // Roll back the listing lock we just took, since this request didn't
+    // actually get accepted (someone else accepted/declined it first).
+    if (listingIds.length > 0) {
+      await supabase
+        .from("listings")
+        .update({ traded: false, updated_at: new Date().toISOString() })
+        .in("id", listingIds);
+    }
+    throw new Error("This swap request is no longer pending.");
+  }
+
+  // Any other pending/accepted offer touching either listing can no
+  // longer go anywhere — auto-cancel those and let the affected users
+  // know, both as a notification and as an in-chat system message.
+  if (listingIds.length > 0) {
+    await cancelCompetingSwapRequests(listingIds, requestId);
   }
 
   await createNotification({

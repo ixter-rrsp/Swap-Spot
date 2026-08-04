@@ -6,6 +6,7 @@ import Image from "next/image";
 import styles from "./SwapProposalCard.module.css";
 import type { SwapRequestDetail } from "@/lib/types/SwapRequestDetail";
 import ConfirmDialog from "@/app/components/UI/ConfirmDialog/ConfirmDialog";
+import { useToast } from "@/app/components/UI/Toast/ToastContext";
 
 interface SwapProposalCardProps {
   swapRequestId: string;
@@ -21,6 +22,7 @@ export default function SwapProposalCard({
   const [error, setError] = useState(false);
   const [actionLoading, setActionLoading] = useState<"accept" | "decline" | null>(null);
   const [showAcceptConfirm, setShowAcceptConfirm] = useState(false);
+  const toast = useToast();
 
   async function load() {
     try {
@@ -37,7 +39,23 @@ export default function SwapProposalCard({
   }
 
   useEffect(() => {
-    load();
+    let cancelled = false;
+
+    async function poll() {
+      if (!cancelled) await load();
+    }
+
+    poll();
+
+    const intervalId = window.setInterval(poll, 10000);
+    const handleFocus = () => void poll();
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [swapRequestId]);
 
   async function handleAccept() {
@@ -47,10 +65,21 @@ export default function SwapProposalCard({
       const response = await fetch(`/api/swap-requests/${swapRequestId}/accept`, {
         method: "PATCH",
       });
-      if (!response.ok) throw new Error("Failed to accept");
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || "Failed to accept");
+      }
       await load();
     } catch (err) {
       console.error(err);
+      toast(
+        err instanceof Error ? err.message : "Failed to accept swap request.",
+        "error"
+      );
+      // The listing may have just been locked by a competing accept, or
+      // this request may no longer be pending — reload to reflect the
+      // real current state instead of leaving stale buttons up.
+      await load();
     } finally {
       setActionLoading(null);
     }
