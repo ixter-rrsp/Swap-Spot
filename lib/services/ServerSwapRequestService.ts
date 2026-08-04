@@ -455,6 +455,23 @@ export async function acceptSwapRequest(
     }
 
     if (!lockedRows || lockedRows.length !== listingIds.length) {
+      // The UPDATE above already committed for whichever rows in
+      // listingIds still had locked_at IS NULL at the time — Postgres
+      // doesn't roll that back just because we're about to throw. If any
+      // of the listings involved here weren't actually free (someone
+      // else's swap already had them locked), we must explicitly release
+      // the ones we DID just lock, or they're stuck locked forever with
+      // no accepted request behind them.
+      if (lockedRows && lockedRows.length > 0) {
+        await supabase
+          .from("listings")
+          .update({ locked_at: null, updated_at: new Date().toISOString() })
+          .in(
+            "id",
+            lockedRows.map((row) => row.id)
+          );
+      }
+
       throw new Error(
         "One of these items was just locked into another swap. Please refresh — this offer may need to be declined."
       );
@@ -580,7 +597,41 @@ export async function declineSwapRequest(
 
     }
 
-function mapSwapRequest(row: any): SwapRequest {
+interface SwapRequestRow {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  status: SwapRequest["status"];
+  created_at: string;
+  sender: {
+    id: string;
+    username: string;
+    full_name: string;
+    avatar_url: string | null;
+  };
+  receiver: {
+    id: string;
+    username: string;
+    full_name: string;
+    avatar_url: string | null;
+  };
+  offered_listing: {
+    id: string;
+    title: string;
+    city: string;
+    swap_value: number;
+    listing_images?: { image_url: string; sort_order: number }[];
+  };
+  requested_listing: {
+    id: string;
+    title: string;
+    city: string;
+    swap_value: number;
+    listing_images?: { image_url: string; sort_order: number }[];
+  };
+}
+
+function mapSwapRequest(row: SwapRequestRow): SwapRequest {
   return {
     id: row.id,
 
