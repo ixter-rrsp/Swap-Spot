@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/components/UI/Toast/ToastContext";
+import ConfirmDialog from "@/app/components/UI/ConfirmDialog/ConfirmDialog";
 
 import { SwapRequestDetail } from "@/lib/types/SwapRequestDetail";
 
@@ -21,6 +22,7 @@ export default function RequestActions({
   const [isPending, startTransition] =
     useTransition();
   const [status, setStatus] = useState(request.status);
+  const [showAcceptConfirm, setShowAcceptConfirm] = useState(false);
   const router = useRouter();
   const toast = useToast();
 
@@ -167,7 +169,7 @@ export default function RequestActions({
         <button
           className={styles.acceptButton}
           disabled={isPending}
-          onClick={handleAccept}
+          onClick={() => setShowAcceptConfirm(true)}
         >
           Accept
         </button>
@@ -180,6 +182,20 @@ export default function RequestActions({
         >
           Decline
         </button>
+
+        {showAcceptConfirm && (
+          <ConfirmDialog
+            title="Accept this swap?"
+            message="Once you accept, your item will be hidden from other users and unavailable for other swaps unless this one is cancelled."
+            confirmLabel="Accept Swap"
+            confirmDisabled={isPending}
+            onConfirm={() => {
+              setShowAcceptConfirm(false);
+              handleAccept();
+            }}
+            onCancel={() => setShowAcceptConfirm(false)}
+          />
+        )}
 
       </section>
 

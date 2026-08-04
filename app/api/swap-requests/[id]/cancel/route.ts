@@ -27,7 +27,12 @@ export async function PATCH(request: Request, { params }: RouteContext) {
   } catch (error) {
     console.error(error);
     const message = error instanceof Error ? error.message : "Failed to cancel swap request.";
-    const status = message === "Unauthorized." ? 401 : 500;
+    const status =
+      message === "Unauthorized."
+        ? 401
+        : message === "This swap request can no longer be cancelled."
+          ? 400
+          : 500;
     return NextResponse.json({ error: message }, { status });
   }
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import styles from "./SwapProposalCard.module.css";
 import type { SwapRequestDetail } from "@/lib/types/SwapRequestDetail";
+import ConfirmDialog from "@/app/components/UI/ConfirmDialog/ConfirmDialog";
 
 interface SwapProposalCardProps {
   swapRequestId: string;
@@ -19,6 +20,7 @@ export default function SwapProposalCard({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [actionLoading, setActionLoading] = useState<"accept" | "decline" | null>(null);
+  const [showAcceptConfirm, setShowAcceptConfirm] = useState(false);
 
   async function load() {
     try {
@@ -39,6 +41,7 @@ export default function SwapProposalCard({
   }, [swapRequestId]);
 
   async function handleAccept() {
+    setShowAcceptConfirm(false);
     setActionLoading("accept");
     try {
       const response = await fetch(`/api/swap-requests/${swapRequestId}/accept`, {
@@ -123,7 +126,7 @@ export default function SwapProposalCard({
           </button>
           <button
             className={styles.acceptButton}
-            onClick={handleAccept}
+            onClick={() => setShowAcceptConfirm(true)}
             disabled={actionLoading !== null}
           >
             {actionLoading === "accept" ? "Accepting..." : "Accept"}
@@ -133,6 +136,17 @@ export default function SwapProposalCard({
         <Link href={`/swap-requests/${detail.id}`} className={styles.viewButton}>
           {detail.status === "pending" ? "Waiting for response" : `View Proposal (${detail.status})`}
         </Link>
+      )}
+
+      {showAcceptConfirm && (
+        <ConfirmDialog
+          title="Accept this swap?"
+          message="Once you accept, your item will be hidden from other users and unavailable for other swaps unless this one is cancelled."
+          confirmLabel="Accept Swap"
+          confirmDisabled={actionLoading !== null}
+          onConfirm={handleAccept}
+          onCancel={() => setShowAcceptConfirm(false)}
+        />
       )}
     </div>
   );
