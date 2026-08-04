@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { ServerPaymentService } from "@/lib/services/ServerPaymentService";
 import { LISTING_OVERAGE_PRICE } from "@/lib/pricing/boost";
+import { getAppOrigin } from "@/lib/utils/getAppOrigin";
 
 export async function POST(request: Request) {
   try {
@@ -17,13 +18,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const origin =
-      request.headers.get("origin") ||
-      request.headers.get("referer") ||
-      process.env.NEXT_PUBLIC_APP_URL ||
-      "http://localhost:3000";
-
-    const cleanOrigin = origin.replace(/\/$/, "");
+    const cleanOrigin = getAppOrigin(request);
 
     const successUrl = `${cleanOrigin}/post?overage_status=success`;
     const cancelUrl = `${cleanOrigin}/post?overage_status=cancelled`;

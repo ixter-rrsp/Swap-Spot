@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { ServerPaymentService } from "@/lib/services/ServerPaymentService";
 import { getBoostOption } from "@/lib/pricing/boost";
+import { getAppOrigin } from "@/lib/utils/getAppOrigin";
 
 export async function POST(
   request: Request,
@@ -60,13 +61,7 @@ export async function POST(
       );
     }
 
-    const origin =
-      request.headers.get("origin") ||
-      request.headers.get("referer") ||
-      process.env.NEXT_PUBLIC_APP_URL ||
-      "http://localhost:3000";
-
-    const cleanOrigin = origin.replace(/\/$/, "");
+    const cleanOrigin = getAppOrigin(request);
 
     const successUrl = `${cleanOrigin}/Listing/${listingId}?boost_status=success`;
     const cancelUrl = `${cleanOrigin}/Listing/${listingId}?boost_status=cancelled`;

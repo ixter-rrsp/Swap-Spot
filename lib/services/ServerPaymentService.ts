@@ -408,4 +408,116 @@ export class ServerPaymentService {
       paidAt: payment.paid_at,
     };
   }
+
+  /**
+   * Safety net for when the webhook is late, misconfigured, or (as
+   * happened before) gets auto-disabled by the provider after too many
+   * failed deliveries. Scans payments stuck in "pending" past a grace
+   * period, asks PayMongo directly whether they were actually paid, and
+   * applies the same activation side effects the webhook would have.
+   *
+   * Meant to be called from a scheduled job (see
+   * app/api/cron/reconcile-payments/route.ts), not from user-facing code.
+   */
+  static async reconcilePendingPayments(): Promise<{
+    checked: number;
+    reconciled: number;
+    errors: string[];
+  }> {
+    const serviceClient = createServiceClient();
+    if (!serviceClient) {
+      throw new Error("Service role client unavailable for payment reconciliation.");
+    }
+
+    const errors: string[] = [];
+    let reconciled = 0;
+
+    // Grace period so we don't race a webhook/verify call that's already
+    // in flight for a checkout the user just completed.
+    const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+
+    const { data: stalePayments, error } = await serviceClient
+      .from("payments")
+      .select("*")
+      .eq("status", "pending")
+      .lt("created_at", cutoff)
+      .not("checkout_session_id", "is", null)
+      .order("created_at", { ascending: true })
+      .limit(50);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (!stalePayments || stalePayments.length === 0) {
+      return { checked: 0, reconciled: 0, errors };
+    }
+
+    for (const payment of stalePayments) {
+      try {
+        const provider = PaymentFactory.getProvider(payment.provider);
+        const sessionData = await provider.getCheckoutSession(
+          payment.checkout_session_id
+        );
+
+        const paymentsList = sessionData?.attributes?.payments || [];
+        if (paymentsList.length === 0) continue;
+
+        const primaryPayment = paymentsList[0];
+        if (primaryPayment.attributes?.status !== "paid") continue;
+
+        const paidAt = primaryPayment.attributes?.paid_at
+          ? new Date(primaryPayment.attributes.paid_at * 1000).toISOString()
+          : new Date().toISOString();
+
+        await serviceClient
+          .from("payments")
+          .update({
+            status: "paid",
+            provider_payment_id: primaryPayment.id,
+            payment_intent_id: primaryPayment.attributes?.payment_intent_id,
+            payment_method_type:
+              primaryPayment.attributes?.source?.type ||
+              primaryPayment.attributes?.payment_method_type,
+            paid_at: paidAt,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", payment.id);
+
+        if (payment.purpose === "subscription" && payment.metadata?.plan_id) {
+          await ServerSubscriptionService.activateSubscription(
+            payment.user_id,
+            payment.metadata.plan_id,
+            payment.id
+          );
+        }
+
+        if (
+          payment.purpose === "listing_boost" &&
+          payment.metadata?.listing_id &&
+          payment.metadata?.duration_days
+        ) {
+          const durationDays = Number(payment.metadata.duration_days);
+          const boostExpiresAt = new Date();
+          boostExpiresAt.setDate(boostExpiresAt.getDate() + durationDays);
+
+          await serviceClient
+            .from("listings")
+            .update({
+              boosted: true,
+              boost_expires_at: boostExpiresAt.toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", payment.metadata.listing_id);
+        }
+
+        reconciled += 1;
+      } catch (err: any) {
+        console.error(`Reconciliation failed for payment ${payment.id}:`, err);
+        errors.push(`${payment.id}: ${err.message || "unknown error"}`);
+      }
+    }
+
+    return { checked: stalePayments.length, reconciled, errors };
+  }
 }

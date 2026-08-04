@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { ServerPaymentService } from "@/lib/services/ServerPaymentService";
 import { SUBSCRIPTION_PLANS, PlanId } from "@/lib/subscriptions/plans";
+import { getAppOrigin } from "@/lib/utils/getAppOrigin";
 
 export async function POST(request: Request) {
   try {
@@ -35,13 +36,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const origin =
-      request.headers.get("origin") ||
-      request.headers.get("referer") ||
-      process.env.NEXT_PUBLIC_APP_URL ||
-      "http://localhost:3000";
-
-    const cleanOrigin = origin.replace(/\/$/, "");
+    const cleanOrigin = getAppOrigin(request);
 
     const successUrl = `${cleanOrigin}/subscriptions?status=success`;
     const cancelUrl = `${cleanOrigin}/subscriptions?status=cancelled`;
