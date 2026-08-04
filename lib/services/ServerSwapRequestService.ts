@@ -1,4 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
+import { createServiceClient } from "@/utils/supabase/service";
 
 import { SwapRequest } from "@/lib/types/SwapRequest";
 
@@ -442,8 +443,22 @@ export async function acceptSwapRequest(
   // separately, at completion time.
   const nowIso = new Date().toISOString();
 
+  // Locking touches two listings — the accepting user's own, and the
+  // other party's — in a single UPDATE. RLS on `listings` restricts
+  // UPDATE to `auth.uid() = owner_id`, so under the regular per-request
+  // client, only the accepting user's own listing would actually get
+  // updated; the other party's row is silently filtered out of the
+  // UPDATE (not an error — RLS just makes it invisible to the write),
+  // which made every accept look like a false "already locked" partial
+  // failure. This is a legitimate cross-user server-side write, so it
+  // has to go through the service-role client, which bypasses RLS.
+  const serviceSupabase = createServiceClient();
+  if (!serviceSupabase) {
+    throw new Error("Service role client unavailable for locking listings.");
+  }
+
   if (listingIds.length > 0) {
-    const { data: lockedRows, error: lockError } = await supabase
+    const { data: lockedRows, error: lockError } = await serviceSupabase
       .from("listings")
       .update({ locked_at: nowIso, updated_at: nowIso })
       .in("id", listingIds)
@@ -463,7 +478,7 @@ export async function acceptSwapRequest(
       // the ones we DID just lock, or they're stuck locked forever with
       // no accepted request behind them.
       if (lockedRows && lockedRows.length > 0) {
-        await supabase
+        await serviceSupabase
           .from("listings")
           .update({ locked_at: null, updated_at: new Date().toISOString() })
           .in(
@@ -499,7 +514,7 @@ export async function acceptSwapRequest(
     // Roll back the listing lock we just took, since this request didn't
     // actually get accepted (someone else accepted/declined it first).
     if (listingIds.length > 0) {
-      await supabase
+      await serviceSupabase
         .from("listings")
         .update({ locked_at: null, updated_at: new Date().toISOString() })
         .in("id", listingIds);
@@ -783,7 +798,10 @@ export async function cancelSwapRequest(
     ].filter(Boolean);
 
     if (listingIds.length > 0) {
-      const { error: unlockError } = await supabase
+      const serviceSupabase = createServiceClient();
+      const unlockClient = serviceSupabase ?? supabase;
+
+      const { error: unlockError } = await unlockClient
         .from("listings")
         .update({ locked_at: null, updated_at: new Date().toISOString() })
         .in("id", listingIds);
