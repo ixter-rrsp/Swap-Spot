@@ -1,4 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
+import { createServiceClient } from "@/utils/supabase/service";
 
 import { SwapAgreement, CreateSwapAgreementInput } from "@/lib/types/SwapAgreement";
 import { SwapAgreementDetail } from "@/lib/types/SwapAgreementDetail";
@@ -10,6 +11,83 @@ import {
   sendReviewRequestMessage,
 } from "@/lib/services/ServerChatService";
 import { createDeliveryAgreementForSwapAgreement } from "@/lib/services/ServerDeliveryAgreementService";
+
+/**
+ * Once a listing is traded, any OTHER swap request still pending/accepted
+ * that involves that same listing (as either side — someone else offering
+ * it, or someone else offering something FOR it) is no longer fulfillable.
+ * Auto-cancels those requests and any draft/pending/confirmed agreement
+ * attached to them, and notifies the affected senders. Uses the service
+ * role client because the current user is very likely not a participant
+ * on these other requests, so normal RLS wouldn't allow the update.
+ */
+export async function cancelCompetingSwapRequests(
+  listingIds: string[],
+  excludeSwapRequestId: string
+): Promise<void> {
+  if (listingIds.length === 0) return;
+
+  const serviceSupabase = createServiceClient();
+  if (!serviceSupabase) {
+    console.error("Service role client unavailable — could not auto-cancel competing swap requests.");
+    return;
+  }
+
+  const { data: competingRequests, error: competingError } = await serviceSupabase
+    .from("swap_requests")
+    .select("id, sender_id, receiver_id")
+    .or(
+      `offered_listing_id.in.(${listingIds.join(",")}),requested_listing_id.in.(${listingIds.join(",")})`
+    )
+    .in("status", ["pending", "accepted"])
+    .neq("id", excludeSwapRequestId);
+
+  if (competingError) {
+    console.error("Failed to look up competing swap requests:", competingError);
+    return;
+  }
+
+  if (!competingRequests || competingRequests.length === 0) return;
+
+  const now = new Date().toISOString();
+  const competingIds = competingRequests.map((r) => r.id);
+
+  const { error: cancelRequestsError } = await serviceSupabase
+    .from("swap_requests")
+    .update({ status: "cancelled", updated_at: now })
+    .in("id", competingIds);
+
+  if (cancelRequestsError) {
+    console.error("Failed to cancel competing swap requests:", cancelRequestsError);
+  }
+
+  // Also cancel any agreement already started against those requests,
+  // as long as it hasn't completed (a completed one is a separate,
+  // already-fulfilled swap and must never be touched here).
+  const { error: cancelAgreementsError } = await serviceSupabase
+    .from("swap_agreements")
+    .update({ status: "cancelled" })
+    .in("swap_request_id", competingIds)
+    .in("status", ["draft", "pending_confirmation", "confirmed"]);
+
+  if (cancelAgreementsError) {
+    console.error("Failed to cancel competing swap agreements:", cancelAgreementsError);
+  }
+
+  for (const request of competingRequests) {
+    try {
+      await createNotification({
+        userId: request.sender_id,
+        type: "swap_cancelled",
+        title: "Swap No Longer Available",
+        message: "This item was swapped with someone else, so your request was automatically cancelled.",
+        referenceId: request.id,
+      });
+    } catch (notifyError) {
+      console.error("Failed to notify sender of auto-cancelled swap request:", notifyError);
+    }
+  }
+}
 
 function mapSwapAgreement(row: any): SwapAgreement {
   return {
@@ -484,6 +562,8 @@ export async function completeSwapAgreement(
 
           if (tradeUpdateError) {
             console.error("Failed to mark listings as traded:", tradeUpdateError);
+          } else {
+            await cancelCompetingSwapRequests(listingIds, agreement.swap_request_id);
           }
         }
       }
@@ -596,11 +676,19 @@ export interface SwapAgreementListDetail extends SwapAgreement {
     id: string;
     title: string;
     imageUrl?: string;
+    city?: string;
+    swapValue?: number;
+    category?: string;
+    condition?: string;
   };
   requestedListing: {
     id: string;
     title: string;
     imageUrl?: string;
+    city?: string;
+    swapValue?: number;
+    category?: string;
+    condition?: string;
   };
 }
 
@@ -625,8 +713,8 @@ async function getAgreementDetailsList(
       *,
       swap_requests!inner(
         id,
-        offered_listing:listings!swap_requests_offered_listing_id_fkey(id, title, listing_images(image_url, sort_order)),
-        requested_listing:listings!swap_requests_requested_listing_id_fkey(id, title, listing_images(image_url, sort_order)),
+        offered_listing:listings!swap_requests_offered_listing_id_fkey(id, title, city, swap_value, category, condition, listing_images(image_url, sort_order)),
+        requested_listing:listings!swap_requests_requested_listing_id_fkey(id, title, city, swap_value, category, condition, listing_images(image_url, sort_order)),
         sender:profiles!swap_requests_sender_id_fkey(id, username, full_name, avatar_url),
         receiver:profiles!swap_requests_receiver_id_fkey(id, username, full_name, avatar_url)
       )
@@ -667,11 +755,19 @@ async function getAgreementDetailsList(
         id: sr.offered_listing.id,
         title: sr.offered_listing.title,
         imageUrl: sr.offered_listing.listing_images?.[0]?.image_url,
+        city: sr.offered_listing.city,
+        swapValue: sr.offered_listing.swap_value,
+        category: sr.offered_listing.category,
+        condition: sr.offered_listing.condition,
       },
       requestedListing: {
         id: sr.requested_listing.id,
         title: sr.requested_listing.title,
         imageUrl: sr.requested_listing.listing_images?.[0]?.image_url,
+        city: sr.requested_listing.city,
+        swapValue: sr.requested_listing.swap_value,
+        category: sr.requested_listing.category,
+        condition: sr.requested_listing.condition,
       }
     };
   });

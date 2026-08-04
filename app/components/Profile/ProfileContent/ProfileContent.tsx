@@ -50,6 +50,9 @@ export default function ProfileContent({
         showActions={
           activeTab === "offers"
         }
+        disableFavorite={
+          activeTab === "received"
+        }
       />
 
     </>

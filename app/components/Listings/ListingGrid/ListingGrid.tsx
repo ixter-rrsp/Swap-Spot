@@ -14,6 +14,7 @@ interface ListingGridProps {
   onActionClick?: () => void;
 
   showActions?: boolean;
+  disableFavorite?: boolean;
 
   emptyTitle?: string;
   emptyDescription?: string;
@@ -25,6 +26,7 @@ export default function ListingGrid({
   actionLabel,
   onActionClick,
   showActions = false,
+  disableFavorite = false,
   emptyTitle,
   emptyDescription,
 }: ListingGridProps) {
@@ -64,6 +66,7 @@ export default function ListingGrid({
               {...listing}
               rating={listing.owner?.rating}
               showActions={showActions}
+              disableFavorite={disableFavorite}
             />
           ))}
         </div>

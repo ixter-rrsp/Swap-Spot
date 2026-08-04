@@ -13,6 +13,12 @@ import { createClient } from "@/utils/supabase/server";
 import { Listing } from "@/lib/types/Listing";
 import styles from "./page.module.css";
 
+// Always fetch fresh — this page shows counts (accepted/completed swaps,
+// received offers) that change the moment a swap agreement is completed
+// elsewhere in the app. Without this, Next.js's client-side router cache
+// can serve a stale snapshot of this page after navigating back to it.
+export const dynamic = "force-dynamic";
+
 export default async function ProfilePage() {
   const supabase = await createClient();
 
@@ -45,11 +51,11 @@ export default async function ProfilePage() {
       title: receivedListingInfo.title,
       description: "Received from swap", // Fallback text
       imageUrl: receivedListingInfo.imageUrl,
-      city: "",
-      swapValue: 0,
+      city: receivedListingInfo.city || "",
+      swapValue: receivedListingInfo.swapValue ?? 0,
       lookingFor: "",
-      category: "other",
-      condition: "used_good",
+      category: (receivedListingInfo.category as Listing["category"]) || "other",
+      condition: (receivedListingInfo.condition as Listing["condition"]) || "used_good",
       boosted: false,
       images: [],
       owner: {

@@ -33,6 +33,7 @@ interface ListingCardProps {
   nearbyLandmark?: string | null;
 
   showActions?: boolean;
+  disableFavorite?: boolean;
 }
 
 
@@ -64,6 +65,7 @@ export default function ListingCard({
   boostExpiresAt = null,
   distance,
   showActions = false,
+  disableFavorite = false,
 }: ListingCardProps)
  {
   const isNearby = distance !== undefined;
@@ -101,15 +103,17 @@ export default function ListingCard({
           )}
 
 
-          <button
-            className={`${styles.favoriteButton} ${saved ? styles.favoriteButtonSaved : ""}`}
-            aria-label={saved ? "Remove from saved" : "Add to saved"}
-            aria-pressed={saved}
-            type="button"
-            onClick={handleFavoriteClick}
-          >
-            <Heart size={18} fill={saved ? "currentColor" : "none"} />
-          </button>
+          {!disableFavorite && (
+            <button
+              className={`${styles.favoriteButton} ${saved ? styles.favoriteButtonSaved : ""}`}
+              aria-label={saved ? "Remove from saved" : "Add to saved"}
+              aria-pressed={saved}
+              type="button"
+              onClick={handleFavoriteClick}
+            >
+              <Heart size={18} fill={saved ? "currentColor" : "none"} />
+            </button>
+          )}
 
 
           {boosted && (
