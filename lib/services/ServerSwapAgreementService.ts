@@ -13,13 +13,16 @@ import {
 import { createDeliveryAgreementForSwapAgreement } from "@/lib/services/ServerDeliveryAgreementService";
 
 /**
- * Once a listing is traded, any OTHER swap request still pending/accepted
- * that involves that same listing (as either side — someone else offering
- * it, or someone else offering something FOR it) is no longer fulfillable.
- * Auto-cancels those requests and any draft/pending/confirmed agreement
- * attached to them, and notifies the affected senders. Uses the service
- * role client because the current user is very likely not a participant
- * on these other requests, so normal RLS wouldn't allow the update.
+ * Once a listing is locked into a swap (as soon as an offer is accepted —
+ * see acceptSwapRequest — not just once fully completed), any OTHER swap
+ * request still pending/accepted that involves that same listing (as
+ * either side — someone else offering it, or someone else offering
+ * something FOR it) is no longer fulfillable. Auto-cancels those requests
+ * and any draft/pending/confirmed agreement attached to them, notifies
+ * the affected senders, and drops a system message in each affected
+ * conversation explaining why. Uses the service role client because the
+ * current user is very likely not a participant on these other requests
+ * or conversations, so normal RLS wouldn't allow the update/insert.
  */
 export async function cancelCompetingSwapRequests(
   listingIds: string[],
@@ -35,7 +38,7 @@ export async function cancelCompetingSwapRequests(
 
   const { data: competingRequests, error: competingError } = await serviceSupabase
     .from("swap_requests")
-    .select("id, sender_id, receiver_id")
+    .select("id, sender_id, receiver_id, requested_listing_id")
     .or(
       `offered_listing_id.in.(${listingIds.join(",")}),requested_listing_id.in.(${listingIds.join(",")})`
     )
@@ -85,6 +88,34 @@ export async function cancelCompetingSwapRequests(
       });
     } catch (notifyError) {
       console.error("Failed to notify sender of auto-cancelled swap request:", notifyError);
+    }
+
+    // Find this request's own conversation (keyed by the requested
+    // listing + the sender as buyer — see createOrGetConversation) and
+    // drop a system message there so both people see it in-thread, not
+    // just as a notification. Sent via the service client and
+    // attributed to request.receiver_id (a genuine participant of that
+    // conversation), since the user who triggered this cascade is often
+    // not a participant of THIS particular conversation at all.
+    try {
+      const { data: conversation } = await serviceSupabase
+        .from("conversations")
+        .select("id")
+        .eq("listing_id", request.requested_listing_id)
+        .eq("buyer_id", request.sender_id)
+        .maybeSingle();
+
+      if (conversation) {
+        await serviceSupabase.from("messages").insert({
+          conversation_id: conversation.id,
+          sender_id: request.receiver_id,
+          message:
+            "This swap can't go any further — the item is now being swapped with someone else.",
+          message_type: "system",
+        });
+      }
+    } catch (messageError) {
+      console.error("Failed to send cascade system message:", messageError);
     }
   }
 }
@@ -641,6 +672,36 @@ export async function cancelSwapAgreement(
 
   if (swapRequestError) {
     console.error("Failed to update swap_requests status to cancelled:", swapRequestError);
+  }
+
+  // An agreement only exists for a request that was accepted, which
+  // means both listings were locked (traded: true) at that point — see
+  // acceptSwapRequest. Unlock them now that this swap is off, so they
+  // become available for other offers again.
+  try {
+    const { data: swapRequestData } = await supabase
+      .from("swap_requests")
+      .select("offered_listing_id, requested_listing_id")
+      .eq("id", agreement.swap_request_id)
+      .single();
+
+    const listingIds = [
+      swapRequestData?.offered_listing_id,
+      swapRequestData?.requested_listing_id,
+    ].filter(Boolean);
+
+    if (listingIds.length > 0) {
+      const { error: unlockError } = await supabase
+        .from("listings")
+        .update({ traded: false, updated_at: new Date().toISOString() })
+        .in("id", listingIds);
+
+      if (unlockError) {
+        console.error("Failed to unlock listings after agreement cancellation:", unlockError);
+      }
+    }
+  } catch (unlockLookupError) {
+    console.error("Failed to look up listings to unlock:", unlockLookupError);
   }
 
   const otherUserId =

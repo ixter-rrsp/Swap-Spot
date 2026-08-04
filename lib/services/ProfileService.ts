@@ -1,7 +1,24 @@
 import type { Profile } from "@/lib/types/Profile";
 import { createClient } from "@/utils/supabase/server";
 
-function mapProfile(data: any): Profile {
+interface RawProfileData {
+  id: string;
+  username: string;
+  full_name: string;
+  avatar_url: string | null;
+  city: string | null;
+  bio: string | null;
+  rating: number | string | null;
+  badge: string | null;
+  date_of_birth: string | null;
+  swap_radius?: number | null;
+  latitude: number | null;
+  longitude: number | null;
+  created_at: string;
+  updated_at: string | null;
+}
+
+function mapProfile(data: RawProfileData): Profile {
   return {
     id: data.id,
     username: data.username,
@@ -11,7 +28,7 @@ function mapProfile(data: any): Profile {
     bio: data.bio,
 
     rating: Number(data.rating),
-    badge: data.badge,
+    badge: data.badge ?? "",
     dateOfBirth: data.date_of_birth,
 
     swapRadius: data.swap_radius ?? 10,
@@ -223,7 +240,7 @@ export async function getProfileDashboard(): Promise<ProfileDashboardData | null
     .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`);
 
   let averageRating = 0;
-  let totalReviews = reviewsData?.length || 0;
+  const totalReviews = reviewsData?.length || 0;
   if (totalReviews > 0 && reviewsData) {
     const sum = reviewsData.reduce((acc, r) => acc + r.rating, 0);
     averageRating = Number((sum / totalReviews).toFixed(1));
@@ -233,7 +250,7 @@ export async function getProfileDashboard(): Promise<ProfileDashboardData | null
     .from("listings")
     .select("id", { count: "exact", head: true })
     .eq("owner_id", user.id)
-    .eq("status", "active");
+    .eq("traded", false);
 
   const { count: sentRequests } = await supabase
     .from("swap_requests")
@@ -257,11 +274,12 @@ export async function getProfileDashboard(): Promise<ProfileDashboardData | null
     .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
     .in("status", ["accepted", "completed"]);
 
-  const { count: completedRequestCount } = await supabase
-    .from("swap_requests")
-    .select("id", { count: "exact", head: true })
-    .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-    .eq("status", "completed");
+  // Completed count comes from swap_agreements.status = "completed"
+  // (completedAgreementsData, fetched above) rather than re-querying
+  // swap_requests — that column only gets synced to "completed" as a
+  // side effect of the agreement finishing, so relying on it directly
+  // here was silently undercounting whenever that sync hadn't (or
+  // couldn't) run. swap_agreements is the source of truth.
 
   const { data: agreements } = await supabase
     .from("swap_agreements")
@@ -305,7 +323,7 @@ export async function getProfileDashboard(): Promise<ProfileDashboardData | null
     },
     reliability: {
       accepted: acceptedCount || 0,
-      completed: completedRequestCount || 0,
+      completed: completedAgreementsData?.length || 0,
     },
   };
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { Truck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -79,8 +80,13 @@ export default function DeliveryAgreementCard({
   }, [swapAgreementId, router]);
 
   useEffect(() => {
-    void load();
+    const frame = window.requestAnimationFrame(() => {
+      void load();
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, [load]);
+
 
   const infoForm = useForm<DeliveryInfoFormData>({
     resolver: zodResolver(deliveryInfoSchema),
@@ -226,7 +232,9 @@ export default function DeliveryAgreementCard({
   return (
     <div className={styles.card}>
       <div className={styles.header}>
-        <span className={styles.icon}>🚚</span>
+        <span className={styles.icon}>
+          <Truck size={20} />
+        </span>
         <div>
           <p className={styles.heading}>Delivery Agreement</p>
           <p className={styles.subheading}>
