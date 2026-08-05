@@ -70,6 +70,56 @@ export async function GET(request: NextRequest) {
 
   const isNewOAuthUser = !userDeviceRegs || userDeviceRegs.length === 0;
 
+  // If Supabase just created a brand-new auth user for this Google
+  // sign-in, check whether an OLDER account already exists with the same
+  // email. This happens when someone originally signed up with
+  // email/password but never verified that email — Supabase's automatic
+  // identity linking only links to a VERIFIED email, so instead of
+  // recognizing them, it silently creates a second, separate account.
+  // Catch that here rather than letting the user end up with two
+  // accounts and no idea why their data "disappeared."
+  if (isNewOAuthUser && user.email && supabaseAdmin.auth.admin) {
+    try {
+      const { data: userList } = await supabaseAdmin.auth.admin.listUsers({
+        perPage: 1000,
+      });
+
+      const duplicateAccount = userList?.users?.find(
+        (candidate) =>
+          candidate.id !== user.id &&
+          candidate.email?.toLowerCase() === user.email!.toLowerCase()
+      );
+
+      if (duplicateAccount) {
+        // Clean up the duplicate we just accidentally created, then sign
+        // this session out — don't leave an orphaned Google-only account
+        // sitting around with no way for the user to reach it again.
+        try {
+          await supabaseAdmin.auth.admin.deleteUser(user.id);
+        } catch (delErr) {
+          console.error(
+            "[OAuth Duplicate Guard] Error deleting duplicate user:",
+            delErr
+          );
+        }
+        await supabase.auth.signOut();
+
+        const response = NextResponse.redirect(
+          `${origin}/login?error=duplicate_email&error_description=${encodeURIComponent(
+            "An account with this email already exists. Please log in with your email and password, then link Google from your profile settings."
+          )}`
+        );
+        response.cookies.delete("sb-device-fp");
+        return response;
+      }
+    } catch (lookupErr) {
+      // If the lookup itself fails, fail open rather than blocking
+      // legitimate sign-ins — worst case we're back to the original
+      // (rare) duplicate-account behavior, not a broken login flow.
+      console.error("[OAuth Duplicate Guard] Lookup failed:", lookupErr);
+    }
+  }
+
   if (normalizedHash) {
     const { data: existingHashReg } = await supabaseAdmin
       .from("device_registrations")

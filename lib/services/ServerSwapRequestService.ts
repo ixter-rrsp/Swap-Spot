@@ -242,12 +242,6 @@ export async function createSwapRequest(
   }
 
 
-  // Also guard the reverse case: the other party may have independently
-  // sent a request for this exact same pair of items, just with the
-  // offer/request roles flipped (e.g. B offers item B for item A, while
-  // A already offered item A for item B). Both requests point at the
-  // same underlying trade, so block the second one rather than letting
-  // two redundant pending requests exist for the same two items.
   const {
     data: reverseRequest,
   } =
