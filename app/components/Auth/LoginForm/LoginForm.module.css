@@ -48,6 +48,35 @@
   text-decoration: underline;
 }
 
+.resendVerification {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.resendVerification p {
+  font-size: .85rem;
+  color: #78350f;
+  margin: 0 0 6px;
+}
+
+.resendVerification button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.resendVerification button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
 .submitButton {
   height: 54px;
 

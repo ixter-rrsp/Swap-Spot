@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import TextField from "@/app/components/UI/TextField/TextField";
 import Spinner from "@/app/components/UI/Spinner/Spinner";
-import { signIn, signInWithGoogle } from "@/lib/services/AuthService";
+import { signIn, signInWithGoogle, resendVerificationEmail } from "@/lib/services/AuthService";
 import { loginSchema, LoginFormData } from "@/lib/validations/LoginSchema";
 import { getDeviceFingerprintHash } from "@/lib/utils/fingerprint";
 import styles from "./LoginForm.module.css";
@@ -41,6 +41,9 @@ export default function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [attemptedEmail, setAttemptedEmail] = useState("");
 
   const toast = useToast();
 
@@ -62,6 +65,7 @@ export default function LoginForm() {
 
   async function onSubmit(data: LoginFormData) {
     setLoading(true);
+    setNeedsVerification(false);
 
     try {
       const fingerprintHash = await getDeviceFingerprintHash();
@@ -72,17 +76,38 @@ export default function LoginForm() {
     } catch (error) {
       const raw = error instanceof Error ? error.message : "Something went wrong.";
       const mapped = mapLoginError(raw);
+      const lower = raw.toLowerCase();
 
       if (
-        raw.toLowerCase().includes("invalid login credentials") ||
-        raw.toLowerCase().includes("invalid email or password")
+        lower.includes("invalid login credentials") ||
+        lower.includes("invalid email or password")
       ) {
         setError("password", { message: "Incorrect email or password." });
+      }
+
+      if (lower.includes("email not confirmed") || lower.includes("verify your email")) {
+        setNeedsVerification(true);
+        setAttemptedEmail(data.email);
       }
 
       toast(mapped, "error");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleResendVerification() {
+    setResending(true);
+    try {
+      await resendVerificationEmail(attemptedEmail);
+      toast("Verification email sent — please check your inbox.", "success");
+    } catch (error) {
+      toast(
+        error instanceof Error ? error.message : "Failed to resend verification email.",
+        "error"
+      );
+    } finally {
+      setResending(false);
     }
   }
 
@@ -122,6 +147,19 @@ export default function LoginForm() {
       <div className={styles.forgot}>
         <Link href="/forgot-password">Forgot Password?</Link>
       </div>
+
+      {needsVerification && (
+        <div className={styles.resendVerification}>
+          <p>Haven&apos;t received the verification email?</p>
+          <button
+            type="button"
+            onClick={handleResendVerification}
+            disabled={resending}
+          >
+            {resending ? "Sending..." : "Resend verification email"}
+          </button>
+        </div>
+      )}
 
       <button
         className={styles.submitButton}

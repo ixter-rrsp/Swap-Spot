@@ -58,6 +58,23 @@ export async function signOut() {
   }
 }
 
+/**
+ * Sends a fresh signup-verification email. Used when a user signed up
+ * with email/password but lost, ignored, or never received the original
+ * verification email, and is now blocked from logging in until they
+ * verify. Without this, an unverified account has no way back in.
+ */
+export async function resendVerificationEmail(email: string) {
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function getCurrentUser() {
   const { data, error } = await supabase.auth.getUser();
 
