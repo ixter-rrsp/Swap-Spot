@@ -8,6 +8,8 @@ import MenuDrawer from "@/app/components/UI/MenuDrawer";
 import { SUBSCRIPTION_PLANS } from "@/lib/subscriptions/plans";
 import MessageUserModal from "@/app/components/Profile/MessageUserModal/MessageUserModal";
 
+import BackButton from "@/app/components/UI/BackButton/BackButton";
+
 import styles from "./ProfileHeader.module.css";
 
 interface ProfileHeaderProps {
@@ -21,9 +23,7 @@ interface ProfileHeaderProps {
   bio?: string;
   badge?: string;
   showActions?: boolean;
-  // The profile owner's id — conversations are attached to one of
-  // their listings, so the Message button opens a picker asking which
-  // listing you're messaging about (same pattern as Propose a Swap).
+  showBackButton?: boolean;
   profileUserId?: string;
 }
 
@@ -38,6 +38,7 @@ export default function ProfileHeader({
   bio,
   badge,
   showActions = true,
+  showBackButton = false,
   profileUserId,
 }: ProfileHeaderProps) {
 
@@ -96,6 +97,12 @@ export default function ProfileHeader({
       className={`${styles.container} ${isFreeTier ? styles.freeContainer : ""}`}
       style={!isFreeTier && matchedPlan ? { backgroundColor: matchedPlan.badgeBg } : undefined}
     >
+      {showBackButton && (
+        <div className={styles.headerBackAction}>
+          <BackButton variant="inline" className={styles.backButtonOverride} />
+        </div>
+      )}
+
       <div className={styles.headerActions}>
         <Link
           href="/saved"

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./BoostedSection.module.css";
 import { ChevronRight } from "lucide-react";
 
@@ -16,13 +17,13 @@ export default function BoostedSection({
       <header className={styles.header}>
         <h2 className={styles.title}>Boosted Swaps</h2>
 
-        <button
-          type="button"
+        <Link
+          href="/boosted"
           className={styles.seeAllButton}
         >
           <span>See all</span>
           <ChevronRight size={18} />
-        </button>
+        </Link>
       </header>
 
       <div className={styles.cards}>

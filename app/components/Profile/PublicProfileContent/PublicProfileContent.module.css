@@ -1,0 +1,177 @@
+.wrapper {
+  padding-top: 4px;
+  padding-bottom: 32px;
+}
+
+/* Tab bar */
+.tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0 16px;
+}
+
+.tab,
+.activeTab {
+  padding: 12px 4px;
+  margin-right: 28px;
+  border: none;
+  background: transparent;
+  font-size: 15px;
+  cursor: pointer;
+  position: relative;
+}
+
+.tab {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.activeTab {
+  color: #111827;
+  font-weight: 700;
+}
+
+.activeTab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #111827;
+}
+
+/* View More */
+.viewMoreRow {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 24px;
+}
+
+.viewMoreBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 28px;
+  border-radius: 999px;
+  border: 1.5px solid #2563eb;
+  background: none;
+  color: #2563eb;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+
+.viewMoreBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Empty state */
+.empty {
+  padding: 32px 0;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* Reviews */
+.reviewsSection {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.spinnerRow {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+}
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reviewCard {
+  padding: 14px;
+  border: 1px solid #f3f4f6;
+  border-radius: 14px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.reviewerInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatarPlaceholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.reviewerName {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.reviewDate {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.rating {
+  display: flex;
+  gap: 2px;
+}
+
+.starFilled {
+  color: #fbbf24;
+  font-size: 16px;
+}
+
+.starEmpty {
+  color: #e5e7eb;
+  font-size: 16px;
+}
+
+.comment {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #4b5563;
+}

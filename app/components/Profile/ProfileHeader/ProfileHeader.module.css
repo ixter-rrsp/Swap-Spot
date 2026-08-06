@@ -168,6 +168,20 @@
   color: rgba(255, 255, 255, 0.85);
 }
 
+.headerBackAction {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+}
+
+.backButtonOverride {
+  color: #374151;
+}
+
+.freeContainer .backButtonOverride {
+  color: #ffffff;
+}
+
 .headerActions {
   position: absolute;
   top: 16px;

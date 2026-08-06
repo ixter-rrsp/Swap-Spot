@@ -197,10 +197,10 @@ export async function getMyListingsForSwap(): Promise<Listing[]> {
   }));
 }
 
-export async function getListingsByOwner(ownerId: string): Promise<Listing[]> {
+export async function getListingsByOwner(ownerId: string, limit?: number): Promise<Listing[]> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("listings")
     .select(`
       *,
@@ -213,9 +213,13 @@ export async function getListingsByOwner(ownerId: string): Promise<Listing[]> {
     .eq("owner_id", ownerId)
     .eq("traded", false)
     .is("locked_at", null)
-    .order("created_at", {
-      ascending: false,
-    });
+    .order("created_at", { ascending: false });
+
+  if (limit !== undefined) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(error.message);

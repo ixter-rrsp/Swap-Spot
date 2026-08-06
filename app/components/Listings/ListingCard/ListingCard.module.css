@@ -7,7 +7,7 @@
 
   background: #fff;
   border-radius: 16px;
-  overflow: visible;
+  overflow: hidden;
 
   text-decoration: none;
   color: inherit;
@@ -137,12 +137,14 @@
 
   padding: 1rem;
   border-left: 4px solid transparent;
+  border-bottom-left-radius: 16px;
 
   flex: 1;
 }
 
 .boostedContent {
   border-left: 4px solid var(--brand-green);
+  border-bottom-left-radius: 16px;
 }
 
 .title {

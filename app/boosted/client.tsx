@@ -9,13 +9,13 @@ import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
 import { Listing } from "@/lib/types/Listing";
 import styles from "./page.module.css";
 
-interface NearbyPageClientProps {
+interface BoostedPageClientProps {
   listings: Listing[];
 }
 
-export default function NearbyPageClient({
+export default function BoostedPageClient({
   listings,
-}: NearbyPageClientProps) {
+}: BoostedPageClientProps) {
   const [search, setSearch] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
 
@@ -23,7 +23,7 @@ export default function NearbyPageClient({
     const searchTerm = search.trim().toLowerCase();
 
     return listings.filter((listing) => {
-      // 1. Search filter
+      // 1. Search text filter
       if (searchTerm) {
         const matchesSearch =
           (listing.title && listing.title.toLowerCase().includes(searchTerm)) ||
@@ -61,16 +61,16 @@ export default function NearbyPageClient({
 
       <div className={styles.headerWrapper}>
         <PageHeader
-          title="Nearby Swaps"
-          subtitle="Discover items available near your location."
+          title="Boosted Swaps"
+          subtitle="Featured listings boosted by their owners for maximum visibility."
         />
       </div>
 
       <ListingGrid
         title=""
         listings={filteredListings}
-        emptyTitle="No nearby swaps found"
-        emptyDescription="Try increasing your swap radius or check back later."
+        emptyTitle="No boosted listings found"
+        emptyDescription="Try clearing your search filters or check back later."
       />
     </>
   );

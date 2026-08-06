@@ -30,22 +30,27 @@ export default function ListingGrid({
   emptyTitle,
   emptyDescription,
 }: ListingGridProps) {
-  return (
-    <section className={styles.container}>
-      <header className={styles.header}>
-        <h2 className={styles.title}>
-          {title}
-        </h2>
+  const hasHeader = Boolean(title || actionLabel);
+  const containerClassName = hasHeader
+    ? styles.container
+    : `${styles.container} ${styles.compactContainer}`;
 
-        {actionLabel && (
-          <button
-            className={styles.action}
-            onClick={onActionClick}
-          >
-            {actionLabel}
-          </button>
-        )}
-      </header>
+  return (
+    <section className={containerClassName}>
+      {hasHeader && (
+        <header className={styles.header}>
+          {title ? <h2 className={styles.title}>{title}</h2> : null}
+
+          {actionLabel && (
+            <button
+              className={styles.action}
+              onClick={onActionClick}
+            >
+              {actionLabel}
+            </button>
+          )}
+        </header>
+      )}
 
       {listings.length === 0 ? (
         <EmptyState
