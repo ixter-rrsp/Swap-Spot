@@ -65,38 +65,74 @@ export default function HomeContent({
 
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const isFirstRender = useRef(true);
+  const lastScrollYRef = useRef(0);
 
   // Restore scroll position on initial mount
   useIsomorphicLayoutEffect(() => {
-    const saved = sessionStorage.getItem("home_scroll_state");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (typeof parsed.scrollY === "number" && parsed.scrollY > 0) {
-          const targetY = parsed.scrollY;
-          window.scrollTo({ top: targetY, behavior: "instant" as ScrollBehavior });
-          const rAF = requestAnimationFrame(() => {
-            window.scrollTo({ top: targetY, behavior: "instant" as ScrollBehavior });
-          });
-          return () => cancelAnimationFrame(rAF);
-        }
-      } catch {}
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
     }
+
+    const saved = sessionStorage.getItem("home_scroll_state");
+    if (!saved) return;
+
+    try {
+      const parsed = JSON.parse(saved);
+      if (typeof parsed.scrollY === "number" && parsed.scrollY > 0) {
+        const targetY = parsed.scrollY;
+
+        const doScroll = () => {
+          window.scrollTo({ top: targetY, behavior: "instant" as ScrollBehavior });
+        };
+
+        doScroll();
+
+        const t1 = setTimeout(doScroll, 10);
+        const t2 = setTimeout(doScroll, 50);
+        const t3 = setTimeout(doScroll, 150);
+        const t4 = setTimeout(doScroll, 300);
+
+        return () => {
+          clearTimeout(t1);
+          clearTimeout(t2);
+          clearTimeout(t3);
+          clearTimeout(t4);
+        };
+      }
+    } catch {}
   }, []);
 
-  // Save scroll position and visibleCount continuously
+  // Save scroll position and visibleCount continuously (ignoring 0 scroll during page exit)
   useEffect(() => {
     const handleScroll = () => {
       const y = window.scrollY;
-      sessionStorage.setItem(
-        "home_scroll_state",
-        JSON.stringify({ scrollY: y, visibleCount })
-      );
+      if (y > 0) {
+        lastScrollYRef.current = y;
+        sessionStorage.setItem(
+          "home_scroll_state",
+          JSON.stringify({ scrollY: y, visibleCount })
+        );
+      }
+    };
+
+    // Also capture click on any listing link BEFORE Next.js starts scrolling to top
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      const link = target?.closest("a");
+      if (link && window.scrollY > 0) {
+        sessionStorage.setItem(
+          "home_scroll_state",
+          JSON.stringify({ scrollY: window.scrollY, visibleCount })
+        );
+      }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("click", handleClick, { capture: true });
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("click", handleClick, { capture: true });
     };
   }, [visibleCount]);
 
