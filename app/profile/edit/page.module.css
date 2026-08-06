@@ -1,0 +1,10 @@
+.container {
+  min-height: 100vh;
+  padding: 24px 20px calc(90px + env(safe-area-inset-bottom)) 20px;
+  background: #f9fafb;
+}
+
+.content {
+  max-width: 600px;
+  margin: 0 auto;
+}

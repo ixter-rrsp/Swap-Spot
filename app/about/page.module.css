@@ -1,0 +1,145 @@
+.container {
+  min-height: 100vh;
+  padding: 24px 20px calc(90px + env(safe-area-inset-bottom)) 20px;
+  background: #f9fafb;
+}
+
+.content {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  margin: 4px 0 24px 0;
+}
+
+/* Hero Section */
+.heroSection {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-radius: 20px;
+  padding: 28px 24px;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logoBadge {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  backdrop-filter: blur(4px);
+}
+
+.heroTitle {
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.02em;
+}
+
+.heroDescription {
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  max-width: 500px;
+}
+
+/* Values Grid */
+.valuesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 520px) {
+  .valuesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.valueCard {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  padding: 18px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.valueIconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.valueTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 6px 0;
+}
+
+.valueText {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #4b5563;
+  margin: 0;
+}
+
+/* Links Card */
+.linksCard {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.linksTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 14px 0;
+}
+
+.linksList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.linkItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.linkItem:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}

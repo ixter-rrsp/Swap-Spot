@@ -1,7 +1,5 @@
 .container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 24px 20px calc(74px + env(safe-area-inset-bottom) + 24px);
+  padding: 0;
 }
 
 .title {

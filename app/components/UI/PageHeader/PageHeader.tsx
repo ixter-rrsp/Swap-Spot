@@ -8,17 +8,22 @@ interface PageHeaderProps {
   subtitle?: string;
   action?: React.ReactNode;
   showBack?: boolean;
+  align?: "left" | "center";
 }
 
-export default function PageHeader({ title, subtitle, action, showBack }: PageHeaderProps) {
-  return (
-    <div className={styles.header}>
-      <div className={styles.copy}>
-        <div className={styles.titleRow}>
-          {showBack ? (
-            <BackButton variant="inline" className={styles.backButton} />
-          ) : null}
+export default function PageHeader({ title, subtitle, action, showBack, align = "left" }: PageHeaderProps) {
+  const isCentered = align === "center";
 
+  return (
+    <div className={`${styles.header} ${isCentered ? styles.headerCentered : ""}`}>
+      {showBack && (
+        <div className={styles.backButtonWrap}>
+          <BackButton variant="inline" className={styles.backButton} />
+        </div>
+      )}
+
+      <div className={`${styles.copy} ${isCentered ? styles.copyCentered : ""}`}>
+        <div className={`${styles.titleRow} ${isCentered ? styles.titleRowCentered : ""}`}>
           <h1 className={styles.title}>{title}</h1>
         </div>
 

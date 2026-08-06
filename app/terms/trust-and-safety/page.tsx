@@ -1,5 +1,6 @@
 import styles from "./page.module.css";
 import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
+import { AlertOctagon, Lightbulb } from "lucide-react";
 
 export default function TrustAndSafetyPage() {
   return (
@@ -21,9 +22,10 @@ export default function TrustAndSafetyPage() {
             <li>Police stations</li>
             <li>Other busy public places</li>
           </ul>
-          <p className={styles.warning}>
-            ⚠️ Never meet in private or isolated locations. Your safety is our priority.
-          </p>
+          <div className={styles.warning}>
+            <AlertOctagon size={16} color="#d97706" style={{ flexShrink: 0 }} />
+            <span>Never meet in private or isolated locations. Your safety is our priority.</span>
+          </div>
         </section>
 
         {/* Inspect Items Carefully */}
@@ -69,9 +71,10 @@ export default function TrustAndSafetyPage() {
             <li>Pressure tactics or urgency</li>
             <li>Requests to communicate outside the platform immediately</li>
           </ul>
-          <p className={styles.tip}>
-            💡 Tip: If something feels off, trust your instincts and report it.
-          </p>
+          <div className={styles.tip}>
+            <Lightbulb size={16} color="#2563eb" style={{ flexShrink: 0 }} />
+            <span>Tip: If something feels off, trust your instincts and report it.</span>
+          </div>
         </section>
 
         {/* Report Suspicious Activity */}

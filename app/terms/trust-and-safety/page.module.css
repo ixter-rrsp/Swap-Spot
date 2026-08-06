@@ -67,6 +67,9 @@
 }
 
 .warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px;
   background: #fef3c7;
   border-left: 4px solid #f59e0b;
@@ -78,6 +81,9 @@
 }
 
 .tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: 12px;
   background: #dbeafe;
   border-left: 4px solid #3b82f6;

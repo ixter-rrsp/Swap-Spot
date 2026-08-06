@@ -154,7 +154,7 @@ export default function EditProfileForm({
           id="bio"
           label="Bio"
           icon={BadgeInfo}
-          rows={4}
+          rows={2}
           placeholder="Tell swap partners a bit about yourself..."
           error={errors.bio?.message}
           disabled={isSubmitting}
