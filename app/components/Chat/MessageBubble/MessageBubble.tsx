@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { Reply } from "lucide-react";
 
-import { Message } from "@/lib/types/Message";
+import { Message, MessageReplyPreview } from "@/lib/types/Message";
 
 import ImageMessage from "../MessageTypes/ImageMessage";
 import VideoMessage from "../MessageTypes/VideoMessage";
@@ -29,7 +29,7 @@ const SWIPE_MAX_DISTANCE = 72; // px the bubble is allowed to visually travel
 const LONG_PRESS_MS = 450;
 const MOVE_CANCELS_LONG_PRESS_PX = 8;
 
-function replyPreviewText(message: Message): string {
+function replyPreviewText(message: MessageReplyPreview): string {
     if (message.messageType === "image") return "📷 Photo";
     if (message.messageType === "video") return "🎥 Video";
     if (message.messageType === "swap_proposal") return "Swap proposal";
