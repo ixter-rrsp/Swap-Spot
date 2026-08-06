@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/app/components/UI/Toast/ToastContext";
 import ConfirmDialog from "@/app/components/UI/ConfirmDialog/ConfirmDialog";
@@ -26,6 +26,38 @@ export default function RequestActions({
   const router = useRouter();
   const toast = useToast();
 
+  // `status` is only seeded from `request.status` once, on mount —
+  // useState's initializer doesn't re-run just because the parent
+  // Server Component re-renders with a fresh `request` prop (e.g. from
+  // the router.refresh() below). Without this, a request that gets
+  // auto-cancelled elsewhere (someone accepted a competing offer on the
+  // same listing) while this page is already open would keep showing
+  // stale "pending" actions — including a Cancel button that fails the
+  // moment it's clicked, since the server already knows it's cancelled.
+  useEffect(() => {
+    setStatus(request.status);
+  }, [request.status]);
+
+  // Keep this in sync with the server even if nothing the current user
+  // does triggers a refresh — e.g. the other party accepts/declines, or
+  // (per above) a competing request causes an auto-cancel.
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      router.refresh();
+    }, 10000);
+
+    function handleFocus() {
+      router.refresh();
+    }
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [router]);
+
 
   const isSender =
     request.currentUserId === request.sender.id;
@@ -38,6 +70,7 @@ export default function RequestActions({
 
   async function sendAction(
     action: "accept" | "decline" | "cancel"
+
   ) {
     const response =
       await fetch(
@@ -148,6 +181,22 @@ export default function RequestActions({
       } catch (error) {
 
         console.error(error);
+
+        const message =
+          error instanceof Error ? error.message : "";
+
+        if (message === "This swap request can no longer be cancelled.") {
+          // The server already knows something we didn't yet — most
+          // likely it was auto-cancelled (a competing offer got
+          // accepted) or resolved some other way while this page was
+          // open. Sync up instead of reporting a false failure.
+          router.refresh();
+          toast(
+            "This request was already resolved — refreshing.",
+            "error"
+          );
+          return;
+        }
 
         toast(
           "Failed to cancel swap request.",

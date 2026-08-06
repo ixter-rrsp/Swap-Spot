@@ -17,6 +17,7 @@ interface ListingRowProfile {
 
 interface ListingRow {
   id: string;
+  owner_id: string;
   title: string;
   description: string;
   city: string;
