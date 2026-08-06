@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     const conversationId = formData.get("conversationId") as string;
     const text = (formData.get("message") as string) || "";
     const files = formData.getAll("files") as File[];
+    const replyToId = (formData.get("replyToId") as string) || undefined;
 
     if (!conversationId) {
       return NextResponse.json(
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
 
     // Handle text message if present
     if (text.trim()) {
-      await sendMessage(conversationId, text.trim());
+      await sendMessage(conversationId, text.trim(), replyToId);
     }
 
     return NextResponse.json({ success: true }, { status: 201 });

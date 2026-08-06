@@ -37,6 +37,15 @@ interface ChatRoomProps {
     };
 }
 
+function replyPreviewLabel(message: Message): string {
+    if (message.messageType === "image") return "📷 Photo";
+    if (message.messageType === "video") return "🎥 Video";
+    if (message.messageType === "swap_proposal") return "Swap proposal";
+    if (message.messageType === "swap_agreement") return "Swap agreement";
+    if (message.messageType === "review_request") return "Review request";
+    return message.message || "Message";
+}
+
 export default function ChatRoom({
     conversationId,
     currentUserId,
@@ -48,6 +57,7 @@ export default function ChatRoom({
     const [messages, setMessages] =
         useState<Message[]>(initialMessages);
     const [isAgreementModalOpen, setIsAgreementModalOpen] = useState(false);
+    const [replyingTo, setReplyingTo] = useState<Message | null>(null);
     const [activeSwapRequestId, setActiveSwapRequestId] = useState<string | null>(() => {
         return initialMessages.find(
             (message) => message.messageType === "swap_proposal" && !!message.swapRequestId
@@ -58,11 +68,20 @@ export default function ChatRoom({
     const bottomRef =
         useRef<HTMLDivElement | null>(null);
 
+    // Kept in sync with `messages` so the realtime INSERT handler can build
+    // a reply preview from a message that's already loaded, without an
+    // extra round trip for the common case of replying to something recent.
+    const messagesRef = useRef<Message[]>(initialMessages);
+    useEffect(() => {
+        messagesRef.current = messages;
+    }, [messages]);
+
 
     useEffect(() => {
         const supabase = createClient();
             let isActive = true;
-            let unsubscribeFn: (() => void) | null = null;
+            let unsubscribeInsert: (() => void) | null = null;
+            let unsubscribeUpdate: (() => void) | null = null;
 
             async function setupRealtime() {
                 const {
@@ -75,7 +94,7 @@ export default function ChatRoom({
 
                 const channelName = `conversation:${conversationId}`;
 
-                unsubscribeFn = subscribeChannel(
+                unsubscribeInsert = subscribeChannel(
                     channelName,
                     {
                         event: "INSERT",
@@ -99,6 +118,12 @@ export default function ChatRoom({
                                 return previous;
                             }
 
+                            const replySource = newMessage.reply_to_id
+                                ? messagesRef.current.find(
+                                      (m) => m.id === newMessage.reply_to_id
+                                  )
+                                : null;
+
                             return [
                                 ...previous,
                                 {
@@ -112,8 +137,53 @@ export default function ChatRoom({
                                     videoUrl: newMessage.video_url,
                                     swapRequestId: newMessage.swap_request_id,
                                     swapAgreementId: newMessage.swap_agreement_id,
+                                    unsentAt: newMessage.unsent_at,
+                                    replyToId: newMessage.reply_to_id,
+                                    replyPreview: replySource
+                                        ? {
+                                              id: replySource.id,
+                                              senderId: replySource.senderId,
+                                              message: replySource.message,
+                                              messageType: replySource.messageType,
+                                          }
+                                        : null,
                                 },
                             ];
+                        });
+                    }
+                );
+
+                // Reflects unsend / remove-for-me across both participants'
+                // screens in real time (the sender's own optimistic update
+                // already happened locally, but this is what makes it show
+                // up live for the OTHER participant too).
+                unsubscribeUpdate = subscribeChannel(
+                    channelName,
+                    {
+                        event: "UPDATE",
+                        schema: "public",
+                        table: "messages",
+                        filter: `conversation_id=eq.${conversationId}`,
+                    },
+                    (payload: any) => {
+                        const updated = payload.new;
+                        if (!updated?.id) return;
+
+                        setMessages((previous) => {
+                            const deletedFor: string[] = updated.deleted_for ?? [];
+
+                            // If this update is the OTHER user removing the
+                            // message for themselves, that shouldn't affect
+                            // what WE see — only act on it if it affects us.
+                            if (deletedFor.includes(currentUserId)) {
+                                return previous.filter((m) => m.id !== updated.id);
+                            }
+
+                            return previous.map((m) =>
+                                m.id === updated.id
+                                    ? { ...m, unsentAt: updated.unsent_at }
+                                    : m
+                            );
                         });
                     }
                 );
@@ -124,12 +194,13 @@ export default function ChatRoom({
             return () => {
                 isActive = false;
                 try {
-                    unsubscribeFn?.();
+                    unsubscribeInsert?.();
+                    unsubscribeUpdate?.();
                 } catch (e) {
                     // ignore
                 }
             };
-    }, [conversationId]);
+    }, [conversationId, currentUserId]);
 
 
     useEffect(() => {
@@ -140,11 +211,6 @@ export default function ChatRoom({
         setActiveSwapRequestId(proposalMessage?.swapRequestId ?? null);
     }, [messages]);
 
-    // Track the actual swap request status so we can gate the
-    // "Create Swap Agreement" button — a proposal existing in the
-    // chat doesn't mean it's been accepted yet. Polls periodically so
-    // the button unlocks shortly after the other party accepts,
-    // without needing a dedicated realtime channel for this.
     useEffect(() => {
         if (!activeSwapRequestId) {
             setActiveSwapRequestStatus(null);
@@ -190,11 +256,15 @@ export default function ChatRoom({
     async function handleSendMessage(
         message: string,
         files?: File[],
-        onProgress?: (fileIndex: number, percent: number) => void
+        onProgress?: (fileIndex: number, percent: number) => void,
+        replyToId?: string | null
     ) {
         const formData = new FormData();
         formData.append("conversationId", conversationId);
         formData.append("message", message);
+        if (replyToId) {
+            formData.append("replyToId", replyToId);
+        }
 
         if (files && files.length > 0) {
             files.forEach((file) => {
@@ -202,8 +272,6 @@ export default function ChatRoom({
             });
         }
 
-        // If caller provided a progress callback, use XHR to get upload progress.
-        // Return an object containing the upload promise and an abort function.
         if (onProgress) {
             const xhr = new XMLHttpRequest();
             xhr.open("POST", "/api/messages");
@@ -214,7 +282,6 @@ export default function ChatRoom({
                     const loaded = ev.loaded;
                     const total = ev.total;
 
-                    // distribute loaded bytes to files proportionally
                     const fileSizes = (files ?? []).map((f) => f.size || 0);
                     const prefixSums = fileSizes.reduce<number[]>((acc, s) => {
                         acc.push((acc.length ? acc[acc.length - 1] : 0) + s);
@@ -257,6 +324,55 @@ export default function ChatRoom({
         }
     }
 
+    function handleReply(message: Message) {
+        setReplyingTo(message);
+    }
+
+    function handleCancelReply() {
+        setReplyingTo(null);
+    }
+
+    async function handleUnsend(messageId: string) {
+        // Optimistic: mark unsent locally right away, roll back on failure.
+        const previous = messages;
+        setMessages((prev) =>
+            prev.map((m) =>
+                m.id === messageId
+                    ? { ...m, unsentAt: new Date().toISOString() }
+                    : m
+            )
+        );
+
+        try {
+            const response = await fetch(`/api/messages/${messageId}/unsend`, {
+                method: "PATCH",
+            });
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+        } catch (err) {
+            console.error("Failed to unsend message:", err);
+            setMessages(previous);
+        }
+    }
+
+    async function handleRemoveForMe(messageId: string) {
+        const previous = messages;
+        setMessages((prev) => prev.filter((m) => m.id !== messageId));
+
+        try {
+            const response = await fetch(`/api/messages/${messageId}/remove-for-me`, {
+                method: "PATCH",
+            });
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+        } catch (err) {
+            console.error("Failed to remove message:", err);
+            setMessages(previous);
+        }
+    }
+
     const isAgreementButtonEnabled = activeSwapRequestStatus === "accepted";
 
     return (
@@ -289,6 +405,9 @@ export default function ChatRoom({
                     <MessageList
                         messages={messages}
                         currentUserId={currentUserId}
+                        onReply={handleReply}
+                        onUnsend={handleUnsend}
+                        onRemoveForMe={handleRemoveForMe}
                     />
 
                 )}
@@ -318,6 +437,9 @@ export default function ChatRoom({
 
                 <MessageInput
                     onSend={handleSendMessage}
+                    replyingTo={replyingTo}
+                    onCancelReply={handleCancelReply}
+                    getReplyPreviewLabel={replyPreviewLabel}
                 />
             </div>
 

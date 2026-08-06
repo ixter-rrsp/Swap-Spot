@@ -106,7 +106,7 @@ export default function SignupForm() {
     return (
       <div className={styles.doneState}>
         <p className={styles.doneText}>
-          ✅ Account created! Check your inbox for a verification email, then{" "}
+          Account created! Check your inbox for a verification email, then{" "}
           <Link href="/login">sign in</Link>.
         </p>
       </div>

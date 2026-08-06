@@ -1,6 +1,6 @@
 .form {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 8px;
 }
 
@@ -67,7 +67,7 @@
 
 .inputRow {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
 }
 
@@ -91,14 +91,66 @@
   border: 1px solid #d1d5db;
   background: #ffffff;
   color: #111827;
-  border-radius: 999px;
-  padding: 12px 16px;
+  border-radius: 20px;
+  padding: 10px 16px;
   font: inherit;
   min-width: 0;
+  resize: none;
+  line-height: 1.4;
+  max-height: 140px;
+  overflow-y: hidden;
+  /* Let the browser wrap naturally instead of hiding overflow text on one
+     line — this is what actually keeps the start of a long message
+     visible instead of scrolling it off to the left. */
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .textInput::placeholder {
   color: #374151;
+}
+
+.replyPreview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.replyPreviewBar {
+  width: 3px;
+  align-self: stretch;
+  background: #16a34a;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.replyPreviewContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.replyPreviewLabel {
+  display: block;
+  font-size: 13px;
+  color: #4b5563;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.replyPreviewClose {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
 }
 
 .sendButton {
