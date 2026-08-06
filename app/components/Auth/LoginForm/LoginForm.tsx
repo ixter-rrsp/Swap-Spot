@@ -71,7 +71,11 @@ export default function LoginForm() {
       const fingerprintHash = await getDeviceFingerprintHash();
       await signIn(data.email, data.password, fingerprintHash);
 
-      router.replace("/home");
+      const redirectTo = searchParams.get("redirect");
+      const isSafeRedirect =
+        redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//");
+
+      router.replace(isSafeRedirect ? redirectTo : "/home");
       router.refresh();
     } catch (error) {
       const raw = error instanceof Error ? error.message : "Something went wrong.";

@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { useToast } from "@/app/components/UI/Toast/ToastContext";
 
 interface SavedListingsContextValue {
@@ -38,6 +39,8 @@ export default function SavedListingsProvider({
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [loaded, setLoaded] = useState(false);
   const toast = useToast();
+  const router = useRouter();
+  const pathname = usePathname();
 
   // Guards against a slow unsave response clobbering a faster re-save
   // (or vice versa) for the same listing.
@@ -102,6 +105,12 @@ export default function SavedListingsProvider({
 
       request
         .then((response) => {
+          if (response.status === 401) {
+            // Guest attempting to save — don't just roll back silently,
+            // send them to log in and preserve where they were.
+            router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+            throw new Error("Unauthorized.");
+          }
           if (!response.ok) throw new Error("Request failed.");
         })
         .catch((error) => {
@@ -116,13 +125,15 @@ export default function SavedListingsProvider({
             }
             return next;
           });
-          toast("Couldn't update saved listings. Try again.", "error");
+          if (error?.message !== "Unauthorized.") {
+            toast("Couldn't update saved listings. Try again.", "error");
+          }
         })
         .finally(() => {
           pendingRef.current.delete(listingId);
         });
     },
-    [savedIds, toast]
+    [savedIds, toast, router, pathname]
   );
 
   return (

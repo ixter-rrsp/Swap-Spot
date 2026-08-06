@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import styles from "./SwapActions.module.css";
 import CreateSwapRequest from "@/app/components/SwapRequests/CreateSwapRequest/CreateSwapRequest";
 import MessageSellerButton from "@/app/components/Chat/MessageSellerButton";
@@ -18,11 +18,12 @@ export default function SwapActions({
   isAuthenticated = true,
 }: SwapActionsProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   const handleProposeSwap = () => {
     if (!isAuthenticated) {
-      router.push("/login");
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
     setOpen(true);
@@ -34,6 +35,7 @@ export default function SwapActions({
         <MessageSellerButton 
           listingId={requestedListingId} 
           className={styles.secondaryButton} 
+          isAuthenticated={isAuthenticated}
         />
 
         {
