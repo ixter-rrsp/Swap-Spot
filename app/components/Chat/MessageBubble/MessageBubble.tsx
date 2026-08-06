@@ -196,11 +196,6 @@ export default function MessageBubble({
                         className={styles.quotedReply}
                         onClick={scrollToReplyTarget}
                     >
-                        <span className={styles.quotedReplySender}>
-                            {message.replyPreview.senderId === currentUserId
-                                ? "You"
-                                : "Them"}
-                        </span>
                         <span className={styles.quotedReplyText}>
                             {replyPreviewText(message.replyPreview)}
                         </span>
