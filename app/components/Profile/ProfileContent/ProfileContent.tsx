@@ -107,7 +107,7 @@ export default function ProfileContent({
       )}
 
       {activeTab === "offers" && hasMoreOffers && (
-        <div style={{ display: "flex", justifyContent: "center", padding: "0 0 24px" }}>
+        <div style={{ display: "flex", justifyContent: "center", padding: "16px 0 calc(90px + env(safe-area-inset-bottom))", marginTop: "-60px" }}>
           <button
             onClick={handleViewMore}
             disabled={loadingMore}
@@ -118,13 +118,14 @@ export default function ProfileContent({
               padding: "10px 28px",
               borderRadius: "999px",
               border: "1.5px solid #2563eb",
-              background: "none",
+              background: "#ffffff",
               color: "#2563eb",
               fontSize: "14px",
               fontWeight: 600,
               cursor: loadingMore ? "not-allowed" : "pointer",
               opacity: loadingMore ? 0.7 : 1,
               transition: "opacity 0.2s",
+              boxShadow: "0 2px 8px rgba(37, 99, 235, 0.12)",
             }}
           >
             {loadingMore ? <Spinner size={16} /> : null}
