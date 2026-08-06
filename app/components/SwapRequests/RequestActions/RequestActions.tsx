@@ -354,7 +354,7 @@ export default function RequestActions({
       <section className={styles.container}>
 
         <div className={styles.statusCard}>
-          🚫 Swap Request Cancelled
+          Swap Request Cancelled
         </div>
 
       </section>
