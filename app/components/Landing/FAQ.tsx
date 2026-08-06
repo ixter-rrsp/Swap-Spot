@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import styles from "./Landing.module.css";
+import Reveal from "./Reveal";
 
 const FAQS = [
   {
@@ -32,14 +33,16 @@ export default function FAQ() {
 
   return (
     <section id="faq" className={styles.section} aria-labelledby="faq-heading">
-      <p className={styles.eyebrow}>FAQ</p>
-      <h2 id="faq-heading" className={styles.sectionTitle}>
-        Frequently asked questions
-      </h2>
-      <p className={styles.sectionSubtitle}>
-        Can't find what you're looking for? Reach out through our contact
-        page.
-      </p>
+      <Reveal variant="up">
+        <p className={styles.eyebrow}>FAQ</p>
+        <h2 id="faq-heading" className={styles.sectionTitle}>
+          Frequently asked questions
+        </h2>
+        <p className={styles.sectionSubtitle}>
+          Can't find what you're looking for? Reach out through our contact
+          page.
+        </p>
+      </Reveal>
 
       <div className={styles.faqList}>
         {FAQS.map((faq, index) => {
@@ -47,30 +50,32 @@ export default function FAQ() {
           const answerId = `faq-answer-${index}`;
 
           return (
-            <div className={styles.faqItem} key={faq.question}>
-              <button
-                type="button"
-                className={styles.faqQuestion}
-                aria-expanded={isOpen}
-                aria-controls={answerId}
-                onClick={() => setOpenIndex(isOpen ? null : index)}
-              >
-                <span>{faq.question}</span>
-                <ChevronDown
-                  size={18}
-                  className={`${styles.faqChevron} ${
-                    isOpen ? styles.faqChevronOpen : ""
-                  }`}
-                  aria-hidden="true"
-                />
-              </button>
+            <Reveal variant="up" delay={index * 70} key={faq.question}>
+              <div className={styles.faqItem}>
+                <button
+                  type="button"
+                  className={styles.faqQuestion}
+                  aria-expanded={isOpen}
+                  aria-controls={answerId}
+                  onClick={() => setOpenIndex(isOpen ? null : index)}
+                >
+                  <span>{faq.question}</span>
+                  <ChevronDown
+                    size={18}
+                    className={`${styles.faqChevron} ${
+                      isOpen ? styles.faqChevronOpen : ""
+                    }`}
+                    aria-hidden="true"
+                  />
+                </button>
 
-              {isOpen && (
-                <p id={answerId} className={styles.faqAnswer}>
-                  {faq.answer}
-                </p>
-              )}
-            </div>
+                {isOpen && (
+                  <p id={answerId} className={styles.faqAnswer}>
+                    {faq.answer}
+                  </p>
+                )}
+              </div>
+            </Reveal>
           );
         })}
       </div>

@@ -6,8 +6,27 @@ import Navbar from "./Navbar";
 import { createClient } from "@/utils/supabase/client";
 import { subscribeChannel } from "@/utils/supabase/channelRegistry";
 
-// Pages that should never show the navbar (auth flows, etc.)
-const HIDDEN_ON = ["/login", "/signup", "/register"];
+// Pages that should never show the app navbar. "/" is the marketing
+// landing page — it ships its own Nav component, so showing this navbar
+// too would duplicate it. The rest are the informational/account pages
+// reachable from the hamburger main menu — they're standalone content
+// pages, not part of the app's core swipe-between-tabs flow, so the
+// bottom navbar isn't needed there for either guests or signed-in users.
+const HIDDEN_ON = [
+  "/login",
+  "/signup",
+  "/register",
+  "/subscriptions",
+  "/profile/edit",
+  "/about",
+  "/how-it-works",
+  "/help",
+  "/trust-and-safety",
+  "/terms",
+  "/privacy",
+  "/contact",
+];
+const HIDDEN_EXACT = ["/"];
 
 interface ConditionalNavbarProps {
   unreadCount: number;
@@ -27,9 +46,9 @@ export default function ConditionalNavbar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const shouldHide = HIDDEN_ON.some((path) =>
-    pathname.startsWith(path)
-  );
+  const shouldHide =
+    HIDDEN_EXACT.includes(pathname) ||
+    HIDDEN_ON.some((path) => pathname.startsWith(path));
 
   const handleNotificationClick = () => {
     setLocalUnread(0);

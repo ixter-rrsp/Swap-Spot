@@ -15,6 +15,11 @@ import {
 
 import styles from "./Navbar.module.css";
 import { FilledHouse, FilledCompass } from "./NavIcons";
+import { useGuestMode } from "@/app/components/Providers/GuestModeContext";
+
+// These main-menu destinations require an account. Home and Discover stay
+// open to guests so they can browse and get a feel for the site first.
+const AUTH_REQUIRED_HREFS = new Set(["/notifications", "/profile", "/post"]);
 
 const navItems = [
   {
@@ -56,6 +61,7 @@ export default function Navbar({
 }: NavbarProps) {
 
   const pathname = usePathname();
+  const { isGuest, requireAuth } = useGuestMode();
 
   // Only these two states exist — no partial resting states.
   const [open, setOpen] = useState(false);
@@ -251,6 +257,12 @@ export default function Navbar({
                 href={item.href}
                 className={`${styles.navItem} ${active ? styles.active : ""
                   }`}
+                onClick={(e) => {
+                  if (isGuest && AUTH_REQUIRED_HREFS.has(item.href)) {
+                    e.preventDefault();
+                    requireAuth(item.href.slice(1));
+                  }
+                }}
               >
                 <div className={styles.iconWrapper}>
                   {active && FilledIcon ? (
@@ -288,7 +300,14 @@ export default function Navbar({
                 href={item.href}
                 className={`${styles.navItem} ${active ? styles.active : ""
                   }`}
-                onClick={item.href === "/notifications" ? onNotificationClick : undefined}
+                onClick={(e) => {
+                  if (isGuest && AUTH_REQUIRED_HREFS.has(item.href)) {
+                    e.preventDefault();
+                    requireAuth(item.href.slice(1));
+                    return;
+                  }
+                  if (item.href === "/notifications") onNotificationClick?.();
+                }}
               >
                 <div className={styles.iconWrapper}>
                   {active && FilledIcon ? (
@@ -317,6 +336,12 @@ export default function Navbar({
           href="/post"
           className={styles.postButton}
           aria-label="Create new listing"
+          onClick={(e) => {
+            if (isGuest) {
+              e.preventDefault();
+              requireAuth("post");
+            }
+          }}
         >
           <span className={`${styles.postButtonIcon} ${open ? styles.flipped : ""}`}>
             <Repeat size={32} strokeWidth={2.5} />

@@ -5,7 +5,6 @@ import { ChevronDown } from "lucide-react";
 import styles from "./page.module.css";
 import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
 
-import Navbar from "@/app/components/Layout/Navbar/Navbar";
 
 interface FAQItem {
   question: string;
@@ -149,7 +148,6 @@ export default function HelpCenterPage() {
         </section>
       </div>
     </main>
-      <Navbar />
     </>
   );
 }

@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useToast } from "@/app/components/UI/Toast/ToastContext";
+import { useGuestMode } from "@/app/components/Providers/GuestModeContext";
 
 interface SavedListingsContextValue {
   isSaved: (listingId: string) => boolean;
@@ -41,6 +42,7 @@ export default function SavedListingsProvider({
   const toast = useToast();
   const router = useRouter();
   const pathname = usePathname();
+  const { requireAuth } = useGuestMode();
 
   // Guards against a slow unsave response clobbering a faster re-save
   // (or vice versa) for the same listing.
@@ -79,6 +81,11 @@ export default function SavedListingsProvider({
 
   const toggleSaved = useCallback(
     (listingId: string) => {
+      // Guests can browse and view listings, but saving requires an
+      // account — send them to sign up instead of flickering an
+      // optimistic save that the server will immediately reject.
+      if (!requireAuth("save")) return;
+
       if (pendingRef.current.has(listingId)) return;
       pendingRef.current.add(listingId);
 
@@ -133,7 +140,7 @@ export default function SavedListingsProvider({
           pendingRef.current.delete(listingId);
         });
     },
-    [savedIds, toast, router, pathname]
+    [savedIds, toast, router, pathname, requireAuth]
   );
 
   return (

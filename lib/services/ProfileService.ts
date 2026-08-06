@@ -49,7 +49,10 @@ export async function getCurrentProfile(): Promise<Profile | null> {
     error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError) {
+  // A guest has no session at all — Supabase surfaces that as an
+  // "Auth session missing!" error rather than just user: null. That's
+  // expected on public pages like /home, not a real failure.
+  if (authError && authError.message !== "Auth session missing!") {
     throw new Error(authError.message);
   }
 

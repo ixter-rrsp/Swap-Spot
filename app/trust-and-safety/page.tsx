@@ -1,6 +1,5 @@
 import styles from "./page.module.css";
 import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
-import Navbar from "@/app/components/Layout/Navbar/Navbar";
 import { ShieldCheck, MapPin, Eye, Lock, AlertTriangle, Flag, Lightbulb, AlertOctagon } from "lucide-react";
 
 export default function TrustAndSafetyPage() {
@@ -119,7 +118,6 @@ export default function TrustAndSafetyPage() {
           </div>
         </div>
       </main>
-      <Navbar />
     </>
   );
 }

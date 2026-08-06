@@ -9,7 +9,6 @@ import { PaymentService } from "@/lib/services/PaymentService";
 import styles from "./page.module.css";
 
 import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
-import Navbar from "@/app/components/Layout/Navbar/Navbar";
 
 function SubscriptionsContent() {
   const searchParams = useSearchParams();
@@ -256,7 +255,6 @@ function SubscriptionsContent() {
           );
         })}
       </div>
-      <Navbar />
     </div>
   );
 }

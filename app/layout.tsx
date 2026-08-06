@@ -57,9 +57,9 @@ export default async function RootLayout({
           flexDirection: "column",
         }}
       >
-        <ConditionalNavbar unreadCount={unreadCount} />
-
         <Providers>
+          <ConditionalNavbar unreadCount={unreadCount} />
+
           <main
             id="main-scroll"
             style={{

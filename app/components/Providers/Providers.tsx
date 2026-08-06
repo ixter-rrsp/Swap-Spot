@@ -3,6 +3,7 @@
 import React from "react";
 import ToastProvider from "@/app/components/UI/Toast/ToastContext";
 import SavedListingsProvider from "@/app/components/Providers/SavedListingsContext";
+import GuestModeProvider from "@/app/components/Providers/GuestModeContext";
 import usePresenceHeartbeat from "@/lib/hooks/usePresenceHeartbeat";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -10,7 +11,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <ToastProvider>
-      <SavedListingsProvider>{children}</SavedListingsProvider>
+      <GuestModeProvider>
+        <SavedListingsProvider>{children}</SavedListingsProvider>
+      </GuestModeProvider>
     </ToastProvider>
   );
 }

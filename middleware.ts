@@ -38,6 +38,7 @@ export async function middleware(
     pathname.startsWith("/subscriptions") ||
     pathname.startsWith("/my-swaps") ||
     pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/saved") ||
     (pathname.startsWith("/Listing/") && pathname.endsWith("/edit"));
 
   if (
@@ -70,6 +71,7 @@ export const config = {
     "/subscriptions/:path*",
     "/my-swaps/:path*",
     "/onboarding/:path*",
+    "/saved/:path*",
     "/Listing/:path*/edit",
   ],
 };

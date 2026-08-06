@@ -1,6 +1,5 @@
 import styles from "./page.module.css";
 import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
-import Navbar from "@/app/components/Layout/Navbar/Navbar";
 import Link from "next/link";
 import { Repeat, ShieldCheck, Users, Zap, Heart, ArrowRight } from "lucide-react";
 
@@ -90,7 +89,6 @@ export default function AboutPage() {
           </div>
         </div>
       </main>
-      <Navbar />
     </>
   );
 }

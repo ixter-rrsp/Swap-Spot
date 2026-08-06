@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Menu, Heart } from "lucide-react";
 import MenuDrawer from "@/app/components/UI/MenuDrawer";
+import { useGuestMode } from "@/app/components/Providers/GuestModeContext";
 import styles from "./HomeHeader.module.css";
 import icon from '../../../../public/src/icon.png'; // or wherever it is
 
@@ -16,6 +17,7 @@ export default function HomeHeader({
   username = null,
 }: HomeHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isGuest, requireAuth } = useGuestMode();
   return (
     <>
       <header className={styles.header}>
@@ -32,6 +34,12 @@ export default function HomeHeader({
               href="/saved"
               className={styles.avatarButton}
               aria-label="Saved listings"
+              onClick={(e) => {
+                if (isGuest) {
+                  e.preventDefault();
+                  requireAuth("saved");
+                }
+              }}
             >
               <span className={styles.avatar}>
                 <Heart size={20} />

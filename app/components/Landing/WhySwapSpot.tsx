@@ -1,5 +1,6 @@
 import { Leaf, Wallet, Users } from "lucide-react";
 import styles from "./Landing.module.css";
+import Reveal from "./Reveal";
 
 const REASONS = [
   {
@@ -29,24 +30,28 @@ export default function WhySwapSpot() {
       className={`${styles.section} ${styles.sectionAlt}`}
       aria-labelledby="why-heading"
     >
-      <p className={styles.eyebrow}>Why SwapSpot</p>
-      <h2 id="why-heading" className={styles.sectionTitle}>
-        A better way to get what you need
-      </h2>
-      <p className={styles.sectionSubtitle}>
-        SwapSpot connects people who have what you want with people who want
-        what you have — no money changes hands.
-      </p>
+      <Reveal variant="up">
+        <p className={styles.eyebrow}>Why SwapSpot</p>
+        <h2 id="why-heading" className={styles.sectionTitle}>
+          A better way to get what you need
+        </h2>
+        <p className={styles.sectionSubtitle}>
+          SwapSpot connects people who have what you want with people who want
+          what you have — no money changes hands.
+        </p>
+      </Reveal>
 
       <div className={styles.whyGrid}>
-        {REASONS.map((reason) => (
-          <div className={styles.whyCard} key={reason.title}>
-            <div className={styles.whyIconWrap}>
-              <reason.icon size={22} aria-hidden="true" />
+        {REASONS.map((reason, index) => (
+          <Reveal variant="up" delay={index * 100} key={reason.title}>
+            <div className={styles.whyCard}>
+              <div className={styles.whyIconWrap}>
+                <reason.icon size={22} aria-hidden="true" />
+              </div>
+              <h3>{reason.title}</h3>
+              <p>{reason.description}</p>
             </div>
-            <h3>{reason.title}</h3>
-            <p>{reason.description}</p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>
