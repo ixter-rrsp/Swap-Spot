@@ -162,6 +162,7 @@ export async function getNearbyListings(): Promise<Listing[]> {
         lookingFor: listing.looking_for,
         category: listing.category,
         condition: listing.condition,
+        createdAt: listing.created_at,
         boosted:
           listing.boosted &&
           (!listing.boost_expires_at ||

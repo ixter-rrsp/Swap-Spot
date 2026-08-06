@@ -36,14 +36,15 @@ export default function NearbyPageClient({
       }
 
       // 2. Date posted filter
-      if (dateFilter !== "all" && listing.createdAt) {
+      if (dateFilter !== "all") {
+        if (!listing.createdAt) return false;
         const createdAtTime = new Date(listing.createdAt).getTime();
-        if (!Number.isNaN(createdAtTime)) {
-          const diffDays = (Date.now() - createdAtTime) / (1000 * 60 * 60 * 24);
-          if (dateFilter === "3days" && diffDays > 3) return false;
-          if (dateFilter === "7days" && diffDays > 7) return false;
-          if (dateFilter === "30days" && diffDays > 30) return false;
-        }
+        if (Number.isNaN(createdAtTime)) return false;
+
+        const diffDays = (Date.now() - createdAtTime) / (1000 * 60 * 60 * 24);
+        if (dateFilter === "3days" && diffDays > 3) return false;
+        if (dateFilter === "7days" && diffDays > 7) return false;
+        if (dateFilter === "30days" && diffDays > 30) return false;
       }
 
       return true;

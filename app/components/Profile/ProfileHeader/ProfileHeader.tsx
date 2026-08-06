@@ -93,10 +93,7 @@ export default function ProfileHeader({
 
   return (
     <>
-    <section
-      className={`${styles.container} ${isFreeTier ? styles.freeContainer : ""}`}
-      style={!isFreeTier && matchedPlan ? { backgroundColor: matchedPlan.badgeBg } : undefined}
-    >
+    <section className={styles.container}>
       {showBackButton && (
         <div className={styles.headerBackAction}>
           <BackButton variant="inline" className={styles.backButtonOverride} />
@@ -122,7 +119,7 @@ export default function ProfileHeader({
         </button>
       </div>
 
-      <div className={`${styles.avatar} ${isFreeTier ? styles.freeAvatar : ""}`}>
+      <div className={styles.avatar}>
         {localAvatar ? (
           <Image
             src={localAvatar}
@@ -132,38 +129,26 @@ export default function ProfileHeader({
             height={100}
           />
         ) : (
-          <span style={!isFreeTier && matchedPlan ? { color: matchedPlan.badgeBg } : undefined}>
+          <span>
             {username.charAt(0).toUpperCase()}
           </span>
         )}
       </div>
 
-      <h2 className={`${styles.name} ${isFreeTier ? styles.freeName : ""}`}>{username}</h2>
+      <h2 className={styles.name}>{username}</h2>
 
       {badge && (
-        <span
-          className={`${styles.badge} ${isFreeTier ? styles.freeBadge : ""}`}
-          style={
-            !isFreeTier && matchedPlan
-              ? {
-                  backgroundColor: matchedPlan.badgeBg,
-                  color: matchedPlan.badgeColor,
-                }
-              : isFreeTier
-                ? { color: matchedPlan!.badgeBg }
-                : undefined
-          }
-        >
+        <span className={styles.badge}>
           {badge}
         </span>
       )}
 
       {metaLine && (
-        <p className={`${styles.meta} ${isFreeTier ? styles.freeMeta : ""}`}>{metaLine}</p>
+        <p className={styles.meta}>{metaLine}</p>
       )}
 
       {hasStats && (
-        <p className={`${styles.stats} ${isFreeTier ? styles.freeStats : ""}`}>
+        <p className={styles.stats}>
           {typeof rating === "number" && (
             <>
               {rating.toFixed(1)}
@@ -197,7 +182,7 @@ export default function ProfileHeader({
       )}
 
       {bio && (
-        <p className={`${styles.bio} ${isFreeTier ? styles.freeBio : ""}`}>{bio}</p>
+        <p className={styles.bio}>{bio}</p>
       )}
 
     </section>
