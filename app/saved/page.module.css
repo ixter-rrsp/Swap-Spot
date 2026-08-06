@@ -1,8 +1,13 @@
 .container {
   min-height: 100vh;
   padding-bottom: 80px;
+  background: #f9fafb;
 }
 
 .content {
-  padding: 5px;
+  padding: 0;
+}
+
+.headerWrapper {
+  padding: 16px 18px 0;
 }
