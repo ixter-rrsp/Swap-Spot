@@ -16,6 +16,7 @@ export default function PageHeader({ title, subtitle, action, showBack, align = 
 
   return (
     <div className={`${styles.header} ${isCentered ? styles.headerCentered : ""}`}>
+      {/* Back button — always in flow, never absolute */}
       {showBack && (
         <div className={styles.backButtonWrap}>
           <BackButton variant="inline" className={styles.backButton} />
@@ -29,6 +30,10 @@ export default function PageHeader({ title, subtitle, action, showBack, align = 
 
         {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
       </div>
+
+      {/* Spacer mirrors the back button on the right so title stays centred */}
+      {showBack && isCentered && <div className={styles.spacer} aria-hidden="true" />}
+
       {action ? <div className={styles.action}>{action}</div> : null}
     </div>
   );
