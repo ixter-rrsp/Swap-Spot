@@ -1,7 +1,7 @@
 .card {
   background: var(--card-bg, #ffffff);
-  border: 1px solid var(--border-color, #e0e0e0);
-  border-radius: 12px;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(17, 24, 39, 0.06);
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -83,14 +83,21 @@
   align-items: center;
   justify-content: space-between;
   background-color: var(--background-light, #f8f9fa);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 16px;
   gap: 16px;
 }
 
 .swapArrow {
-  font-size: 24px;
-  color: var(--text-secondary, #666);
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .listing {
@@ -110,7 +117,7 @@
 }
 
 .image {
-  border-radius: 8px;
+  border-radius: 12px;
   object-fit: cover;
   margin-bottom: 8px;
 }
@@ -118,7 +125,7 @@
 .imagePlaceholder {
   width: 90px;
   height: 90px;
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: #e5e7eb;
   color: #9ca3af;
   display: flex;
@@ -180,18 +187,17 @@
   flex: 1;
   display: inline-block;
   text-align: center;
-  background-color: var(--background-light, #f8f9fa);
-  color: var(--text-primary, #333);
-  border: 1px solid var(--border-color, #e0e0e0);
+  background-color: #eff6ff;
+  color: #2563eb;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 600;
   text-decoration: none;
   transition: background-color 0.2s;
 }
 
 .actionButton:hover {
-  background-color: #e5e7eb;
+  background-color: #dbeafe;
 }
 
 .reviewButton {
@@ -201,7 +207,7 @@
   background-color: var(--primary-color, #007bff);
   color: white;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 600;
   text-decoration: none;
   transition: background-color 0.2s;
@@ -221,7 +227,7 @@
   background-color: #d1fae5;
   color: #059669;
   padding: 12px;
-  border-radius: 8px;
+  border-radius: 12px;
   font-weight: 600;
   text-decoration: none;
   border: 1px solid #6ee7b7;

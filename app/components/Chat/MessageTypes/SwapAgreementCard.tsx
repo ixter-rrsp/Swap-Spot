@@ -115,13 +115,14 @@ export default function SwapAgreementCard({
       {agreement.deliveryMethod === "meetup" && (
         <div className={styles.detailsBox}>
           <p className={styles.detailLine}>
-            <MapPin
-              size={14}
-              style={{ verticalAlign: "-2px", marginRight: "4px" }}
-            />
-            {agreement.meetupLocation}
-            {agreement.meetupDate ? ` · ${agreement.meetupDate}` : ""}
-            {agreement.meetupTime ? ` · ${agreement.meetupTime}` : ""}
+            <span className={styles.detailLineInner}>
+              <MapPin size={14} className={styles.detailIcon} />
+              <span>
+                {agreement.meetupLocation}
+                {agreement.meetupDate ? ` · ${agreement.meetupDate}` : ""}
+                {agreement.meetupTime ? ` · ${agreement.meetupTime}` : ""}
+              </span>
+            </span>
           </p>
         </div>
       )}

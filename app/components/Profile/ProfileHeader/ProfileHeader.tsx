@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Menu } from "lucide-react";
+import Link from "next/link";
+import { Menu, Heart } from "lucide-react";
 import MenuDrawer from "@/app/components/UI/MenuDrawer";
 import { SUBSCRIPTION_PLANS } from "@/lib/subscriptions/plans";
 import MessageUserModal from "@/app/components/Profile/MessageUserModal/MessageUserModal";
@@ -95,14 +96,24 @@ export default function ProfileHeader({
       className={`${styles.container} ${isFreeTier ? styles.freeContainer : ""}`}
       style={!isFreeTier && matchedPlan ? { backgroundColor: matchedPlan.badgeBg } : undefined}
     >
-      <button
-        type="button"
-        className={styles.menuButton}
-        aria-label="Open menu"
-        onClick={() => setMenuOpen(true)}
-      >
-        <Menu size={22} />
-      </button>
+      <div className={styles.headerActions}>
+        <Link
+          href="/saved"
+          className={styles.savedButton}
+          aria-label="Saved listings"
+        >
+          <Heart size={20} />
+        </Link>
+
+        <button
+          type="button"
+          className={styles.menuButton}
+          aria-label="Open menu"
+          onClick={() => setMenuOpen(true)}
+        >
+          <Menu size={22} />
+        </button>
+      </div>
 
       <div className={`${styles.avatar} ${isFreeTier ? styles.freeAvatar : ""}`}>
         {localAvatar ? (

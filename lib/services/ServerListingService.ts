@@ -3,6 +3,42 @@ import { Listing } from "@/lib/types/Listing";
 import { haversineDistance } from "@/lib/utils/distance";
 import { getFallbackCityCoordinates, resolveListingLandmark } from "./landmark";
 
+interface ListingRowProfile {
+  id: string;
+  username: string;
+  full_name: string;
+  avatar_url: string | null;
+  rating: number;
+  badge: string;
+  city: string;
+  latitude?: number | null;
+  longitude?: number | null;
+}
+
+interface ListingRow {
+  id: string;
+  title: string;
+  description: string;
+  city: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  landmark_latitude?: number | null;
+  landmark_longitude?: number | null;
+  nearby_landmark?: string | null;
+  swap_value: number;
+  looking_for: string;
+  category: string;
+  condition: string;
+  boosted?: boolean;
+  boost_expires_at?: string | null;
+  listing_images?: Array<{
+    id: string;
+    image_url: string;
+    sort_order: number;
+  }> | null;
+  profiles?: ListingRowProfile[] | null;
+}
+
 export async function getMyListings(): Promise<Listing[]> {
   const supabase = await createClient();
 
@@ -250,6 +286,21 @@ export async function getListingById(id: string) {
     throw new Error("Owner profile not found.");
   }
 
+  // `profiles.rating` is a stored column that's never actually written to
+  // when reviews come in — it stays at its default forever. The rating
+  // shown on the listing's Owner card needs to match what the profile
+  // page itself shows, which computes it live from the reviews table
+  // instead of trusting that stale column.
+  const { data: ownerReviews } = await supabase
+    .from("reviews")
+    .select("rating")
+    .eq("reviewee_id", data.profiles.id);
+
+  const liveRating =
+    ownerReviews && ownerReviews.length > 0
+      ? ownerReviews.reduce((sum, r) => sum + r.rating, 0) / ownerReviews.length
+      : 0;
+
   return {
     id: data.id,
     title: data.title,
@@ -286,7 +337,7 @@ export async function getListingById(id: string) {
       username: data.profiles.username,
       fullName: data.profiles.full_name,
       avatarUrl: data.profiles.avatar_url,
-      rating: data.profiles.rating,
+      rating: Number(liveRating.toFixed(1)),
       badge: data.profiles.badge,
       city: data.profiles.city,
     },
@@ -387,8 +438,8 @@ export async function getListings(options: GetListingsOptions = {}) {
     }
   }
 
-  return (data ?? []).map((row: any) => {
-    const ownerProfile = row.profiles?.[0] ?? row.profiles ?? null;
+  return (data ?? []).map((row: ListingRow) => {
+    const ownerProfile: ListingRowProfile | null = row.profiles?.[0] ?? null;
     let distance: number | undefined;
 
     if (
@@ -464,9 +515,9 @@ export async function getBoostedListings() {
     throw new Error(error.message);
   }
 
-  return (data ?? []).map((row: any) => ({
+  return (data ?? []).map((row: ListingRow) => ({
     ...row,
-    profiles: row.profiles?.[0] ?? row.profiles ?? null,
+    profiles: row.profiles?.[0] ?? null,
   }));
 }
 

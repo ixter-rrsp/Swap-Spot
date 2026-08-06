@@ -49,6 +49,20 @@
   line-height: 1.4;
 }
 
+.detailLineInner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.detailIcon {
+  flex-shrink: 0;
+  /* Tailwind's Preflight sets `svg { display: block }`, which knocks
+     inline icons like this one onto their own line next to text.
+     Force it back to inline-flex so it sits beside the label text. */
+  display: inline-flex !important;
+}
+
 .statusRow {
   margin-bottom: 8px;
 }

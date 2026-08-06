@@ -164,11 +164,17 @@
   color: rgba(255, 255, 255, 0.85);
 }
 
-.menuButton {
+.headerActions {
   position: absolute;
   top: 16px;
   right: 16px;
 
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.menuButton {
   background: transparent;
   border: none;
   cursor: pointer;
@@ -186,14 +192,36 @@
   transition: background 0.2s ease;
 }
 
-.freeContainer .menuButton {
+.savedButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  color: #374151;
+
+  transition: background 0.2s ease;
+}
+
+.freeContainer .menuButton,
+.freeContainer .savedButton {
   color: #ffffff;
 }
 
-.menuButton:hover {
+.menuButton:hover,
+.savedButton:hover {
   background: rgba(0, 0, 0, 0.06);
 }
 
-.freeContainer .menuButton:hover {
+.freeContainer .menuButton:hover,
+.freeContainer .savedButton:hover {
   background: rgba(255, 255, 255, 0.15);
 }

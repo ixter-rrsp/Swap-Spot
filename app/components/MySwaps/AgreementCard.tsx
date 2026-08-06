@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MapPin } from "lucide-react";
+import { MapPin, ArrowLeftRight } from "lucide-react";
 import styles from "./AgreementCard.module.css";
 import type { SwapAgreementListDetail } from "@/lib/services/ServerSwapAgreementService";
 
@@ -82,7 +82,7 @@ export default function AgreementCard({ agreement, reviewStatus }: AgreementCard
           imageUrl={agreement.offeredListing.imageUrl}
           label="You offered"
         />
-        <div className={styles.swapArrow}>⇄</div>
+        <div className={styles.swapArrow}><ArrowLeftRight size={18} /></div>
         <ListingPreview
           title={agreement.requestedListing.title}
           imageUrl={agreement.requestedListing.imageUrl}

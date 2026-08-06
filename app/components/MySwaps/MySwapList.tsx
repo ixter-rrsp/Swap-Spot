@@ -12,16 +12,9 @@ interface MySwapListProps {
 export default function MySwapList({ title, emptyMessage, children, isEmpty }: MySwapListProps) {
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <div className={styles.titleRow}>
-          <BackButton href="/profile" variant="inline" />
-          <h2 className={styles.title}>{title}</h2>
-        </div>
-        <div className={styles.headerContent}>
-          <p className={styles.subtitle}>
-            Keep track of the latest status and next step for each swap in one place.
-          </p>
-        </div>
+      <div className={styles.topBar}>
+        <BackButton href="/profile" variant="inline" className={styles.topBarBack} />
+        <h1 className={styles.topBarTitle}>{title}</h1>
       </div>
 
       {isEmpty ? (

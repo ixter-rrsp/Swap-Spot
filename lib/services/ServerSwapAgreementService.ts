@@ -586,7 +586,16 @@ export async function completeSwapAgreement(
         const listingIds = [swapRequestData.offered_listing_id, swapRequestData.requested_listing_id].filter(Boolean);
 
         if (listingIds.length > 0) {
-          const { error: tradeUpdateError } = await supabase
+          // Same cross-user RLS gap as the listing lock in
+          // acceptSwapRequest: this touches BOTH participants' listings
+          // in one UPDATE, but `owner_id = auth.uid()` silently filters
+          // out whichever listing the current user doesn't own, so only
+          // one side ever actually got marked traded. Service client
+          // bypasses that, matching the established fix pattern.
+          const serviceSupabase = createServiceClient();
+          const writeClient = serviceSupabase ?? supabase;
+
+          const { error: tradeUpdateError } = await writeClient
             .from("listings")
             .update({ traded: true, locked_at: null, updated_at: now })
             .in("id", listingIds);

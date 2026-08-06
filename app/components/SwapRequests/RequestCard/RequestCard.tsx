@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowLeftRight } from "lucide-react";
 
 import styles from "./RequestCard.module.css";
 
@@ -104,7 +105,7 @@ export default function RequestCard({
 
 
         <div className={styles.swapArrow}>
-          ⇄
+          <ArrowLeftRight size={18} />
         </div>
 
 
@@ -153,8 +154,7 @@ export default function RequestCard({
         <div className={styles.actions} style={{ marginTop: 8 }}>
           <Link
             href={href}
-            className={styles.accept}
-            style={{ backgroundColor: '#f0f4f8', color: '#007bff', textDecoration: 'none' }}
+            className={styles.viewRequest}
           >
             View Request
           </Link>
