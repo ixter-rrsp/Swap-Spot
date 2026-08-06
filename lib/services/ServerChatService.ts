@@ -390,8 +390,27 @@ export async function getConversationMessages(
         );
     }
 
-    return data.map(
-        (message): Message => ({
+    return data.map((message): Message => {
+        // PostgREST can't cleanly infer cardinality on a self-referencing
+        // FK (messages -> messages) — when a message has no reply, it
+        // sometimes comes back as an empty array `[]` rather than `null`.
+        // `[]` is truthy in JS, so treat that (and any array) as "take the
+        // first row if present, otherwise there's no reply".
+        const rawReplyTo = Array.isArray(message.reply_to)
+            ? message.reply_to[0]
+            : message.reply_to;
+
+        const replyPreview =
+            rawReplyTo && rawReplyTo.id
+                ? {
+                      id: rawReplyTo.id,
+                      senderId: rawReplyTo.sender_id,
+                      message: rawReplyTo.message,
+                      messageType: rawReplyTo.message_type as MessageType,
+                  }
+                : null;
+
+        return {
             id: message.id,
             senderId: message.sender_id,
             message: message.message,
@@ -406,16 +425,9 @@ export async function getConversationMessages(
 
             unsentAt: message.unsent_at,
             replyToId: message.reply_to_id,
-            replyPreview: message.reply_to
-                ? {
-                      id: message.reply_to.id,
-                      senderId: message.reply_to.sender_id,
-                      message: message.reply_to.message,
-                      messageType: message.reply_to.message_type as MessageType,
-                  }
-                : null,
-        })
-    );
+            replyPreview,
+        };
+    });
 }
 
 function isAllowedImage(file: File): boolean {
