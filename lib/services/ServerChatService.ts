@@ -322,11 +322,16 @@ export async function getConversationMessages(
         throw new Error("You are not allowed to view this conversation.");
     }
 
+    // Embed by the FK *column* (reply_to_id) rather than a constraint
+    // name — Postgres auto-names constraints, and guessing that name
+    // (e.g. "messages_reply_to_id_fkey") breaks the instant it doesn't
+    // match what the DB actually generated. Column-based embedding
+    // works regardless of how the constraint was named.
     const { data, error } = await supabase
         .from("messages")
         .select(`
             *,
-            reply_to:messages!messages_reply_to_id_fkey(
+            reply_to:messages!reply_to_id(
                 id,
                 sender_id,
                 message,
@@ -342,8 +347,47 @@ export async function getConversationMessages(
             ascending: true,
         });
 
+    // The reply-embed query above depends on Postgres relationship
+    // metadata that could still be off in ways we haven't anticipated —
+    // if it errors, don't take the whole conversation down over a
+    // reply-preview feature. Retry without the embed so messages keep
+    // working; reply previews just won't render for that request.
     if (error) {
-        throw new Error(error.message);
+        console.error(
+            "getConversationMessages: reply_to embed failed, retrying without it:",
+            error.message
+        );
+
+        const fallback = await supabase
+            .from("messages")
+            .select("*")
+            .eq("conversation_id", conversationId)
+            .not("deleted_for", "cs", `{${user.id}}`)
+            .order("created_at", { ascending: true });
+
+        if (fallback.error) {
+            throw new Error(fallback.error.message);
+        }
+
+        return fallback.data.map(
+            (message): Message => ({
+                id: message.id,
+                senderId: message.sender_id,
+                message: message.message,
+                isRead: message.is_read,
+                createdAt: message.created_at,
+
+                messageType: message.message_type as MessageType,
+                imageUrl: message.image_url,
+                videoUrl: message.video_url,
+                swapRequestId: message.swap_request_id,
+                swapAgreementId: message.swap_agreement_id,
+
+                unsentAt: message.unsent_at,
+                replyToId: message.reply_to_id,
+                replyPreview: null,
+            })
+        );
     }
 
     return data.map(
