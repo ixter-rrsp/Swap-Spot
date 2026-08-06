@@ -135,6 +135,15 @@
     left: 0;
 }
 
+/* When there isn't enough room above the bubble (e.g. it's one of the
+   first messages, right under the sticky chat header with the listing
+   name/photo), open the menu downward instead so it can't slide behind
+   the header. */
+.menuFlip {
+    top: 100%;
+    transform: translateY(8px);
+}
+
 .menuMine button,
 .menuTheirs button {
     background: none;

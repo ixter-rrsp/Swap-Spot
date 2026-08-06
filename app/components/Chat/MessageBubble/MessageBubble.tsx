@@ -50,12 +50,28 @@ export default function MessageBubble({
     const [dragX, setDragX] = useState(0);
     const [dragging, setDragging] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [menuFlip, setMenuFlip] = useState(false);
 
     const rowRef = useRef<HTMLDivElement | null>(null);
     const startXRef = useRef<number | null>(null);
     const startYRef = useRef<number | null>(null);
     const longPressTimerRef = useRef<number | null>(null);
     const swipeCommittedRef = useRef(false);
+
+    // Rough height of the options menu (Reply / Unsend / Remove for You,
+    // ~3 rows) plus a little breathing room — used to decide whether
+    // there's enough space above the bubble to open the menu upward
+    // without it sliding underneath the sticky chat header.
+    const MENU_ESTIMATED_HEIGHT = 160;
+
+    function openMenu() {
+        const rect = rowRef.current?.getBoundingClientRect();
+        const notEnoughRoomAbove =
+            !rect || rect.top < MENU_ESTIMATED_HEIGHT;
+
+        setMenuFlip(notEnoughRoomAbove);
+        setMenuOpen(true);
+    }
 
     function clearLongPressTimer() {
         if (longPressTimerRef.current) {
@@ -73,7 +89,7 @@ export default function MessageBubble({
 
         clearLongPressTimer();
         longPressTimerRef.current = window.setTimeout(() => {
-            setMenuOpen(true);
+            openMenu();
         }, LONG_PRESS_MS);
 
         rowRef.current?.setPointerCapture(event.pointerId);
@@ -247,7 +263,10 @@ export default function MessageBubble({
                         onClick={() => setMenuOpen(false)}
                     />
                     <div
-                        className={isMine ? styles.menuMine : styles.menuTheirs}
+                        className={[
+                            isMine ? styles.menuMine : styles.menuTheirs,
+                            menuFlip ? styles.menuFlip : "",
+                        ].join(" ").trim()}
                     >
                         <button
                             type="button"
