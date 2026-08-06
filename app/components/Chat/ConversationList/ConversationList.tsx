@@ -9,11 +9,17 @@ interface Props {
 
   conversations: Conversation[];
 
+  currentUserId?: string | null;
+
+  onOpenConversation?: (conversationId: string) => void;
+
 }
 
 
 export default function ConversationList({
   conversations,
+  currentUserId = null,
+  onOpenConversation,
 }: Props) {
 
 
@@ -35,6 +41,12 @@ export default function ConversationList({
               }
               conversation={
                 conversation
+              }
+              currentUserId={currentUserId}
+              onOpen={
+                onOpenConversation
+                  ? () => onOpenConversation(conversation.id)
+                  : undefined
               }
             />
 

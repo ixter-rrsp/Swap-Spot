@@ -2,7 +2,7 @@ import {
     getUserConversations,
 } from "@/lib/services/ServerChatService";
 
-import ConversationList from "@/app/components/Chat/ConversationList/ConversationList";
+import ConversationListLive from "@/app/components/Chat/ConversationList/ConversationListLive";
 import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
 
 
@@ -16,18 +16,12 @@ export default async function MessagesPage() {
         await getUserConversations();
 
 
-    console.log(
-        "CONVERSATIONS:",
-        conversations
-    );
-
-
     return (
 
         <main style={{ padding: "24px" }}>
             <PageHeader title="Messages" />
 
-            <ConversationList conversations={conversations} />
+            <ConversationListLive initialConversations={conversations} />
         </main>
 
     );

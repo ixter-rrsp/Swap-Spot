@@ -8,11 +8,15 @@ import { Conversation } from "@/lib/types/Conversation";
 
 interface Props {
   conversation: Conversation;
+  currentUserId?: string | null;
+  onOpen?: () => void;
 }
 
 
 export default function ConversationCard({
   conversation,
+  currentUserId = null,
+  onOpen,
 }: Props) {
 
   const {
@@ -24,11 +28,17 @@ export default function ConversationCard({
   const isUnread = unreadCount > 0;
   const displayName = otherUser.fullName || otherUser.username;
 
+  const isMine =
+    !!lastMessage &&
+    !!currentUserId &&
+    lastMessage.senderId === currentUserId;
+
   return (
 
     <Link
       href={`/messages/${conversation.id}`}
       className={`${styles.card} ${isUnread ? styles.unreadCard : ""}`}
+      onClick={onOpen}
     >
 
       <div className={styles.avatar}>
@@ -65,7 +75,7 @@ export default function ConversationCard({
 
           {
             lastMessage
-              ? lastMessage.message
+              ? `${isMine ? "You: " : ""}${lastMessage.message}`
               : "No messages yet"
           }
 

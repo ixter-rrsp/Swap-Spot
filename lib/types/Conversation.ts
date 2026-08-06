@@ -17,6 +17,7 @@ export interface Conversation {
     lastMessage: {
         message: string;
         createdAt: string;
+        senderId: string;
     } | null;
 
     lastMessageRelativeTime?: string;

@@ -174,6 +174,7 @@ export async function getUserConversations(): Promise<Conversation[]> {
     const conversationIds = conversationsData.map((conversation) => conversation.id);
 
     const unreadCounts: Record<string, number> = {};
+    const latestSenderByConversation: Record<string, string> = {};
 
     if (conversationIds.length > 0) {
         type UnreadMessageRow = {
@@ -197,6 +198,32 @@ export async function getUserConversations(): Promise<Conversation[]> {
             const conversationId = message.conversation_id;
             unreadCounts[conversationId] =
                 (unreadCounts[conversationId] ?? 0) + 1;
+        }
+
+        // conversations.last_message is a denormalized text snapshot with
+        // no sender attached, so to know whether "you" sent the last
+        // message we look up the actual latest message row per
+        // conversation instead of adding a new column.
+        type LatestMessageRow = {
+            conversation_id: string;
+            sender_id: string;
+            created_at: string;
+        };
+
+        const latestMessagesResult = await supabase
+            .from("messages")
+            .select("conversation_id, sender_id, created_at")
+            .in("conversation_id", conversationIds)
+            .order("created_at", { ascending: false });
+
+        if (latestMessagesResult.error) {
+            throw new Error(latestMessagesResult.error.message);
+        }
+
+        for (const message of (latestMessagesResult.data ?? []) as LatestMessageRow[]) {
+            if (!latestSenderByConversation[message.conversation_id]) {
+                latestSenderByConversation[message.conversation_id] = message.sender_id;
+            }
         }
     }
 
@@ -227,6 +254,7 @@ export async function getUserConversations(): Promise<Conversation[]> {
                 ? {
                     message: conversation.last_message,
                     createdAt: conversation.last_message_at,
+                    senderId: latestSenderByConversation[conversation.id] ?? "",
                 }
                 : null,
                 lastMessageRelativeTime: conversation.last_message

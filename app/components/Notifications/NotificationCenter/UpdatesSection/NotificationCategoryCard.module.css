@@ -71,7 +71,18 @@
 }
 
 .expanded {
+  position: relative;
   padding: 4px 4px 8px 56px;
+}
+
+.expanded::before {
+  content: "";
+  position: absolute;
+  left: 25px;
+  top: 0;
+  bottom: 8px;
+  width: 2px;
+  background: #16a34a;
 }
 
 .statusMessage,

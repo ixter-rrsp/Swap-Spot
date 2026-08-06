@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Menu } from "lucide-react";
 import MenuDrawer from "@/app/components/UI/MenuDrawer";
 import { SUBSCRIPTION_PLANS } from "@/lib/subscriptions/plans";
@@ -41,7 +42,8 @@ export default function ProfileHeader({
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [messageModalOpen, setMessageModalOpen] = useState(false);
-  const [localAvatar, setLocalAvatar] = useState<string | null | undefined>(avatarUrl ?? null);
+  const [optimisticAvatar, setOptimisticAvatar] = useState<string | null | undefined>(null);
+  const localAvatar = avatarUrl ?? optimisticAvatar;
 
   const memberSinceYear =
     memberSince === undefined
@@ -63,15 +65,11 @@ export default function ProfileHeader({
 
   // Listen for optimistic avatar updates
   useEffect(() => {
-    setLocalAvatar(avatarUrl ?? null);
-  }, [avatarUrl]);
-
-  useEffect(() => {
     const handler = (e: Event) => {
       const custom = e as CustomEvent;
       const detail = custom?.detail;
       if (detail?.avatarUrl) {
-        setLocalAvatar(detail.avatarUrl);
+        setOptimisticAvatar(detail.avatarUrl);
       }
     };
 
@@ -79,10 +77,24 @@ export default function ProfileHeader({
     return () => window.removeEventListener("swapspot:avatar-updated", handler as EventListener);
   }, []);
 
+  const matchedPlan = badge
+    ? Object.values(SUBSCRIPTION_PLANS).find(
+        (p) => p.badgeName.toUpperCase() === badge.toUpperCase()
+      )
+    : undefined;
+
+  // The Free tier gets its own colored-card treatment, themed off the
+  // Free plan's own configured badge color (so it stays in sync if that
+  // color is ever changed) — every other tier keeps the existing plain
+  // white-card look.
+  const isFreeTier = matchedPlan?.id === "free";
 
   return (
     <>
-    <section className={styles.container} style={{ position: "relative" }}>
+    <section
+      className={`${styles.container} ${isFreeTier ? styles.freeContainer : ""}`}
+      style={!isFreeTier && matchedPlan ? { backgroundColor: matchedPlan.badgeBg } : undefined}
+    >
       <button
         type="button"
         className={styles.menuButton}
@@ -92,40 +104,48 @@ export default function ProfileHeader({
         <Menu size={22} />
       </button>
 
-      <div className={styles.avatar}>
+      <div className={`${styles.avatar} ${isFreeTier ? styles.freeAvatar : ""}`}>
         {localAvatar ? (
-          <img src={localAvatar} alt={username} className={styles.avatarImage} />
+          <Image
+            src={localAvatar}
+            alt={username}
+            className={styles.avatarImage}
+            width={100}
+            height={100}
+          />
         ) : (
-          <span>{username.charAt(0).toUpperCase()}</span>
+          <span style={isFreeTier ? { color: matchedPlan!.badgeBg } : undefined}>
+            {username.charAt(0).toUpperCase()}
+          </span>
         )}
       </div>
 
-      <h2 className={styles.name}>{username}</h2>
+      <h2 className={`${styles.name} ${isFreeTier ? styles.freeName : ""}`}>{username}</h2>
 
-      {badge && (() => {
-        // Find the matching plan by badgeName for correct styling
-        const matchedPlan = Object.values(SUBSCRIPTION_PLANS).find(
-          (p) => p.badgeName.toUpperCase() === badge.toUpperCase()
-        );
-        return (
-          <span
-            className={styles.badge}
-            style={matchedPlan ? {
-              backgroundColor: matchedPlan.badgeBg,
-              color: matchedPlan.badgeColor,
-            } : undefined}
-          >
-            {badge}
-          </span>
-        );
-      })()}
+      {badge && (
+        <span
+          className={`${styles.badge} ${isFreeTier ? styles.freeBadge : ""}`}
+          style={
+            !isFreeTier && matchedPlan
+              ? {
+                  backgroundColor: matchedPlan.badgeBg,
+                  color: matchedPlan.badgeColor,
+                }
+              : isFreeTier
+                ? { color: matchedPlan!.badgeBg }
+                : undefined
+          }
+        >
+          {badge}
+        </span>
+      )}
 
       {metaLine && (
-        <p className={styles.meta}>{metaLine}</p>
+        <p className={`${styles.meta} ${isFreeTier ? styles.freeMeta : ""}`}>{metaLine}</p>
       )}
 
       {hasStats && (
-        <p className={styles.stats}>
+        <p className={`${styles.stats} ${isFreeTier ? styles.freeStats : ""}`}>
           {typeof rating === "number" && (
             <>
               {rating.toFixed(1)}
@@ -159,7 +179,7 @@ export default function ProfileHeader({
       )}
 
       {bio && (
-        <p className={styles.bio}>{bio}</p>
+        <p className={`${styles.bio} ${isFreeTier ? styles.freeBio : ""}`}>{bio}</p>
       )}
 
     </section>

@@ -26,16 +26,16 @@ export default function NotificationItem({
   function getIcon() {
     switch (notification.type) {
       case "swap_request":
-        return <Repeat size={20} color="#059669" />;
+        return <Repeat size={20} color="#2563eb" />;
 
       case "swap_accepted":
-        return <CheckCircle2 size={20} color="#16a34a" />;
+        return <CheckCircle2 size={20} color="#2563eb" />;
 
       case "swap_declined":
-        return <XCircle size={20} color="#dc2626" />;
+        return <XCircle size={20} color="#2563eb" />;
 
       default:
-        return <Bell size={20} color="#d97706" />;
+        return <Bell size={20} color="#2563eb" />;
     }
   }
 
