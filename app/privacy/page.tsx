@@ -5,7 +5,7 @@ export default function PrivacyPage() {
   return (
     <main className={styles.container}>
       <div className={styles.content}>
-        <PageHeader title="Privacy Policy" />
+        <PageHeader title="Privacy Policy" showBack />
         <p className={styles.lastUpdated}>Last updated: July 2026</p>
 
         {/* Information We Collect */}

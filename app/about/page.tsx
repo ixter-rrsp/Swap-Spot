@@ -9,7 +9,7 @@ export default function AboutPage() {
     <>
       <main className={styles.container}>
         <div className={styles.content}>
-          <PageHeader title="About SwapSpot" />
+          <PageHeader title="About SwapSpot" showBack />
           <p className={styles.subtitle}>Reimagining local trading through seamless item-for-item swaps</p>
 
           {/* Hero Section */}

@@ -8,7 +8,7 @@ export default function TrustAndSafetyPage() {
     <>
       <main className={styles.container}>
         <div className={styles.content}>
-          <PageHeader title="Trust & Safety" />
+          <PageHeader title="Trust &amp; Safety" showBack />
           <p className={styles.subtitle}>Your guide to safe, transparent, and secure swapping on SwapSpot</p>
 
           {/* Hero Banner */}

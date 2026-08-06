@@ -8,6 +8,9 @@ import { SubscriptionService, SubscriptionResponse } from "@/lib/services/Subscr
 import { PaymentService } from "@/lib/services/PaymentService";
 import styles from "./page.module.css";
 
+import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
+import Navbar from "@/app/components/Layout/Navbar/Navbar";
+
 function SubscriptionsContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
@@ -96,12 +99,12 @@ function SubscriptionsContent() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>SwapSpot Membership Plans</h1>
-        <p className={styles.subtitle}>
-          Unlock unlimited item listings, gain trusted badges, and maximize your swapping reach.
-        </p>
-      </div>
+        <PageHeader
+          title="SwapSpot Membership Plans"
+          subtitle="Unlock unlimited item listings, gain trusted badges, and maximize your swapping reach."
+          showBack
+          align="center"
+        />
 
       {bannerMessage && (
         <div
@@ -253,6 +256,7 @@ function SubscriptionsContent() {
           );
         })}
       </div>
+      <Navbar />
     </div>
   );
 }

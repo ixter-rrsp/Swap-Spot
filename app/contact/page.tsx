@@ -6,7 +6,7 @@ export default function ContactPage() {
   return (
     <main className={styles.container}>
       <div className={styles.content}>
-        <PageHeader title="Contact Us" />
+        <PageHeader title="Contact Us" showBack />
 
         {/* Introduction */}
         <section className={styles.intro}>

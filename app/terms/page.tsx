@@ -5,7 +5,7 @@ export default function TermsPage() {
   return (
     <main className={styles.container}>
       <div className={styles.content}>
-        <PageHeader title="Terms & Conditions" />
+        <PageHeader title="Terms &amp; Conditions" showBack />
         <p className={styles.lastUpdated}>Last updated: July 2026</p>
 
         {/* Acceptance of Terms */}

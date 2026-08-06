@@ -1,12 +1,14 @@
 import styles from "./page.module.css";
 import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
+import Navbar from "@/app/components/Layout/Navbar/Navbar";
 
 export default function HowItWorksPage() {
   return (
-    <main className={styles.container}>
-      <div className={styles.content}>
-        <PageHeader title="How SwapSpot Works" />
-        <p className={styles.subtitle}>A step-by-step guide to trading on SwapSpot</p>
+    <>
+      <main className={styles.container}>
+        <div className={styles.content}>
+          <PageHeader title="How SwapSpot Works" showBack align="center" />
+          <p className={styles.subtitle}>A step-by-step guide to trading on SwapSpot</p>
 
         {/* Step 1 */}
         <section className={styles.step}>
@@ -86,5 +88,7 @@ export default function HowItWorksPage() {
         </section>
       </div>
     </main>
+    <Navbar />
+  </>
   );
 }

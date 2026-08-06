@@ -5,6 +5,8 @@ import { ChevronDown } from "lucide-react";
 import styles from "./page.module.css";
 import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
 
+import Navbar from "@/app/components/Layout/Navbar/Navbar";
+
 interface FAQItem {
   question: string;
   answer: string;
@@ -110,9 +112,10 @@ export default function HelpCenterPage() {
   };
 
   return (
-    <main className={styles.container}>
-      <div className={styles.content}>
-        <PageHeader title="Help Center" />
+    <>
+      <main className={styles.container}>
+        <div className={styles.content}>
+          <PageHeader title="Help Center" showBack align="center" />
 
         {faqSections.map((section, sectionIndex) => (
           <section key={sectionIndex} className={styles.section}>
@@ -141,10 +144,12 @@ export default function HelpCenterPage() {
             <a href="/contact" className={styles.link}>
               Contact Us
             </a>
-            {" "}page to get in touch with our support team. We're here to help!
+            {" "}page to get in touch with our support team. We&apos;re here to help!
           </p>
         </section>
       </div>
     </main>
+      <Navbar />
+    </>
   );
 }
