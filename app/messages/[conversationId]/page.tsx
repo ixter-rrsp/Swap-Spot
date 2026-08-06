@@ -30,7 +30,8 @@ export default async function ConversationPage({
 
     const messages =
         await getConversationMessages(
-            conversationId
+            conversationId,
+            15
         );
 
     await markMessagesAsRead(

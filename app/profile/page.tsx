@@ -6,11 +6,8 @@ import ProfileContent from "../components/Profile/ProfileContent/ProfileContent"
 import DashboardCards from "../components/Profile/DashboardCards/DashboardCards";
 import ProfileReviews from "../components/Profile/ProfileReviews/ProfileReviews";
 import { getProfileDashboard } from "@/lib/services/ProfileService";
-import { getRecentReviews } from "@/lib/services/ServerReviewService";
 import { getMyListings } from "@/lib/services/ServerListingService";
-import { getCompletedAgreements } from "@/lib/services/ServerSwapAgreementService";
 import { createClient } from "@/utils/supabase/server";
-import { Listing } from "@/lib/types/Listing";
 import styles from "./page.module.css";
 
 // Always fetch fresh — this page shows counts (accepted/completed swaps,
@@ -38,39 +35,6 @@ export default async function ProfilePage() {
   const { profile, stats, counts, reliability } = dashboardData;
 
   const myOffers = await getMyListings();
-  
-  // Fetch completed agreements to determine what the user has received
-  const completedAgreements = await getCompletedAgreements();
-  const receivedOffers: Listing[] = completedAgreements.map(ag => {
-    const isRequester = ag.requesterId === user.id;
-    // If the current user is the requester, they received the requestedListing
-    const receivedListingInfo = isRequester ? ag.requestedListing : ag.offeredListing;
-    
-    return {
-      id: receivedListingInfo.id,
-      title: receivedListingInfo.title,
-      description: "Received from swap", // Fallback text
-      imageUrl: receivedListingInfo.imageUrl,
-      city: receivedListingInfo.city || "",
-      swapValue: receivedListingInfo.swapValue ?? 0,
-      lookingFor: "",
-      category: (receivedListingInfo.category as Listing["category"]) || "other",
-      condition: (receivedListingInfo.condition as Listing["condition"]) || "used_good",
-      boosted: false,
-      images: [],
-      owner: {
-        id: ag.otherUser.id,
-        username: ag.otherUser.username,
-        fullName: ag.otherUser.fullName,
-        avatarUrl: ag.otherUser.avatarUrl || null,
-        rating: 0,
-        badge: "Member",
-        city: "",
-      },
-    } as Listing;
-  });
-  
-  const recentReviews = await getRecentReviews(profile.id, 5);
 
   return (
     <main className={styles.profilePage}>
@@ -87,21 +51,16 @@ export default async function ProfilePage() {
         showActions={false}
       />
 
-   
-
       <DashboardCards counts={counts} />
 
-   <ProgressCard
+      <ProgressCard
         completed={reliability.completed}
         accepted={reliability.accepted}
       />
-      
-      <ProfileContent
-        myOffers={myOffers}
-        receivedOffers={receivedOffers}
-      />
 
-      <ProfileReviews reviews={recentReviews} />
+      <ProfileContent myOffers={myOffers} />
+
+      <ProfileReviews userId={profile.id} />
     </main>
   );
 }

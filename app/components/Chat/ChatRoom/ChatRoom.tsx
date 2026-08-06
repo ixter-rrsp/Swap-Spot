@@ -12,6 +12,7 @@ import MessageList from "../MessageList/MessageList";
 
 import ChatHeader from "../Header/Header";
 import CreateSwapAgreement from "@/app/components/SwapRequests/CreateSwapAgreement/CreateSwapAgreement";
+import Spinner from "@/app/components/UI/Spinner/Spinner";
 
 import styles from "./ChatRoom.module.css";
 
@@ -244,14 +245,79 @@ export default function ChatRoom({
         };
     }, [activeSwapRequestId]);
 
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [hasMoreMessages, setHasMoreMessages] = useState(initialMessages.length >= 15);
+    const messageAreaRef = useRef<HTMLDivElement | null>(null);
+
+    // Track scroll height before prepend to maintain exact scroll position
+    const prependingRef = useRef<{ scrollHeight: number; scrollTop: number } | null>(null);
+    const isInitialMount = useRef(true);
+
+    // Initial scroll to bottom on mount
     useEffect(() => {
-
-        bottomRef.current?.scrollIntoView({
-            behavior: "smooth",
-        });
-
+        if (isInitialMount.current && messages.length > 0) {
+            bottomRef.current?.scrollIntoView({ behavior: "instant" as any });
+            isInitialMount.current = false;
+        }
     }, [messages]);
 
+    // Handle scroll position adjustment after prepending older messages
+    useEffect(() => {
+        if (prependingRef.current && messageAreaRef.current) {
+            const container = messageAreaRef.current;
+            const newScrollHeight = container.scrollHeight;
+            const diff = newScrollHeight - prependingRef.current.scrollHeight;
+            container.scrollTop = prependingRef.current.scrollTop + diff;
+            prependingRef.current = null;
+        }
+    }, [messages]);
+
+    async function loadOlderMessages() {
+        if (isLoadingMore || !hasMoreMessages || messages.length === 0) return;
+
+        const oldestMessage = messages[0];
+        if (!oldestMessage) return;
+
+        setIsLoadingMore(true);
+
+        if (messageAreaRef.current) {
+            prependingRef.current = {
+                scrollHeight: messageAreaRef.current.scrollHeight,
+                scrollTop: messageAreaRef.current.scrollTop,
+            };
+        }
+
+        try {
+            const response = await fetch(
+                `/api/messages?conversationId=${conversationId}&limit=15&before=${encodeURIComponent(oldestMessage.createdAt)}`
+            );
+            if (response.ok) {
+                const olderMessages: Message[] = await response.json();
+                if (olderMessages.length < 15) {
+                    setHasMoreMessages(false);
+                }
+                if (olderMessages.length > 0) {
+                    setMessages((prev) => {
+                        const existingIds = new Set(prev.map((m) => m.id));
+                        const uniqueOlder = olderMessages.filter((m) => !existingIds.has(m.id));
+                        return [...uniqueOlder, ...prev];
+                    });
+                }
+            }
+        } catch (err) {
+            console.error("Failed to load older messages:", err);
+        } finally {
+            setIsLoadingMore(false);
+        }
+    }
+
+    function handleScroll() {
+        if (!messageAreaRef.current || isLoadingMore || !hasMoreMessages) return;
+
+        if (messageAreaRef.current.scrollTop <= 80) {
+            void loadOlderMessages();
+        }
+    }
 
     async function handleSendMessage(
         message: string,
@@ -278,24 +344,10 @@ export default function ChatRoom({
 
             const promise = new Promise<void>((resolve, reject) => {
                 xhr.upload.onprogress = (ev) => {
-                    if (!ev.lengthComputable) return;
-                    const loaded = ev.loaded;
-                    const total = ev.total;
-
-                    const fileSizes = (files ?? []).map((f) => f.size || 0);
-                    const prefixSums = fileSizes.reduce<number[]>((acc, s) => {
-                        acc.push((acc.length ? acc[acc.length - 1] : 0) + s);
-                        return acc;
-                    }, [] as number[]);
-
-                    for (let i = 0; i < (files ?? []).length; i++) {
-                        const prevSum = i === 0 ? 0 : prefixSums[i - 1];
-                        const fileSize = fileSizes[i];
-                        const fileLoaded = Math.max(0, Math.min(fileSize, loaded - prevSum));
-                        const percent = fileSize > 0 ? Math.round((fileLoaded / fileSize) * 100) : Math.round((loaded / (total || 1)) * 100);
-                        try {
-                            onProgress(i, percent);
-                        } catch {}
+                    if (ev.lengthComputable && files && files.length > 0) {
+                        const fileIndex = 0;
+                        const percent = Math.round((ev.loaded / ev.total) * 100);
+                        onProgress(fileIndex, percent);
                     }
                 };
 
@@ -322,6 +374,11 @@ export default function ChatRoom({
             console.log("SERVER ERROR:", error);
             throw new Error(error);
         }
+
+        // Scroll to bottom on user send
+        setTimeout(() => {
+            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
     }
 
     function handleReply(message: Message) {
@@ -392,7 +449,16 @@ export default function ChatRoom({
             />
 
 
-            <div className={styles.messageArea}>
+            <div
+                ref={messageAreaRef}
+                className={styles.messageArea}
+                onScroll={handleScroll}
+            >
+                {isLoadingMore && (
+                    <div style={{ padding: "10px 0", display: "flex", justifyContent: "center" }}>
+                        <Spinner size={20} />
+                    </div>
+                )}
 
                 {messages.length === 0 ? (
 

@@ -47,6 +47,9 @@ export default function NotificationCenter({
     useState<NotificationCategory | null>(null);
   const [notifications, setNotifications] =
     useState<Notification[] | null>(null);
+  const [categoryCache, setCategoryCache] = useState<
+    Partial<Record<NotificationCategory, Notification[]>>
+  >({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +58,14 @@ export default function NotificationCenter({
       return;
     }
 
+    if (categoryCache[selectedCategory]) {
+      setNotifications(categoryCache[selectedCategory]!);
+      setIsLoading(false);
+      return;
+    }
+
     let active = true;
+    setIsLoading(true);
 
     async function loadNotifications() {
       try {
@@ -68,12 +78,17 @@ export default function NotificationCenter({
         }
 
         const data = await response.json();
+        const loadedList = Array.isArray(data) ? data : [];
 
         if (!active) {
           return;
         }
 
-        setNotifications(Array.isArray(data) ? data : []);
+        setCategoryCache((prev) => ({
+          ...prev,
+          [selectedCategory!]: loadedList,
+        }));
+        setNotifications(loadedList);
       } catch (fetchError) {
         if (!active) {
           return;
@@ -96,7 +111,7 @@ export default function NotificationCenter({
     return () => {
       active = false;
     };
-  }, [selectedCategory]);
+  }, [selectedCategory, categoryCache]);
 
   function handleCategoryClick(category: NotificationCategory) {
     setSelectedCategory((current) => {
@@ -107,7 +122,9 @@ export default function NotificationCenter({
         setError(null);
         setIsLoading(false);
       } else {
-        setIsLoading(true);
+        if (!categoryCache[category]) {
+          setIsLoading(true);
+        }
         setError(null);
 
         // optimistic: clear unread for this category locally

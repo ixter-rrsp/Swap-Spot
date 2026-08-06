@@ -312,7 +312,9 @@ export async function getUnreadChatMessageCount() {
 }
 
 export async function getConversationMessages(
-    conversationId: string
+    conversationId: string,
+    limit?: number,
+    before?: string
 ): Promise<Message[]> {
     const supabase = await createClient();
 
@@ -350,21 +352,31 @@ export async function getConversationMessages(
         throw new Error("You are not allowed to view this conversation.");
     }
 
-    const { data, error } = await supabase
+    let query = supabase
         .from("messages")
         .select("*")
         .eq("conversation_id", conversationId)
-        // Hide messages this user chose to "remove for me" — deleted_for is
-        // a per-user array, so this only affects their own view, not the
-        // other participant's.
-        .not("deleted_for", "cs", `{${user.id}}`)
-        .order("created_at", {
-            ascending: true,
-        });
+        .not("deleted_for", "cs", `{${user.id}}`);
+
+    if (before) {
+        query = query.lt("created_at", before);
+    }
+
+    if (limit) {
+        // To fetch the MOST RECENT N messages (or N messages BEFORE a date),
+        // order descending with limit, then reverse back to chronological order.
+        query = query.order("created_at", { ascending: false }).limit(limit);
+    } else {
+        query = query.order("created_at", { ascending: true });
+    }
+
+    const { data: rawData, error } = await query;
 
     if (error) {
         throw new Error(error.message);
     }
+
+    const data = limit ? [...(rawData ?? [])].reverse() : (rawData ?? []);
 
     // Reply previews are fetched as a separate, explicit lookup rather
     // than a PostgREST embed on this self-referencing FK

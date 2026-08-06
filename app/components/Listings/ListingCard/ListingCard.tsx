@@ -94,6 +94,8 @@ export default function ListingCard({
               src={imageUrl}
               alt={title}
               fill
+              loading="lazy"
+              sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
               className={styles.image}
             />
           ) : (

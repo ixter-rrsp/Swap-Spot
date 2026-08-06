@@ -4,8 +4,37 @@ import {
   sendMessage,
   sendImageMessage,
   sendVideoMessage,
+  getConversationMessages,
 } from "@/lib/services/ServerChatService";
 import { uploadChatFile } from "@/lib/services/serverStorageServices";
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const conversationId = searchParams.get("conversationId");
+  const limitParam = searchParams.get("limit");
+  const beforeParam = searchParams.get("before");
+
+  if (!conversationId) {
+    return NextResponse.json(
+      { error: "conversationId is required" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const limit = limitParam ? parseInt(limitParam, 10) : undefined;
+    const before = beforeParam || undefined;
+
+    const messages = await getConversationMessages(conversationId, limit, before);
+    return NextResponse.json(messages);
+  } catch (error: any) {
+    console.error("Error fetching messages:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to fetch messages" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {

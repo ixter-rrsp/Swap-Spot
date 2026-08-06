@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import styles from "./HomeContent.module.css";
@@ -10,9 +10,12 @@ import CategoryChips from "../CategoryChips/CategoryChips";
 import BoostedSection from "../BoostedSection/BoostedSection";
 
 import ListingGrid from "../../Listings/ListingGrid/ListingGrid";
+import Spinner from "@/app/components/UI/Spinner/Spinner";
 
 import type { Listing } from "@/lib/types/Listing";
 
+const INITIAL_BATCH_SIZE = 4;
+const BATCH_INCREMENT = 4;
 
 interface HomeContentProps {
 
@@ -45,6 +48,14 @@ export default function HomeContent({
 
   const [category, setCategory] =
     useState("all");
+
+  const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH_SIZE);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Reset visible count when search or category filter changes
+  useEffect(() => {
+    setVisibleCount(INITIAL_BATCH_SIZE);
+  }, [search, category]);
 
 
   function matchesFilters(listing: Listing, searchTerm: string) {
@@ -108,6 +119,31 @@ export default function HomeContent({
       search,
       category,
     ]);
+
+  const visibleListings = useMemo(() => {
+    return filteredListings.slice(0, visibleCount);
+  }, [filteredListings, visibleCount]);
+
+  const hasMore = visibleCount < filteredListings.length;
+
+  useEffect(() => {
+    if (!sentinelRef.current || !hasMore) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => prev + BATCH_INCREMENT);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinelRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [hasMore]);
 
 
 
@@ -191,7 +227,7 @@ export default function HomeContent({
 
       title="Nearby Swaps"
 
-      listings={filteredNearbyListings.slice(0, 6)}
+      listings={filteredNearbyListings.slice(0, 4)}
 
       actionLabel="See All"
 
@@ -207,16 +243,29 @@ export default function HomeContent({
 
         title="Listings"
 
-        listings={filteredListings.slice(0, 8)}
-
-        actionLabel="See All"
-
-        onActionClick={() =>
-          router.push("/listings")
-        }
+        listings={visibleListings}
 
       />
 
+      {hasMore && (
+        <div
+          ref={sentinelRef}
+          style={{
+            minHeight: "60px",
+            margin: "20px 0 40px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "8px",
+          }}
+        >
+          <Spinner size={28} />
+          <span style={{ color: "#666", fontSize: "13px", fontWeight: 500 }}>
+            Loading more listings...
+          </span>
+        </div>
+      )}
 
     </>
   );
