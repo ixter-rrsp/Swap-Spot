@@ -26,23 +26,40 @@ export default function DiscoverPageClient({
 }: DiscoverPageClientProps) {
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
   const [search, setSearch] = useState("");
+  const [dateFilter, setDateFilter] = useState("all");
   const [loading, setLoading] = useState(false);
   const userLocation = useUserLocation();
 
   const filteredListings = useMemo(() => {
     const term = search.trim().toLowerCase();
-    if (!term) return listings;
 
     return listings.filter((listing) => {
-      return (
-        (listing.title && listing.title.toLowerCase().includes(term)) ||
-        (listing.city && listing.city.toLowerCase().includes(term)) ||
-        (listing.lookingFor && listing.lookingFor.toLowerCase().includes(term)) ||
-        (listing.description && listing.description.toLowerCase().includes(term)) ||
-        (listing.category && listing.category.toLowerCase().includes(term))
-      );
+      // Search term filter
+      if (term) {
+        const matchesSearch =
+          (listing.title && listing.title.toLowerCase().includes(term)) ||
+          (listing.city && listing.city.toLowerCase().includes(term)) ||
+          (listing.lookingFor && listing.lookingFor.toLowerCase().includes(term)) ||
+          (listing.description && listing.description.toLowerCase().includes(term)) ||
+          (listing.category && listing.category.toLowerCase().includes(term));
+
+        if (!matchesSearch) return false;
+      }
+
+      // Date posted filter
+      if (dateFilter !== "all" && listing.createdAt) {
+        const createdAtTime = new Date(listing.createdAt).getTime();
+        if (!Number.isNaN(createdAtTime)) {
+          const diffDays = (Date.now() - createdAtTime) / (1000 * 60 * 60 * 24);
+          if (dateFilter === "3days" && diffDays > 3) return false;
+          if (dateFilter === "7days" && diffDays > 7) return false;
+          if (dateFilter === "30days" && diffDays > 30) return false;
+        }
+      }
+
+      return true;
     });
-  }, [listings, search]);
+  }, [listings, search, dateFilter]);
 
   const handleSelectListing = (listing: Listing) => {
     if (userLocation) {
@@ -85,6 +102,8 @@ export default function DiscoverPageClient({
         <SearchBar
           value={search}
           onChange={setSearch}
+          dateFilter={dateFilter}
+          onDateFilterChange={setDateFilter}
           className={styles.searchBarOverride}
         />
       </div>
@@ -99,8 +118,8 @@ export default function DiscoverPageClient({
         <div className={styles.emptyState}>
           <h2>No Listings Found</h2>
           <p>
-            {search.trim()
-              ? `No items visible on the map match "${search}".`
+            {search.trim() || dateFilter !== "all"
+              ? "No items visible on the map match your selected filters."
               : "There are currently no listings visible on the Discover map."}
           </p>
         </div>

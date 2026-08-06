@@ -61,6 +61,7 @@ export default async function RootLayout({
 
         <Providers>
           <main
+            id="main-scroll"
             style={{
               flex: 1,
               overflow: "auto",

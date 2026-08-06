@@ -32,6 +32,7 @@ type ListingWithRelations = {
   swap_value: number;
   category: string;
   condition: string;
+  created_at: string;
   boosted: boolean;
   boost_expires_at: string | null;
   listing_images: Array<{
@@ -73,6 +74,7 @@ export async function getMapVisibleListings(): Promise<Listing[]> {
       swap_value,
       category,
       condition,
+      created_at,
       boosted,
       boost_expires_at,
       listing_images (
@@ -188,6 +190,7 @@ export async function getMapVisibleListings(): Promise<Listing[]> {
       lookingFor: "",
       category: listing.category ?? "other",
       condition: listing.condition ?? "used_good",
+      createdAt: listing.created_at,
       boosted:
         listing.boosted &&
         (!listing.boost_expires_at ||

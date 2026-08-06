@@ -68,12 +68,12 @@ export default function HomeContent({
   const isFirstRender = useRef(true);
   const lastScrollYRef = useRef(0);
 
+  // Helper: get the actual scrollable container
+  const getScroller = () =>
+    document.getElementById("main-scroll");
+
   // Restore scroll position on initial mount
   useIsomorphicLayoutEffect(() => {
-    if ("scrollRestoration" in history) {
-      history.scrollRestoration = "manual";
-    }
-
     const saved = sessionStorage.getItem("home_scroll_state");
     if (!saved) return;
 
@@ -83,30 +83,32 @@ export default function HomeContent({
         const targetY = parsed.scrollY;
 
         const doScroll = () => {
-          window.scrollTo({ top: targetY, behavior: "instant" as ScrollBehavior });
+          const scroller = getScroller();
+          if (scroller) scroller.scrollTop = targetY;
         };
 
         doScroll();
 
-        const t1 = setTimeout(doScroll, 10);
-        const t2 = setTimeout(doScroll, 50);
-        const t3 = setTimeout(doScroll, 150);
-        const t4 = setTimeout(doScroll, 300);
+        const t1 = setTimeout(doScroll, 16);
+        const t2 = setTimeout(doScroll, 100);
+        const t3 = setTimeout(doScroll, 300);
 
         return () => {
           clearTimeout(t1);
           clearTimeout(t2);
           clearTimeout(t3);
-          clearTimeout(t4);
         };
       }
     } catch {}
   }, []);
 
-  // Save scroll position and visibleCount continuously (ignoring 0 scroll during page exit)
+  // Save scroll position and visibleCount whenever user scrolls
   useEffect(() => {
+    const scroller = getScroller();
+    if (!scroller) return;
+
     const handleScroll = () => {
-      const y = window.scrollY;
+      const y = scroller.scrollTop;
       if (y > 0) {
         lastScrollYRef.current = y;
         sessionStorage.setItem(
@@ -116,23 +118,24 @@ export default function HomeContent({
       }
     };
 
-    // Also capture click on any listing link BEFORE Next.js starts scrolling to top
+    // Capture click on any anchor BEFORE Next.js can reset scroll
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       const link = target?.closest("a");
-      if (link && window.scrollY > 0) {
+      const scroller = getScroller();
+      if (link && scroller && scroller.scrollTop > 0) {
         sessionStorage.setItem(
           "home_scroll_state",
-          JSON.stringify({ scrollY: window.scrollY, visibleCount })
+          JSON.stringify({ scrollY: scroller.scrollTop, visibleCount })
         );
       }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    scroller.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("click", handleClick, { capture: true });
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      scroller.removeEventListener("scroll", handleScroll);
       window.removeEventListener("click", handleClick, { capture: true });
     };
   }, [visibleCount]);
