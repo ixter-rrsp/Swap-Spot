@@ -98,6 +98,16 @@
   max-width: 280px;
   line-height: 1.5;
   margin: 0 0 10px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: center;
+}
+
+.footerDescriptionIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .footerQuote {

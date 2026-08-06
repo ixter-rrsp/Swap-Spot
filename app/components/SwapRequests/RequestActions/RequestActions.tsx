@@ -22,21 +22,29 @@ export default function RequestActions({
   const [isPending, startTransition] =
     useTransition();
   const [status, setStatus] = useState(request.status);
+  const [prevRequestStatus, setPrevRequestStatus] = useState(request.status);
   const [showAcceptConfirm, setShowAcceptConfirm] = useState(false);
   const router = useRouter();
   const toast = useToast();
 
-  // `status` is only seeded from `request.status` once, on mount —
-  // useState's initializer doesn't re-run just because the parent
-  // Server Component re-renders with a fresh `request` prop (e.g. from
-  // the router.refresh() below). Without this, a request that gets
+  // Sync `status` when `request.status` changes — done here, during
+  // render, rather than in a useEffect. `status` is only seeded once by
+  // useState's initializer, so without this a request that gets
   // auto-cancelled elsewhere (someone accepted a competing offer on the
   // same listing) while this page is already open would keep showing
   // stale "pending" actions — including a Cancel button that fails the
   // moment it's clicked, since the server already knows it's cancelled.
-  useEffect(() => {
+  //
+  // This is React's recommended pattern for "adjusting state when a prop
+  // changes": https://react.dev/learn/you-might-not-need-an-effect#adjusting-state-based-on-a-prop
+  // Doing this in an effect instead would cause an extra, avoidable
+  // render pass (render with stale status -> effect fires -> setState ->
+  // re-render), which is exactly what the "Calling setState synchronously
+  // within an effect" warning flags.
+  if (request.status !== prevRequestStatus) {
+    setPrevRequestStatus(request.status);
     setStatus(request.status);
-  }, [request.status]);
+  }
 
   // Keep this in sync with the server even if nothing the current user
   // does triggers a refresh — e.g. the other party accepts/declines, or
@@ -354,7 +362,7 @@ export default function RequestActions({
       <section className={styles.container}>
 
         <div className={styles.statusCard}>
-          Swap Request Cancelled
+           Swap Request Cancelled
         </div>
 
       </section>

@@ -75,6 +75,37 @@ export async function resendVerificationEmail(email: string) {
   }
 }
 
+/**
+ * Sends a password reset email. Supabase's link brings the user back to
+ * /reset-password with a `code` param (PKCE) that page exchanges for a
+ * temporary recovery session before letting them set a new password.
+ */
+export async function requestPasswordReset(email: string) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+/**
+ * Sets a new password for the currently-authenticated user. Used both by
+ * the "forgot password" recovery flow (after /reset-password establishes
+ * a temporary session from the emailed link) and could be reused later
+ * for an in-app "change password" setting.
+ */
+export async function updatePassword(newPassword: string) {
+  const { error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function getCurrentUser() {
   const { data, error } = await supabase.auth.getUser();
 

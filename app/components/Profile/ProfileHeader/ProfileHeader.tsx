@@ -125,7 +125,7 @@ export default function ProfileHeader({
             height={100}
           />
         ) : (
-          <span style={isFreeTier ? { color: matchedPlan!.badgeBg } : undefined}>
+          <span style={!isFreeTier && matchedPlan ? { color: matchedPlan.badgeBg } : undefined}>
             {username.charAt(0).toUpperCase()}
           </span>
         )}

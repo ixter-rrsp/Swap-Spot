@@ -43,7 +43,11 @@
 }
 
 .freeAvatar {
-  background: #ffffff;
+  background: var(--brand-green);
+  border: none;
+}
+.freeAvatar span{
+  color: #ffffff;
 }
 
 .avatarImage {

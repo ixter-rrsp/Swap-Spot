@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 
 import { ListingImage } from "@/lib/types/Listing";
@@ -15,7 +15,9 @@ interface ListingGalleryProps {
 }
 
 
-const MAX_VISIBLE_THUMBNAILS = 4;
+// A swipe shorter than this (in pixels) is treated as a tap/scroll, not a
+// deliberate "go to next/prev image" gesture.
+const SWIPE_THRESHOLD = 40;
 
 
 export default function ListingGallery({
@@ -25,6 +27,7 @@ export default function ListingGallery({
 }: ListingGalleryProps) {
 
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
 
   const selectedImage = images[selectedIndex]?.url;
 
@@ -42,16 +45,42 @@ export default function ListingGallery({
     );
   }
 
+  function goToNext() {
+    setSelectedIndex((index) => (index + 1) % images.length);
+  }
 
-  const visibleThumbnails = images.slice(0, MAX_VISIBLE_THUMBNAILS);
-  const overflowCount = images.length - MAX_VISIBLE_THUMBNAILS;
-  const hasOverflow = overflowCount > 0;
+  function goToPrevious() {
+    setSelectedIndex((index) => (index - 1 + images.length) % images.length);
+  }
+
+  function handleTouchStart(e: React.TouchEvent<HTMLDivElement>) {
+    touchStartX.current = e.touches[0].clientX;
+  }
+
+  function handleTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
+    if (touchStartX.current === null || images.length <= 1) return;
+
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD) return;
+
+    if (deltaX < 0) {
+      goToNext(); // swiped left -> next image
+    } else {
+      goToPrevious(); // swiped right -> previous image
+    }
+  }
 
 
   return (
     <section className={styles.wrapper}>
 
-      <div className={containerClassName}>
+      <div
+        className={containerClassName}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <Image
           src={selectedImage}
           alt={title}
@@ -71,38 +100,27 @@ export default function ListingGallery({
       {images.length > 1 && (
         <div className={styles.thumbnails}>
 
-          {visibleThumbnails.map((image, index) => {
-            const isLastVisible =
-              hasOverflow && index === MAX_VISIBLE_THUMBNAILS - 1;
+          {images.map((image, index) => (
+            <button
+              key={image.id}
+              type="button"
+              onClick={() => setSelectedIndex(index)}
+              className={
+                selectedIndex === index
+                  ? styles.activeThumbnail
+                  : styles.thumbnail
+              }
+            >
 
-            return (
-              <button
-                key={image.id}
-                type="button"
-                onClick={() => setSelectedIndex(index)}
-                className={
-                  selectedIndex === index
-                    ? styles.activeThumbnail
-                    : styles.thumbnail
-                }
-              >
+              <Image
+                src={image.url}
+                alt={title}
+                fill
+                className={styles.thumbnailImage}
+              />
 
-                <Image
-                  src={image.url}
-                  alt={title}
-                  fill
-                  className={styles.thumbnailImage}
-                />
-
-                {isLastVisible && (
-                  <span className={styles.overflowOverlay}>
-                    +{overflowCount}
-                  </span>
-                )}
-
-              </button>
-            );
-          })}
+            </button>
+          ))}
 
         </div>
       )}
