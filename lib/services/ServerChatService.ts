@@ -1,6 +1,7 @@
 import { Conversation } from "@/lib/types/Conversation";
 import { Message, MessageType } from "@/lib/types/Message";
 import { createClient } from "@/utils/supabase/server";
+import { createServiceClient } from "@/utils/supabase/service";
 import { createNotification } from "@/lib/services/NotificationService";
 
 export async function createOrGetConversation(listingId: string) {
@@ -323,8 +324,20 @@ export async function getConversationMessages(
 
     const { data, error } = await supabase
         .from("messages")
-        .select("*")
+        .select(`
+            *,
+            reply_to:messages!messages_reply_to_id_fkey(
+                id,
+                sender_id,
+                message,
+                message_type
+            )
+        `)
         .eq("conversation_id", conversationId)
+        // Hide messages this user chose to "remove for me" — deleted_for is
+        // a per-user array, so this only affects their own view, not the
+        // other participant's.
+        .not("deleted_for", "cs", `{${user.id}}`)
         .order("created_at", {
             ascending: true,
         });
@@ -346,6 +359,17 @@ export async function getConversationMessages(
             videoUrl: message.video_url,
             swapRequestId: message.swap_request_id,
             swapAgreementId: message.swap_agreement_id,
+
+            unsentAt: message.unsent_at,
+            replyToId: message.reply_to_id,
+            replyPreview: message.reply_to
+                ? {
+                      id: message.reply_to.id,
+                      senderId: message.reply_to.sender_id,
+                      message: message.reply_to.message,
+                      messageType: message.reply_to.message_type as MessageType,
+                  }
+                : null,
         })
     );
 }
@@ -496,7 +520,8 @@ export async function sendChatMessage(
 
 export async function sendMessage(
     conversationId: string,
-    message: string
+    message: string,
+    replyToId?: string | null
 ): Promise<void> {
     const supabase = await createClient();
 
@@ -545,6 +570,21 @@ export async function sendMessage(
         throw new Error("Message cannot exceed 1000 characters.");
     }
 
+    let validatedReplyToId: string | null = null;
+
+    if (replyToId) {
+        const { data: replyTarget } = await supabase
+            .from("messages")
+            .select("id")
+            .eq("id", replyToId)
+            .eq("conversation_id", conversationId)
+            .maybeSingle();
+
+        // Silently drop an invalid/foreign reply id rather than failing the
+        // whole send — the message still has value on its own.
+        validatedReplyToId = replyTarget?.id ?? null;
+    }
+
     const { data: insertedMessage, error } = await supabase
         .from("messages")
         .insert({
@@ -552,6 +592,7 @@ export async function sendMessage(
             sender_id: user.id,
             message: trimmedMessage,
             message_type: "text",
+            reply_to_id: validatedReplyToId,
         })
         .select("id")
         .single();
@@ -585,6 +626,114 @@ export async function sendMessage(
         } catch {
             // no-op; the message has already been inserted successfully.
         }
+    }
+}
+
+export async function unsendMessage(messageId: string): Promise<void> {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+        throw new Error(authError.message);
+    }
+
+    if (!user) {
+        throw new Error("User not authenticated.");
+    }
+
+    const { data: existing, error: fetchError } = await supabase
+        .from("messages")
+        .select("id, sender_id, conversation_id")
+        .eq("id", messageId)
+        .single();
+
+    if (fetchError || !existing) {
+        throw new Error("Message not found.");
+    }
+
+    // Only the original sender can unsend — this removes the message for
+    // BOTH participants, so it can't be triggered by the recipient.
+    if (existing.sender_id !== user.id) {
+        throw new Error("You can only unsend your own messages.");
+    }
+
+    // The unsend itself still only ever touches the sender's own row here,
+    // so RLS wouldn't normally be an issue for THIS particular update — but
+    // using the service client keeps this consistent with
+    // removeMessageForMe below and avoids depending on messages having a
+    // permissive-enough UPDATE policy at all.
+    const serviceSupabase = createServiceClient();
+    const writeClient = serviceSupabase ?? supabase;
+
+    const { error } = await writeClient
+        .from("messages")
+        .update({ unsent_at: new Date().toISOString() })
+        .eq("id", messageId);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+}
+
+export async function removeMessageForMe(messageId: string): Promise<void> {
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+        throw new Error(authError.message);
+    }
+
+    if (!user) {
+        throw new Error("User not authenticated.");
+    }
+
+    const { data: existing, error: fetchError } = await supabase
+        .from("messages")
+        .select("id, conversation_id, deleted_for")
+        .eq("id", messageId)
+        .single();
+
+    if (fetchError || !existing) {
+        throw new Error("Message not found.");
+    }
+
+    // Verify the user actually belongs to this conversation before letting
+    // them hide a message from their own view.
+    const { conversation } = await requireConversationParticipant(
+        supabase,
+        existing.conversation_id
+    );
+    void conversation;
+
+    const currentDeletedFor: string[] = existing.deleted_for ?? [];
+    if (currentDeletedFor.includes(user.id)) {
+        return; // already hidden for this user, nothing to do
+    }
+
+    // This update must succeed for EITHER participant, including the
+    // recipient hiding a message they didn't send — a typical
+    // "sender_id = auth.uid()"-style UPDATE policy on `messages` would
+    // silently block that under the regular client (same failure mode we
+    // already hit with listing locks elsewhere in this app), so this goes
+    // through the service-role client instead.
+    const serviceSupabase = createServiceClient();
+    const writeClient = serviceSupabase ?? supabase;
+
+    const { error } = await writeClient
+        .from("messages")
+        .update({ deleted_for: [...currentDeletedFor, user.id] })
+        .eq("id", messageId);
+
+    if (error) {
+        throw new Error(error.message);
     }
 }
 
