@@ -1,43 +1,29 @@
-import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
-import Skeleton from "@/app/components/UI/Skeleton/Skeleton";
-import ListingCardSkeleton from "@/app/components/UI/ListingSkeleton/ListingSkeleton";
-import styles from "./page.module.css";
+import styles from "./loading.module.css";
 
-export default function Loading() {
+export default function NotificationsLoading() {
   return (
-    <div className={styles.container}>
-      <PageHeader title="Notifications" showBack={false} />
-
-      <section className={styles.section}>
-        <div className={styles.sectionHeader}>
-          <span className={styles.sectionLabel}>UPDATES</span>
+    <div className={styles.page}>
+      {/* Header skeleton */}
+      <div className={styles.header}>
+        <div className={styles.title} />
+        <div className={styles.tabsRow}>
+          <div className={styles.tab} />
+          <div className={styles.tab} />
         </div>
-        <div style={{ display: 'grid', gap: 12 }}>
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 8, background: '#e5e7eb' }} />
-              <div style={{ flex: 1 }}>
-                <Skeleton height="16px" width="60%" />
-                <div style={{ height: 6 }} />
-                <Skeleton height="14px" width="40%" />
-              </div>
+      </div>
+
+      {/* Category summaries / notification list skeleton */}
+      <div className={styles.list}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className={styles.card}>
+            <div className={styles.icon} />
+            <div className={styles.content}>
+              <div className={styles.line1} />
+              <div className={styles.line2} />
             </div>
-          ))}
-        </div>
-
-        <div style={{ height: 18 }} />
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <div style={{ width: 72, height: 44, borderRadius: 8, background: '#e5e7eb' }} />
-          <div style={{ flex: 1 }}>
-            <Skeleton height="18px" width="40%" />
-            <div style={{ height: 8 }} />
-            <Skeleton height="14px" width="30%" />
+            <div className={styles.badge} />
           </div>
-        </div>
-      </section>
-
-      <div style={{ marginTop: 20 }}>
-        <ListingCardSkeleton />
+        ))}
       </div>
     </div>
   );

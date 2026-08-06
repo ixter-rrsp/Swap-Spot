@@ -1,37 +1,46 @@
-import Skeleton from "@/app/components/UI/Skeleton/Skeleton";
-import ListingCardSkeleton from "@/app/components/UI/ListingSkeleton/ListingSkeleton";
-import styles from "./page.module.css";
+import styles from "./loading.module.css";
 
-export default function Loading() {
+export default function ProfileLoading() {
   return (
-    <main className={styles.profilePage}>
-      <header style={{ display: 'flex', gap: 16, alignItems: 'center', padding: '16px 0' }}>
-        <div style={{ width: 96, height: 96, borderRadius: 999, background: '#e5e7eb' }} />
-        <div style={{ flex: 1 }}>
-          <Skeleton height="20px" width="40%" />
-          <div style={{ height: 8 }} />
-          <Skeleton height="14px" width="30%" />
-          <div style={{ height: 12 }} />
-          <Skeleton height="12px" width="50%" />
-        </div>
-      </header>
+    <div className={styles.page}>
+      {/* ── ProfileHeader Skeleton ── */}
+      <div className={styles.header}>
+        <div className={styles.avatar} />
+        <div className={styles.name} />
+        <div className={styles.subtext} />
+        <div className={styles.ratingRow} />
+        <div className={styles.badge} />
+      </div>
 
-      <section style={{ display: 'grid', gap: 12, marginTop: 12 }}>
-        <div style={{ display: 'flex', gap: 12 }}>
-          <div style={{ flex: 1 }}>
-            <Skeleton height="80px" width="100%" />
-          </div>
-          <div style={{ flex: 1 }}>
-            <Skeleton height="80px" width="100%" />
-          </div>
-        </div>
+      {/* ── DashboardCards Skeleton ── */}
+      <div className={styles.cardsRow}>
+        <div className={styles.dashCard} />
+        <div className={styles.dashCard} />
+      </div>
 
-        <div style={{ display: 'grid', gap: 12 }}>
-          {Array.from({ length: 3 }).map((_, i) => (
-            <ListingCardSkeleton key={i} />
-          ))}
-        </div>
-      </section>
-    </main>
+      {/* ── ProgressCard Skeleton ── */}
+      <div className={styles.progressCard}>
+        <div className={styles.progressHeader} />
+        <div className={styles.progressBar} />
+      </div>
+
+      {/* ── OfferSwitcher & Grid Skeleton ── */}
+      <div className={styles.tabsRow}>
+        <div className={styles.tab} />
+        <div className={styles.tab} />
+      </div>
+
+      <div className={styles.grid}>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className={styles.card}>
+            <div className={styles.cardImage} />
+            <div className={styles.cardBody}>
+              <div className={styles.cardTitle} />
+              <div className={styles.cardSub} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

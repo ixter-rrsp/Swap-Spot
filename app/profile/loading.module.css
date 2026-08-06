@@ -1,0 +1,161 @@
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #e8eaed 25%, #f3f4f6 50%, #e8eaed 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+.page {
+  background: #f9fafb;
+  min-height: 100vh;
+  padding-bottom: calc(74px + env(safe-area-inset-bottom) + 20px);
+}
+
+/* Header hero box */
+.header {
+  background: #2563eb;
+  border-radius: 0 0 28px 28px;
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  composes: shimmer;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  background-color: rgba(255,255,255,0.3);
+}
+
+.name {
+  composes: shimmer;
+  width: 140px;
+  height: 20px;
+  background-color: rgba(255,255,255,0.3);
+}
+
+.subtext {
+  composes: shimmer;
+  width: 180px;
+  height: 14px;
+  background-color: rgba(255,255,255,0.25);
+}
+
+.ratingRow {
+  composes: shimmer;
+  width: 120px;
+  height: 14px;
+  background-color: rgba(255,255,255,0.25);
+}
+
+.badge {
+  composes: shimmer;
+  width: 80px;
+  height: 22px;
+  border-radius: 999px;
+  background-color: rgba(255,255,255,0.3);
+  margin-top: 4px;
+}
+
+/* Dashboard cards */
+.cardsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 16px;
+}
+
+.dashCard {
+  composes: shimmer;
+  height: 80px;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+/* Progress card */
+.progressCard {
+  margin: 0 16px 16px;
+  padding: 16px;
+  background: #ffffff;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.progressHeader {
+  composes: shimmer;
+  height: 16px;
+  width: 60%;
+}
+
+.progressBar {
+  composes: shimmer;
+  height: 10px;
+  width: 100%;
+  border-radius: 999px;
+}
+
+/* Tabs & Grid */
+.tabsRow {
+  display: flex;
+  gap: 16px;
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.tab {
+  composes: shimmer;
+  height: 32px;
+  width: 100px;
+  border-radius: 999px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.cardImage {
+  composes: shimmer;
+  width: 100%;
+  aspect-ratio: 4/3;
+}
+
+.cardBody {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cardTitle {
+  composes: shimmer;
+  height: 14px;
+  width: 85%;
+}
+
+.cardSub {
+  composes: shimmer;
+  height: 12px;
+  width: 60%;
+}

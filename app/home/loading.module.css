@@ -1,34 +1,268 @@
-.section {
-  margin-top: 2rem;
+/* ── shimmer base ─────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
 }
 
+.shimmer {
+  background: linear-gradient(90deg, #e8eaed 25%, #f3f4f6 50%, #e8eaed 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* ── page wrapper ─────────────────────────────────────────────────── */
+.page {
+  background: #f9fafb;
+  min-height: 100vh;
+  padding-bottom: calc(74px + env(safe-area-inset-bottom) + 20px);
+}
+
+/* ── HomeHeader ───────────────────────────────────────────────────── */
 .header {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-radius: 0 0 24px 24px;
+  padding: 20px 16px calc(5dvh + 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.headerTopRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  margin-bottom: 1rem;
 }
 
-.header h2 {
-  margin: 0;
-
-  font-size: 1.2rem;
-  font-weight: 700;
+.headerLogo {
+  composes: shimmer;
+  width: 110px;
+  height: 20px;
+  background-color: rgba(255,255,255,0.25);
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 75%);
+  border-radius: 6px;
 }
 
-.header span {
-  color: #2563eb;
-
-  font-size: .95rem;
-  font-weight: 600;
+.headerAvatarRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
+.headerIcon {
+  composes: shimmer;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0.2);
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 75%);
+}
+
+.headerAvatar {
+  composes: shimmer;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0.2);
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 75%);
+}
+
+.headerTagline {
+  composes: shimmer;
+  width: 55%;
+  height: 26px;
+  border-radius: 6px;
+  background-color: rgba(255,255,255,0.2);
+  background-image: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.1) 75%);
+  margin-left: 10px;
+}
+
+/* ── SearchBar (floated up over header) ──────────────────────────── */
+.searchBarWrap {
+  width: 85%;
+  margin: 4dvh auto 0;
+  position: relative;
+  top: calc(-8dvh);
+  z-index: 50;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.searchIcon {
+  composes: shimmer;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.searchInput {
+  composes: shimmer;
+  flex: 1;
+  height: 18px;
+  border-radius: 6px;
+}
+
+.filterBtn {
+  composes: shimmer;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background-color: #dbeafe;
+  background-image: linear-gradient(90deg, #dbeafe 25%, #bfdbfe 50%, #dbeafe 75%);
+}
+
+/* ── CategoryChips ───────────────────────────────────────────────── */
+.chipsRow {
+  display: flex;
+  gap: 13px;
+  overflow: hidden;
+  padding: 0 16px;
+  margin-top: -24px;
+  margin-bottom: 28px;
+  justify-content: flex-start;
+}
+
+.chip {
+  composes: shimmer;
+  height: 40px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+/* ── Section shared ──────────────────────────────────────────────── */
+.section {
+  padding: 0 16px 16px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 0 0 0 0;
+}
+
+.sectionTitle {
+  composes: shimmer;
+  height: 20px;
+  width: 130px;
+  border-radius: 6px;
+}
+
+.sectionLink {
+  composes: shimmer;
+  height: 16px;
+  width: 55px;
+  border-radius: 6px;
+}
+
+/* ── Boosted carousel ────────────────────────────────────────────── */
+.carousel {
+  display: flex;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.boostedCard {
+  composes: shimmer;
+  flex: 0 0 220px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #ffffff;
+  background-image: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.boostedImage {
+  composes: shimmer;
+  width: 100%;
+  height: 130px;
+  border-radius: 0;
+}
+
+.boostedBody {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.boostedBadge {
+  composes: shimmer;
+  height: 18px;
+  width: 60px;
+  border-radius: 999px;
+}
+
+.boostedName {
+  composes: shimmer;
+  height: 15px;
+  width: 80%;
+  border-radius: 5px;
+}
+
+.boostedSub {
+  composes: shimmer;
+  height: 13px;
+  width: 55%;
+  border-radius: 5px;
+}
+
+/* ── Listing card grid ───────────────────────────────────────────── */
 .grid {
   display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 
-  grid-template-columns:
-    repeat(auto-fill, minmax(220px, 1fr));
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
 
-  gap: 1.5rem;
+.cardImage {
+  composes: shimmer;
+  width: 100%;
+  aspect-ratio: 4/3;
+}
+
+.cardBody {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cardTitle {
+  composes: shimmer;
+  height: 14px;
+  width: 85%;
+  border-radius: 5px;
+}
+
+.cardSub {
+  composes: shimmer;
+  height: 12px;
+  width: 60%;
+  border-radius: 5px;
+}
+
+.cardMeta {
+  composes: shimmer;
+  height: 12px;
+  width: 40%;
+  border-radius: 5px;
 }
