@@ -29,7 +29,7 @@ export default function CreateSwapRequest({
   useEffect(() => {
     async function loadListings() {
       try {
-        const response = await fetch("/api/listings/my");
+        const response = await fetch("/api/listings/my?forSwap=1");
         if (response.status === 401) {
           router.push("/login");
           return;
@@ -86,7 +86,7 @@ export default function CreateSwapRequest({
         // Re-fetch so the now-locked listing (correctly excluded server
         // side) drops out of the picker instead of staying selectable.
         try {
-          const response = await fetch("/api/listings/my");
+          const response = await fetch("/api/listings/my?forSwap=1");
           const data = await response.json();
           setListings(Array.isArray(data) ? data : []);
         } catch (refreshError) {

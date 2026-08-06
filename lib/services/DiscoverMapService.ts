@@ -107,57 +107,64 @@ export async function getMapVisibleListings(): Promise<Listing[]> {
 
   const listings = data as ListingWithRelations[];
 
-  for (const listing of listings) {
-    if (listing.latitude == null || listing.longitude == null) {
-      continue;
-    }
-
-    const hasPublicLandmark =
-      listing.nearby_landmark != null &&
-      listing.landmark_latitude != null &&
-      listing.landmark_longitude != null;
-
-    const currentDistanceKm =
-      hasPublicLandmark && listing.landmark_latitude != null && listing.landmark_longitude != null
-        ? getDistanceInKm(
-            listing.latitude,
-            listing.longitude,
-            listing.landmark_latitude,
-            listing.landmark_longitude
-          )
-        : Infinity;
-
-    const shouldRefreshLandmark = !hasPublicLandmark || currentDistanceKm > 5;
-
-    if (!shouldRefreshLandmark) {
-      continue;
-    }
-
-    try {
-      const fallbackCity = listing.profiles?.[0]?.city ?? listing.city;
-      const landmarkInfo = await resolveListingLandmark(
-        listing.latitude,
-        listing.longitude,
-        fallbackCity
-      );
-
-      if (!landmarkInfo.landmark || !landmarkInfo.landmarkLatitude || !landmarkInfo.landmarkLongitude) {
+  // Backfill landmark data for any listings that need it — fire-and-forget
+  // so this never blocks the initial page render. The updated coordinates
+  // will be visible on the next page load.
+  Promise.resolve().then(async () => {
+    for (const listing of listings) {
+      if (listing.latitude == null || listing.longitude == null) {
         continue;
       }
 
-      await supabase
-        .from("listings")
-        .update({
-          city: landmarkInfo.city || listing.city,
-          nearby_landmark: landmarkInfo.landmark ?? null,
-          landmark_latitude: landmarkInfo.landmarkLatitude,
-          landmark_longitude: landmarkInfo.landmarkLongitude,
-        })
-        .eq("id", listing.id);
-    } catch (updateError) {
-      console.warn("Failed to backfill landmark data for listing", listing.id, updateError);
+      const hasPublicLandmark =
+        listing.nearby_landmark != null &&
+        listing.landmark_latitude != null &&
+        listing.landmark_longitude != null;
+
+      const currentDistanceKm =
+        hasPublicLandmark && listing.landmark_latitude != null && listing.landmark_longitude != null
+          ? getDistanceInKm(
+              listing.latitude,
+              listing.longitude,
+              listing.landmark_latitude,
+              listing.landmark_longitude
+            )
+          : Infinity;
+
+      const shouldRefreshLandmark = !hasPublicLandmark || currentDistanceKm > 5;
+
+      if (!shouldRefreshLandmark) {
+        continue;
+      }
+
+      try {
+        const fallbackCity = listing.profiles?.[0]?.city ?? listing.city;
+        const landmarkInfo = await resolveListingLandmark(
+          listing.latitude,
+          listing.longitude,
+          fallbackCity
+        );
+
+        if (!landmarkInfo.landmark || !landmarkInfo.landmarkLatitude || !landmarkInfo.landmarkLongitude) {
+          continue;
+        }
+
+        await supabase
+          .from("listings")
+          .update({
+            city: landmarkInfo.city || listing.city,
+            nearby_landmark: landmarkInfo.landmark ?? null,
+            landmark_latitude: landmarkInfo.landmarkLatitude,
+            landmark_longitude: landmarkInfo.landmarkLongitude,
+          })
+          .eq("id", listing.id);
+      } catch (updateError) {
+        console.warn("Failed to backfill landmark data for listing", listing.id, updateError);
+      }
     }
-  }
+  }).catch((err) => {
+    console.warn("[DiscoverMapService] Background landmark backfill failed", err);
+  });
 
   return listings.map((listing): Listing => {
     const profile = listing.profiles?.[0] || null;

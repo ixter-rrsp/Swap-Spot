@@ -40,7 +40,7 @@ interface ListingRow {
   profiles?: ListingRowProfile[] | null;
 }
 
-export async function getMyListings(): Promise<Listing[]> {
+export async function getMyListings(limit?: number): Promise<Listing[]> {
   const supabase = await createClient();
 
   const {
@@ -56,7 +56,7 @@ export async function getMyListings(): Promise<Listing[]> {
     return [];
   }
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("listings")
     .select(`
       *,
@@ -71,6 +71,12 @@ export async function getMyListings(): Promise<Listing[]> {
     .order("created_at", {
       ascending: false,
     });
+
+  if (limit !== undefined) {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(error.message);

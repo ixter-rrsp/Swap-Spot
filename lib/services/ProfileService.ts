@@ -225,19 +225,62 @@ export async function getProfileDashboard(): Promise<ProfileDashboardData | null
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const profile = await getCurrentProfile();
+  // Run profile fetch and all independent DB queries in parallel to eliminate
+  // the staircase of sequential round-trips that was blocking the initial render.
+  const [
+    profile,
+    { data: reviewsData },
+    { data: completedAgreementsData },
+    { count: activeListings },
+    { count: sentRequests },
+    { count: toAccept },
+    { count: acceptedCount },
+    { data: agreements },
+  ] = await Promise.all([
+    getCurrentProfile(),
+    supabase.from("reviews").select("rating").eq("reviewee_id", user.id),
+    supabase
+      .from("swap_agreements")
+      .select("id")
+      .eq("status", "completed")
+      .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`),
+    supabase
+      .from("listings")
+      .select("id", { count: "exact", head: true })
+      .eq("owner_id", user.id)
+      .eq("traded", false),
+    supabase
+      .from("swap_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("sender_id", user.id)
+      .eq("status", "pending"),
+    supabase
+      .from("swap_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("receiver_id", user.id)
+      .eq("status", "pending"),
+    // Reliability tracker: how many swap requests this user was part of
+    // ever reached "accepted", versus how many of those went all the way
+    // to "completed". A swap that reached "completed" was, by definition,
+    // accepted at some earlier point — so it counts toward both.
+    supabase
+      .from("swap_requests")
+      .select("id", { count: "exact", head: true })
+      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+      .in("status", ["accepted", "completed"]),
+    // Completed count comes from swap_agreements.status = "completed"
+    // (completedAgreementsData, fetched above) rather than re-querying
+    // swap_requests — that column only gets synced to "completed" as a
+    // side effect of the agreement finishing, so relying on it directly
+    // here was silently undercounting whenever that sync hadn't (or
+    // couldn't) run. swap_agreements is the source of truth.
+    supabase
+      .from("swap_agreements")
+      .select("*")
+      .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`),
+  ]);
+
   if (!profile) return null;
-
-  const { data: reviewsData } = await supabase
-    .from("reviews")
-    .select("rating")
-    .eq("reviewee_id", user.id);
-
-  const { data: completedAgreementsData } = await supabase
-    .from("swap_agreements")
-    .select("id")
-    .eq("status", "completed")
-    .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`);
 
   let averageRating = 0;
   const totalReviews = reviewsData?.length || 0;
@@ -245,46 +288,6 @@ export async function getProfileDashboard(): Promise<ProfileDashboardData | null
     const sum = reviewsData.reduce((acc, r) => acc + r.rating, 0);
     averageRating = Number((sum / totalReviews).toFixed(1));
   }
-
-  const { count: activeListings } = await supabase
-    .from("listings")
-    .select("id", { count: "exact", head: true })
-    .eq("owner_id", user.id)
-    .eq("traded", false);
-
-  const { count: sentRequests } = await supabase
-    .from("swap_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("sender_id", user.id)
-    .eq("status", "pending");
-
-  const { count: toAccept } = await supabase
-    .from("swap_requests")
-    .select("id", { count: "exact", head: true })
-    .eq("receiver_id", user.id)
-    .eq("status", "pending");
-
-  // Reliability tracker: how many swap requests this user was part of
-  // ever reached "accepted", versus how many of those went all the way
-  // to "completed". A swap that reached "completed" was, by definition,
-  // accepted at some earlier point — so it counts toward both.
-  const { count: acceptedCount } = await supabase
-    .from("swap_requests")
-    .select("id", { count: "exact", head: true })
-    .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
-    .in("status", ["accepted", "completed"]);
-
-  // Completed count comes from swap_agreements.status = "completed"
-  // (completedAgreementsData, fetched above) rather than re-querying
-  // swap_requests — that column only gets synced to "completed" as a
-  // side effect of the agreement finishing, so relying on it directly
-  // here was silently undercounting whenever that sync hadn't (or
-  // couldn't) run. swap_agreements is the source of truth.
-
-  const { data: agreements } = await supabase
-    .from("swap_agreements")
-    .select("*")
-    .or(`requester_id.eq.${user.id},receiver_id.eq.${user.id}`);
 
   let toConfirm = 0;
   let toComplete = 0;

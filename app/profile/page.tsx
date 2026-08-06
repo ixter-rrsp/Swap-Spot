@@ -27,14 +27,17 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  const dashboardData = await getProfileDashboard();
+  // Run both fetches in parallel — they're fully independent of each other.
+  const [dashboardData, myOffers] = await Promise.all([
+    getProfileDashboard(),
+    getMyListings(6),
+  ]);
+
   if (!dashboardData) {
     return <div className={styles.profilePage}>Unable to load profile data.</div>;
   }
 
   const { profile, stats, counts, reliability } = dashboardData;
-
-  const myOffers = await getMyListings();
 
   return (
     <main className={styles.profilePage}>
@@ -58,7 +61,7 @@ export default async function ProfilePage() {
         accepted={reliability.accepted}
       />
 
-      <ProfileContent myOffers={myOffers} />
+      <ProfileContent myOffers={myOffers} initialHasMore={myOffers.length === 6} />
 
       <ProfileReviews userId={profile.id} />
     </main>

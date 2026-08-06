@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 import styles from "./HomeContent.module.css";
@@ -43,18 +43,71 @@ export default function HomeContent({
   const router = useRouter();
 
 
-  const [search, setSearch] =
-    useState("");
+  const useIsomorphicLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
-  const [category, setCategory] =
-    useState("all");
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
 
-  const [visibleCount, setVisibleCount] = useState(INITIAL_BATCH_SIZE);
+  const [visibleCount, setVisibleCount] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("home_scroll_state");
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (typeof parsed.visibleCount === "number" && parsed.visibleCount > 0) {
+            return parsed.visibleCount;
+          }
+        } catch {}
+      }
+    }
+    return INITIAL_BATCH_SIZE;
+  });
+
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const isFirstRender = useRef(true);
 
-  // Reset visible count when search or category filter changes
+  // Restore scroll position on initial mount
+  useIsomorphicLayoutEffect(() => {
+    const saved = sessionStorage.getItem("home_scroll_state");
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (typeof parsed.scrollY === "number" && parsed.scrollY > 0) {
+          const targetY = parsed.scrollY;
+          window.scrollTo({ top: targetY, behavior: "instant" as ScrollBehavior });
+          const rAF = requestAnimationFrame(() => {
+            window.scrollTo({ top: targetY, behavior: "instant" as ScrollBehavior });
+          });
+          return () => cancelAnimationFrame(rAF);
+        }
+      } catch {}
+    }
+  }, []);
+
+  // Save scroll position and visibleCount continuously
   useEffect(() => {
+    const handleScroll = () => {
+      const y = window.scrollY;
+      sessionStorage.setItem(
+        "home_scroll_state",
+        JSON.stringify({ scrollY: y, visibleCount })
+      );
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [visibleCount]);
+
+  // Reset visible count when search or category filter changes (after initial mount)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     setVisibleCount(INITIAL_BATCH_SIZE);
+    sessionStorage.removeItem("home_scroll_state");
   }, [search, category]);
 
 
