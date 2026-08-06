@@ -47,6 +47,7 @@ export default function HomeContent({
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
+  const [dateFilter, setDateFilter] = useState("all");
 
   const [visibleCount, setVisibleCount] = useState<number>(() => {
     if (typeof window !== "undefined") {
@@ -136,7 +137,7 @@ export default function HomeContent({
     };
   }, [visibleCount]);
 
-  // Reset visible count when search or category filter changes (after initial mount)
+  // Reset visible count when search, category, or date filter changes (after initial mount)
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -144,7 +145,24 @@ export default function HomeContent({
     }
     setVisibleCount(INITIAL_BATCH_SIZE);
     sessionStorage.removeItem("home_scroll_state");
-  }, [search, category]);
+  }, [search, category, dateFilter]);
+
+  function matchesDateFilter(listing: Listing) {
+    if (dateFilter === "all") return true;
+    if (!listing.createdAt) return true;
+
+    const createdAtTime = new Date(listing.createdAt).getTime();
+    if (Number.isNaN(createdAtTime)) return true;
+
+    const now = Date.now();
+    const diffDays = (now - createdAtTime) / (1000 * 60 * 60 * 24);
+
+    if (dateFilter === "3days") return diffDays <= 3;
+    if (dateFilter === "7days") return diffDays <= 7;
+    if (dateFilter === "30days") return diffDays <= 30;
+
+    return true;
+  }
 
 
   function matchesFilters(listing: Listing, searchTerm: string) {
@@ -199,7 +217,7 @@ export default function HomeContent({
 
 
       return listings.filter(
-        (listing) => matchesFilters(listing, searchTerm)
+        (listing) => matchesFilters(listing, searchTerm) && matchesDateFilter(listing)
       );
 
 
@@ -207,6 +225,7 @@ export default function HomeContent({
       listings,
       search,
       category,
+      dateFilter,
     ]);
 
   const visibleListings = useMemo(() => {
@@ -296,6 +315,8 @@ export default function HomeContent({
       <SearchBar
         value={search}
         onChange={setSearch}
+        dateFilter={dateFilter}
+        onDateFilterChange={setDateFilter}
       />
 
 

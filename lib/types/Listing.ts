@@ -38,6 +38,8 @@ export interface Listing {
   nearbyLandmark?: string | null;
 
   showOnMap?: boolean;
+
+  createdAt?: string;
 }
 
 export interface ListingImage {

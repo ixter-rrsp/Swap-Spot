@@ -30,6 +30,7 @@ function mapRow(row: any): Listing {
     category: row.category,
     condition: row.condition,
     boosted: row.boosted,
+    createdAt: row.created_at,
     owner: {
       id: row.profiles?.id ?? row.owner_id,
       username: row.profiles?.username ?? "",
