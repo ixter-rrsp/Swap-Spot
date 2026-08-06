@@ -68,7 +68,7 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: #22c55e;
+  background: var(--brand-green);
   color: #ffffff;
   display: grid;
   place-items: center;

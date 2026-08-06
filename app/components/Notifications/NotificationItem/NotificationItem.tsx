@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import styles from "./NotificationItem.module.css";
 
 import { Notification } from "@/lib/types/Notification";
-import { MessageSquare, Repeat, CheckCircle2, XCircle, Bell } from "lucide-react";
+import {Repeat, CheckCircle2, XCircle, Bell } from "lucide-react";
 
 import { markNotificationAsReadAction } from "@/lib/actions/NotificationAction";
 

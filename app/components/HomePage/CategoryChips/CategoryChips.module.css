@@ -49,14 +49,14 @@
 }
 
 .chip:hover {
-  border-color: #22c55e;
-  color: #16a34a;
+  border-color: var(--brand-green);
+  color: var(--brand-green);
 }
 
 .active {
-  background: #16a34a;
+  background: var(--brand-green);
   color: white;
-  border-color: #16a34a;
+  border-color: var(--brand-green);
 }
 
 .chip:focus-visible {

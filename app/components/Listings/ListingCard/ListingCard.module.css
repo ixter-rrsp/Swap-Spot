@@ -19,7 +19,9 @@
 }
 
 .boosted {
-  border: 1.5px solid #22c55e;
+  /* The green accent now lives on the content area only (see
+     .boostedContent) — this card-level modifier is kept only for
+     any code that still references it, but no longer draws a border. */
 }
 
 .card:hover {
@@ -134,15 +136,22 @@
   gap: 0.55rem;
 
   padding: 1rem;
+  border-left: 4px solid transparent;
 
   flex: 1;
 }
 
+.boostedContent {
+  border-left: 4px solid var(--brand-green);
+}
+
 .title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 700;
 
   color: #111827;
+
+  line-height: 1.3;
 
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -156,6 +165,13 @@
   align-items: center;
   gap: 0.4rem;
 
-  font-size: 0.875rem;
+  font-size: 0.85rem;
+  font-weight: 500;
   color: #6b7280;
+}
+
+.priceInfo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
 }

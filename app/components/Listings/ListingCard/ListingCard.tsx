@@ -131,7 +131,7 @@ export default function ListingCard({
         </div>
 
 
-        <div className={styles.content}>
+        <div className={`${styles.content} ${boosted ? styles.boostedContent : ""}`}>
 
           <h3 className={styles.title}>
             {title}
@@ -155,7 +155,7 @@ export default function ListingCard({
           )}
 
 
-          <div className={styles.info}>
+          <div className={`${styles.info} ${styles.priceInfo}`}>
             <Banknote size={16} />
             <span>
               {swapValue.toLocaleString()}

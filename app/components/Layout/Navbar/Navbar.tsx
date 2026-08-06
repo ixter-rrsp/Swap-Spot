@@ -14,15 +14,18 @@ import {
 } from "lucide-react";
 
 import styles from "./Navbar.module.css";
+import { FilledHouse, FilledCompass } from "./NavIcons";
 
 const navItems = [
   {
     href: "/home",
     icon: House,
+    filledIcon: FilledHouse,
   },
   {
     href: "/discover",
     icon: Compass,
+    filledIcon: FilledCompass,
   },
   {
     href: "/notifications",
@@ -239,6 +242,7 @@ export default function Navbar({
         <div className={styles.navContent}>
           {navItems.slice(0, 2).map((item) => {
             const Icon = item.icon;
+            const FilledIcon = item.filledIcon;
             const active = pathname === item.href;
 
             return (
@@ -249,7 +253,15 @@ export default function Navbar({
                   }`}
               >
                 <div className={styles.iconWrapper}>
-                  <Icon size={22} strokeWidth={2} />
+                  {active && FilledIcon ? (
+                    <FilledIcon size={22} />
+                  ) : (
+                    <Icon
+                      size={22}
+                      strokeWidth={2}
+                      fill={active ? "currentColor" : "none"}
+                    />
+                  )}
 
                   {item.href === "/notifications" &&
                     unreadCount > 0 && (
@@ -267,6 +279,7 @@ export default function Navbar({
 
           {navItems.slice(2).map((item) => {
             const Icon = item.icon;
+            const FilledIcon = item.filledIcon;
             const active = pathname === item.href;
 
             return (
@@ -278,7 +291,15 @@ export default function Navbar({
                 onClick={item.href === "/notifications" ? onNotificationClick : undefined}
               >
                 <div className={styles.iconWrapper}>
-                  <Icon size={22} strokeWidth={2} />
+                  {active && FilledIcon ? (
+                    <FilledIcon size={22} />
+                  ) : (
+                    <Icon
+                      size={22}
+                      strokeWidth={2}
+                      fill={active ? "currentColor" : "none"}
+                    />
+                  )}
 
                   {item.href === "/notifications" &&
                     unreadCount > 0 && (

@@ -3,6 +3,7 @@
 :root {
   --background: #dbdbdb;
   --foreground: #e4e0e0;
+  --brand-green: #16a34a;
 }
 
 @theme inline {
@@ -33,7 +34,7 @@ html, body {
 }
 body {
   height: 100dvh;
-  height: -webkit-fill-available;  /* Safari fallback */
+  height: -webkit-fill-available;
   min-height: 100dvh;
   min-height: -webkit-fill-available;
 }
