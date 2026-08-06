@@ -26,7 +26,7 @@
 
   overflow: hidden;
 
-  background: #e5e7eb;
+  background: #2563eb;
 
   display: flex;
   align-items: center;
@@ -44,7 +44,7 @@
 
 .userCard h3 {
   margin: 10px 0 4px;
-
+  color: #111827;
   font-size: 16px;
 }
 

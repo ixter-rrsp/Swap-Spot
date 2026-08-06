@@ -34,16 +34,16 @@ export const SUBSCRIPTION_PLANS: Record<PlanId, SubscriptionPlanConfig> = {
   basic: {
     id: "basic",
     name: "Basic",
-    price: 199,
-    durationMonths: 3,
-    maxActiveListings: null, // Unlimited
+    price: 129,
+    durationMonths: 1,
+    maxActiveListings: 25,
     badgeName: "Basic",
     badgeColor: "#059669", // Emerald Green
     badgeBg: "#d1fae5",
     description: "Perfect for active swappers looking to list more items.",
     features: [
-      "Unlimited item listings",
-      "3-Month active duration",
+      "Up to 25 item listings",
+      "1-Month active duration",
       "Green Basic member badge",
       "Increased visibility",
     ],
@@ -52,15 +52,15 @@ export const SUBSCRIPTION_PLANS: Record<PlanId, SubscriptionPlanConfig> = {
     id: "premium",
     name: "Premium",
     price: 299,
-    durationMonths: 5,
-    maxActiveListings: null, // Unlimited
+    durationMonths: 3,
+    maxActiveListings: 50,
     badgeName: "Premium",
     badgeColor: "white", // Silver / Slate
     badgeBg: "#A855F7",
     description: "Great value for power users and frequent traders.",
     features: [
-      "Unlimited item listings",
-      "5-Month active duration",
+      "Up to 50 item listings",
+      "3-Month active duration",
       "Silver Premium member badge",
       "Priority customer support",
     ],
@@ -68,7 +68,7 @@ export const SUBSCRIPTION_PLANS: Record<PlanId, SubscriptionPlanConfig> = {
   vip: {
     id: "vip",
     name: "VIP",
-    price: 999,
+    price: 899,
     durationMonths: 12,
     maxActiveListings: null, // Unlimited
     badgeName: "VIP",

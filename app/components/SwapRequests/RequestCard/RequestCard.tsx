@@ -151,7 +151,11 @@ export default function RequestCard({
 
       {href && (
         <div className={styles.actions} style={{ marginTop: 8 }}>
-          <Link href={href} className={styles.accept} style={{ backgroundColor: '#f0f4f8', color: '#007bff', textAlign: 'center', width: '100%', display: 'block', textDecoration: 'none' }}>
+          <Link
+            href={href}
+            className={styles.accept}
+            style={{ backgroundColor: '#f0f4f8', color: '#007bff', textDecoration: 'none' }}
+          >
             View Request
           </Link>
         </div>
