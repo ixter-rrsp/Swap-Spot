@@ -10,37 +10,41 @@ import { getCurrentProfile } from "@/lib/services/ProfileService";
 import type { Listing } from "@/lib/types/Listing";
 
 
-function mapRow(row: any): Listing {
+function mapRow(row: unknown): Listing {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const r = row as any;
+
   return {
-    id: row.id,
-    title: row.title,
-    description: row.description,
-    imageUrl: row.listing_images?.[0]?.image_url,
+    id: r.id,
+    title: r.title,
+    description: r.description,
+    imageUrl: r.listing_images?.[0]?.image_url,
     images:
-      row.listing_images?.map(
+      r.listing_images?.map(
         (image: { id: string; image_url: string; sort_order: number }) => ({
           id: image.id,
           url: image.image_url,
           sortOrder: image.sort_order,
         })
       ) ?? [],
-    city: row.city,
-    swapValue: row.swap_value,
-    lookingFor: row.looking_for,
-    category: row.category,
-    condition: row.condition,
-    boosted: row.boosted,
-    createdAt: row.created_at,
+    city: r.city,
+    swapValue: r.swap_value,
+    lookingFor: r.looking_for,
+    category: r.category,
+    condition: r.condition,
+    boosted: r.boosted,
+    createdAt: r.created_at,
     owner: {
-      id: row.profiles?.id ?? row.owner_id,
-      username: row.profiles?.username ?? "",
-      fullName: row.profiles?.full_name ?? "",
-      avatarUrl: row.profiles?.avatar_url ?? null,
-      rating: Number(row.profiles?.rating ?? 0),
-      badge: row.profiles?.badge ?? "Member",
-      city: row.profiles?.city ?? row.city,
-      latitude: row.profiles?.latitude ?? null,
-      longitude: row.profiles?.longitude ?? null,
+      id: r.profiles?.id ?? r.owner_id,
+      username: r.profiles?.username ?? "",
+      fullName: r.profiles?.full_name ?? "",
+      avatarUrl: r.profiles?.avatar_url ?? null,
+      rating: Number(r.profiles?.rating ?? 0),
+      badge: r.profiles?.badge ?? "Member",
+      isVerified: r.profiles?.is_verified ?? false,
+      city: r.profiles?.city ?? r.city,
+      latitude: r.profiles?.latitude ?? null,
+      longitude: r.profiles?.longitude ?? null,
     },
   };
 }

@@ -115,6 +115,7 @@ export async function getSavedListings(): Promise<Listing[]> {
           avatarUrl: listing.profiles?.avatar_url ?? null,
           rating: Number(listing.profiles?.rating ?? 0),
           badge: listing.profiles?.badge ?? "Member",
+          isVerified: listing.profiles?.is_verified ?? false,
           city: listing.profiles?.city ?? listing.city,
           latitude: listing.profiles?.latitude ?? null,
           longitude: listing.profiles?.longitude ?? null,

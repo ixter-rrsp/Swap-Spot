@@ -176,6 +176,7 @@ export async function getNearbyListings(): Promise<Listing[]> {
           avatarUrl: listing.profiles.avatar_url,
           rating: Number(listing.profiles.rating),
           badge: listing.profiles.badge,
+          isVerified: listing.profiles.is_verified ?? false,
           city: listing.profiles.city,
           latitude: listing.profiles.latitude,
           longitude: listing.profiles.longitude,

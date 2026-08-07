@@ -47,6 +47,7 @@ export default async function ListingsPage() {
       avatarUrl: row.profiles?.avatar_url ?? null,
       rating: Number(row.profiles?.rating ?? 0),
       badge: row.profiles?.badge ?? "Member",
+      isVerified: row.profiles?.is_verified ?? false,
       city: row.profiles?.city ?? row.city,
       latitude: row.profiles?.latitude ?? null,
       longitude: row.profiles?.longitude ?? null,
