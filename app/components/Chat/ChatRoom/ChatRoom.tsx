@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { createClient } from "@/utils/supabase/client";
 import { subscribeChannel } from "@/utils/supabase/channelRegistry";
 
-import { Message } from "@/lib/types/Message";
+import { Message, MessageType } from "@/lib/types/Message";
 
 import MessageInput from "../MessageInput/MessageInput";
 import MessageList from "../MessageList/MessageList";
@@ -39,6 +39,29 @@ interface ChatRoomProps {
     };
 }
 
+// Shape of a `messages` table row as delivered by Supabase realtime
+// payloads — only the fields this component actually reads off INSERT/UPDATE
+// events.
+interface RealtimeMessageRow {
+    id: string;
+    sender_id: string;
+    message: string | null;
+    is_read: boolean;
+    created_at: string;
+    message_type: MessageType;
+    image_url: string | null;
+    video_url: string | null;
+    swap_request_id: string | null;
+    swap_agreement_id: string | null;
+    unsent_at: string | null;
+    reply_to_id: string | null;
+    deleted_for?: string[];
+}
+
+interface RealtimeMessagePayload {
+    new: RealtimeMessageRow;
+}
+
 function replyPreviewLabel(message: Message): string {
     if (message.messageType === "image") return "📷 Photo";
     if (message.messageType === "video") return "🎥 Video";
@@ -60,11 +83,17 @@ export default function ChatRoom({
         useState<Message[]>(initialMessages);
     const [isAgreementModalOpen, setIsAgreementModalOpen] = useState(false);
     const [replyingTo, setReplyingTo] = useState<Message | null>(null);
-    const [activeSwapRequestId, setActiveSwapRequestId] = useState<string | null>(() => {
-        return initialMessages.find(
+
+    // Derived from `messages`, not independent state — computing it during
+    // render (rather than via useEffect + setState) avoids an extra
+    // render pass every time `messages` changes.
+    const activeSwapRequestId = useMemo(() => {
+        const proposalMessage = messages.find(
             (message) => message.messageType === "swap_proposal" && !!message.swapRequestId
-        )?.swapRequestId ?? null;
-    });
+        );
+        return proposalMessage?.swapRequestId ?? null;
+    }, [messages]);
+
     const [activeSwapRequestStatus, setActiveSwapRequestStatus] = useState<string | null>(null);
 
     const bottomRef =
@@ -104,7 +133,7 @@ export default function ChatRoom({
                         table: "messages",
                         filter: `conversation_id=eq.${conversationId}`,
                     },
-                    (payload: any) => {
+                    (payload: RealtimeMessagePayload) => {
                         const newMessage = payload.new;
 
                         if (!newMessage?.id) {
@@ -131,7 +160,7 @@ export default function ChatRoom({
                                 {
                                     id: newMessage.id,
                                     senderId: newMessage.sender_id,
-                                    message: newMessage.message,
+                                    message: newMessage.message ?? "",
                                     isRead: newMessage.is_read,
                                     createdAt: newMessage.created_at,
                                     messageType: newMessage.message_type,
@@ -167,7 +196,7 @@ export default function ChatRoom({
                         table: "messages",
                         filter: `conversation_id=eq.${conversationId}`,
                     },
-                    (payload: any) => {
+                    (payload: RealtimeMessagePayload) => {
                         const updated = payload.new;
                         if (!updated?.id) return;
 
@@ -204,19 +233,12 @@ export default function ChatRoom({
             };
     }, [conversationId, currentUserId]);
 
-
-    useEffect(() => {
-        const proposalMessage = messages.find(
-            (message) => message.messageType === "swap_proposal" && !!message.swapRequestId
-        );
-
-        setActiveSwapRequestId(proposalMessage?.swapRequestId ?? null);
-    }, [messages]);
-
     useEffect(() => {
         if (!activeSwapRequestId) {
-            setActiveSwapRequestStatus(null);
-            return;
+            // Defer to the next tick so this reset doesn't fire
+            // synchronously as part of the effect's own execution.
+            const resetId = setTimeout(() => setActiveSwapRequestStatus(null), 0);
+            return () => clearTimeout(resetId);
         }
 
         let cancelled = false;
@@ -257,7 +279,7 @@ export default function ChatRoom({
     // Initial scroll to bottom on mount
     useEffect(() => {
         if (isInitialMount.current && messages.length > 0) {
-            bottomRef.current?.scrollIntoView({ behavior: "instant" as any });
+            bottomRef.current?.scrollIntoView({ behavior: "instant" as ScrollBehavior });
             isInitialMount.current = false;
         }
     }, [messages]);

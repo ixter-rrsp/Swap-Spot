@@ -8,6 +8,46 @@ import {
   PaymentStatus,
 } from "./types";
 
+// Minimal shape of a PayMongo webhook payload — only the fields this
+// provider actually reads. PayMongo's real payloads carry more fields per
+// resource type, so this stays intentionally loose (optional chaining below
+// still guards against missing fields) rather than modeling their full API.
+interface PayMongoWebhookPayload {
+  data?: {
+    id?: string;
+    attributes?: {
+      type?: string;
+      data?: {
+        id?: string;
+        attributes?: {
+          payments?: Array<{
+            id?: string;
+            attributes?: {
+              payment_intent_id?: string;
+              payment_method_type?: string;
+              paid_at?: number;
+              source?: { type?: string };
+            };
+          }>;
+          payment_intent_id?: string;
+          payment_method_type?: string;
+          paid_at?: number;
+          source?: { type?: string };
+        };
+      };
+    };
+  };
+}
+
+interface PayMongoCheckoutSession {
+  id: string;
+  type: string;
+  attributes: {
+    checkout_url: string;
+    [key: string]: unknown;
+  };
+}
+
 export class PayMongoProvider implements PaymentProvider {
   readonly providerName = "paymongo";
   private baseUrl = "https://api.paymongo.com/v1";
@@ -193,7 +233,7 @@ export class PayMongoProvider implements PaymentProvider {
     }
   }
 
-  parseWebhookEvent(payload: any): ParsedWebhookEvent | null {
+  parseWebhookEvent(payload: PayMongoWebhookPayload): ParsedWebhookEvent | null {
     if (!payload?.data) return null;
 
     const eventId = payload.data.id;
@@ -268,7 +308,9 @@ export class PayMongoProvider implements PaymentProvider {
     };
   }
 
-  async getCheckoutSession(checkoutSessionId: string): Promise<any> {
+  async getCheckoutSession(
+    checkoutSessionId: string
+  ): Promise<PayMongoCheckoutSession> {
     const response = await fetch(
       `${this.baseUrl}/checkout_sessions/${checkoutSessionId}`,
       {
@@ -289,4 +331,3 @@ export class PayMongoProvider implements PaymentProvider {
     return data.data;
   }
 }
-
