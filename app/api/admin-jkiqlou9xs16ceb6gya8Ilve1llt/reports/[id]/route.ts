@@ -4,6 +4,7 @@ import { requireAdmin } from "@/lib/admin/requireAdmin";
 import { createServiceClient } from "@/utils/supabase/service";
 
 const VALID_STATUSES = ["pending", "reviewing", "resolved", "dismissed"];
+const AUTO_SUSPEND_STRIKE_THRESHOLD = 3;
 
 export async function PATCH(
   request: Request,
@@ -82,9 +83,13 @@ export async function PATCH(
   }
 
   // Apply the strike delta to the reported user's profile, matching whatever
-  // we just committed on the report row.
+  // we just committed on the report row. If a strike just pushed the user to
+  // the auto-suspend threshold, soft-suspend them automatically.
   if (movingIntoResolved && !existing.strike_counted) {
-    await incrementStrikes(supabase, existing.reported_user_id, 1);
+    const nextCount = await incrementStrikes(supabase, existing.reported_user_id, 1);
+    if (nextCount !== null && nextCount >= AUTO_SUSPEND_STRIKE_THRESHOLD) {
+      await autoSoftSuspendIfNeeded(supabase, existing.reported_user_id, nextCount);
+    }
   } else if (movingOutOfResolved && existing.strike_counted) {
     await incrementStrikes(supabase, existing.reported_user_id, -1);
   }
@@ -92,11 +97,15 @@ export async function PATCH(
   return NextResponse.json(data);
 }
 
+/**
+ * Adjusts report_strikes by delta (floored at 0) and returns the resulting
+ * count, or null if the update couldn't be applied.
+ */
 async function incrementStrikes(
   supabase: NonNullable<ReturnType<typeof createServiceClient>>,
   userId: string,
   delta: 1 | -1
-) {
+): Promise<number | null> {
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("report_strikes")
@@ -105,7 +114,7 @@ async function incrementStrikes(
 
   if (profileError || !profile) {
     console.error("Failed to load profile for strike update:", profileError);
-    return;
+    return null;
   }
 
   const nextCount = Math.max(0, (profile.report_strikes ?? 0) + delta);
@@ -117,6 +126,43 @@ async function incrementStrikes(
 
   if (updateError) {
     console.error("Failed to update strike count:", updateError);
+    return null;
   }
+
+  return nextCount;
 }
 
+/**
+ * Once a user hits AUTO_SUSPEND_STRIKE_THRESHOLD strikes, automatically move
+ * them to a soft suspension — but only if they aren't already suspended, so
+ * this never downgrades a hard suspension an admin applied manually.
+ */
+async function autoSoftSuspendIfNeeded(
+  supabase: NonNullable<ReturnType<typeof createServiceClient>>,
+  userId: string,
+  strikeCount: number
+) {
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("suspension_status")
+    .eq("id", userId)
+    .single();
+
+  if (profileError || !profile || profile.suspension_status !== "none") {
+    return;
+  }
+
+  const { error: suspendError } = await supabase
+    .from("profiles")
+    .update({
+      suspension_status: "soft",
+      suspended_at: new Date().toISOString(),
+      suspension_reason: `Automatically soft-suspended after reaching ${strikeCount} report strikes.`,
+      suspended_by: "system",
+    })
+    .eq("id", userId);
+
+  if (suspendError) {
+    console.error("Failed to auto-suspend user:", suspendError);
+  }
+}

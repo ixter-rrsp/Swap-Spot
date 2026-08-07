@@ -289,6 +289,58 @@
   flex-wrap: wrap;
 }
 
+.suspendActions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.suspendSoftBtn,
+.suspendHardBtn,
+.suspendLiftBtn {
+  border: none;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.suspendSoftBtn {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.suspendSoftBtn:hover {
+  background: #fed7aa;
+}
+
+.suspendHardBtn {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.suspendHardBtn:hover {
+  background: #fecaca;
+}
+
+.suspendLiftBtn {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.suspendLiftBtn:hover {
+  background: #bbf7d0;
+}
+
+.suspendSoftBtn:disabled,
+.suspendHardBtn:disabled,
+.suspendLiftBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .saveNotes,
 .actionBtn,
 .resolveBtn,

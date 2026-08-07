@@ -15,6 +15,9 @@ interface ProfileRef {
   avatar_url: string | null;
   badge?: string;
   report_strikes?: number;
+  suspension_status?: "none" | "soft" | "hard";
+  suspension_reason?: string | null;
+  suspended_by?: string | null;
 }
 
 interface Report {
@@ -57,6 +60,7 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [suspendingId, setSuspendingId] = useState<string | null>(null);
   const [notesDraft, setNotesDraft] = useState<Record<string, string>>({});
 
   const loadReports = useCallback(async () => {
@@ -115,6 +119,41 @@ export default function AdminDashboardPage() {
       setError(err instanceof Error ? err.message : "Failed to update report.");
     } finally {
       setSavingId(null);
+    }
+  }
+
+  async function updateSuspension(
+    userId: string,
+    action: "soft" | "hard" | "unrestrict"
+  ) {
+    if (action === "hard") {
+      const confirmed = window.confirm(
+        "Hard suspend this user? They'll be locked out of their account entirely."
+      );
+      if (!confirmed) return;
+    }
+
+    setSuspendingId(userId);
+    try {
+      const response = await fetch(
+        `/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/users/${userId}/suspend`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action }),
+        }
+      );
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || "Failed to update suspension.");
+      }
+
+      await loadReports();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update suspension.");
+    } finally {
+      setSuspendingId(null);
     }
   }
 
@@ -229,6 +268,81 @@ export default function AdminDashboardPage() {
                       {report.reported.report_strikes} strike
                       {report.reported.report_strikes === 1 ? "" : "s"}
                     </span>
+                  )}
+                  {report.reported && report.reported.suspension_status !== "none" && (
+                    <span
+                      className={styles.badgeStatus}
+                      data-status={report.reported.suspension_status}
+                      style={{ marginTop: 4, marginRight: 0 }}
+                    >
+                      {report.reported.suspension_status === "hard"
+                        ? "Hard Suspended"
+                        : "Soft Suspended"}
+                    </span>
+                  )}
+                  {report.reported && (
+                    <div className={styles.suspendActions}>
+                      {report.reported.suspension_status === "none" && (
+                        <>
+                          <button
+                            type="button"
+                            className={styles.suspendSoftBtn}
+                            disabled={suspendingId === report.reported.id}
+                            onClick={() =>
+                              updateSuspension(report.reported!.id, "soft")
+                            }
+                          >
+                            Soft Suspend
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.suspendHardBtn}
+                            disabled={suspendingId === report.reported.id}
+                            onClick={() =>
+                              updateSuspension(report.reported!.id, "hard")
+                            }
+                          >
+                            Hard Suspend
+                          </button>
+                        </>
+                      )}
+                      {report.reported.suspension_status === "soft" && (
+                        <>
+                          <button
+                            type="button"
+                            className={styles.suspendHardBtn}
+                            disabled={suspendingId === report.reported.id}
+                            onClick={() =>
+                              updateSuspension(report.reported!.id, "hard")
+                            }
+                          >
+                            Escalate to Hard
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.suspendLiftBtn}
+                            disabled={suspendingId === report.reported.id}
+                            onClick={() =>
+                              updateSuspension(report.reported!.id, "unrestrict")
+                            }
+                          >
+                            Lift Suspension
+                          </button>
+                        </>
+                      )}
+                      {report.reported.suspension_status === "hard" && (
+                        <button
+                          type="button"
+                          className={styles.suspendLiftBtn}
+                          disabled={suspendingId === report.reported.id}
+                          onClick={() =>
+                            updateSuspension(report.reported!.id, "unrestrict")
+                          }
+                        >
+                          Lift Suspension
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
