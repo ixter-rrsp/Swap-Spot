@@ -70,7 +70,7 @@ export async function createListing(
     }
   } catch (err: unknown) {
     if (
-      err.message &&
+      err instanceof Error &&
       (err.message.includes("Listing limit reached") ||
         err.message.includes("overage") ||
         err.message.includes("extra-post payment"))
