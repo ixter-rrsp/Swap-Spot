@@ -43,7 +43,8 @@ export async function GET() {
           avatarUrl: ag.otherUser.avatarUrl || null,
           rating: 0,
           badge: "Member",
-          city: "",
+          city: ag.otherUser.city || "",
+          isVerified: ag.otherUser.isVerified ?? false,
         },
       } as Listing;
     });
