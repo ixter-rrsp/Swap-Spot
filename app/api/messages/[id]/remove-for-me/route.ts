@@ -11,10 +11,10 @@ export async function PATCH(
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     console.error("Error removing message for user:", error);
+    const message = error instanceof Error ? error.message : "Failed to remove message.";
     return NextResponse.json(
-      { error: error?.message || "Failed to remove message." },
+      { error: message },
       { status: 400 }
     );
   }
 }
-

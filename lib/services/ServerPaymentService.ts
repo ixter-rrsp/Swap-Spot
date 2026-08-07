@@ -229,7 +229,7 @@ export class ServerPaymentService {
         }
       }
     } catch (err: unknown) {
-      paymentUpdateError = err.message || "Failed to update payment";
+      paymentUpdateError = err instanceof Error ? err.message : "Failed to update payment";
     }
 
     // 4. Record webhook in payment_webhooks table for audit and idempotency
@@ -268,7 +268,7 @@ export class ServerPaymentService {
     currency: string;
     purpose: string;
     referenceId?: string | null;
-    metadata?: any;
+    metadata?: Record<string, unknown> | null;
     paidAt?: string | null;
   }> {
     const supabase = await createServerClient();
@@ -514,7 +514,7 @@ export class ServerPaymentService {
         reconciled += 1;
       } catch (err: unknown) {
         console.error(`Reconciliation failed for payment ${payment.id}:`, err);
-        errors.push(`${payment.id}: ${err.message || "unknown error"}`);
+        errors.push(`${payment.id}: ${err instanceof Error ? err.message : "unknown error"}`);
       }
     }
 
