@@ -105,6 +105,31 @@
   cursor: default;
 }
 
+.reportButton {
+  flex: 0 0 auto;
+  width: 44px;
+  padding: 0;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  transition: background 0.15s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.reportButton:hover {
+  background: rgba(185, 28, 28, 0.85);
+}
+
+.reportButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .bio {
   margin: 10px 4px 0;
   max-width: 320px;

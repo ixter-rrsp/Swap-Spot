@@ -11,7 +11,7 @@ export default function ContactPage() {
         {/* Introduction */}
         <section className={styles.intro}>
           <p className={styles.introText}>
-            We'd love to hear from you! Whether you have questions, feedback, or need support, our team is here to help. Reach out to us using the information below.
+            We&apos;d love to hear from you! Whether you have questions, feedback, or need support, our team is here to help. Reach out to us using the information below.
           </p>
         </section>
 
@@ -52,7 +52,7 @@ export default function ContactPage() {
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Suggestions & Feedback</h2>
           <p className={styles.text}>
-            Have an idea to improve SwapSpot? We love hearing suggestions from our community! Please send us your ideas, and we'll review them carefully.
+            Have an idea to improve SwapSpot? We love hearing suggestions from our community! Please send us your ideas, and we&apos;ll review them carefully.
           </p>
           <div className={styles.closingMessage}>
             <p>

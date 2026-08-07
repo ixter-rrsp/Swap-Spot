@@ -6,6 +6,10 @@ import {
 import {
   createClient,
 } from "@/utils/supabase/middleware";
+import {
+  ADMIN_SESSION_COOKIE,
+  verifyAdminSessionToken,
+} from "@/lib/admin/session";
 
 
 export async function middleware(
@@ -26,6 +30,35 @@ export async function middleware(
 
   const pathname =
     request.nextUrl.pathname;
+
+  // --- Hidden admin dashboard gate (hardcoded-credential session, separate
+  // from the Supabase auth used above) ---
+  const isAdminApiRoute =
+    pathname.startsWith("/api/admin-x9k2p/") &&
+    !pathname.startsWith("/api/admin-x9k2p/login");
+
+  const isAdminDashboardRoute = pathname.startsWith(
+    "/admin-x9k2p/dashboard"
+  );
+
+  if (isAdminApiRoute || isAdminDashboardRoute) {
+    const adminToken = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
+    const adminUsername = await verifyAdminSessionToken(adminToken);
+
+    if (!adminUsername) {
+      if (isAdminApiRoute) {
+        return NextResponse.json(
+          { error: "Unauthorized" },
+          { status: 401 }
+        );
+      }
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/admin-x9k2p";
+      return NextResponse.redirect(loginUrl);
+    }
+
+    return response;
+  }
 
   const isProtected =
     pathname === "/profile" ||
@@ -73,5 +106,7 @@ export const config = {
     "/onboarding/:path*",
     "/saved/:path*",
     "/Listing/:path*/edit",
+    "/admin-x9k2p/dashboard/:path*",
+    "/api/admin-x9k2p/:path*",
   ],
 };

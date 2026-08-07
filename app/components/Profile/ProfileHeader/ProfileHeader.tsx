@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, Heart } from "lucide-react";
+import { Menu, Heart, Flag } from "lucide-react";
 import MenuDrawer from "@/app/components/UI/MenuDrawer";
 import { SUBSCRIPTION_PLANS } from "@/lib/subscriptions/plans";
 import MessageUserModal from "@/app/components/Profile/MessageUserModal/MessageUserModal";
+import ReportUserModal from "@/app/components/Profile/ReportUserModal/ReportUserModal";
 
 import BackButton from "@/app/components/UI/BackButton/BackButton";
 
@@ -44,6 +45,7 @@ export default function ProfileHeader({
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [messageModalOpen, setMessageModalOpen] = useState(false);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
   const [optimisticAvatar, setOptimisticAvatar] = useState<string | null | undefined>(null);
   const localAvatar = avatarUrl ?? optimisticAvatar;
 
@@ -178,6 +180,17 @@ export default function ProfileHeader({
           >
             Message
           </button>
+
+          <button
+            type="button"
+            className={styles.reportButton}
+            onClick={() => setReportModalOpen(true)}
+            disabled={!profileUserId}
+            aria-label={`Report ${username}`}
+            title="Report user"
+          >
+            <Flag size={18} />
+          </button>
         </div>
       )}
 
@@ -193,6 +206,14 @@ export default function ProfileHeader({
         profileUserId={profileUserId}
         profileUsername={username}
         onClose={() => setMessageModalOpen(false)}
+      />
+    )}
+
+    {reportModalOpen && profileUserId && (
+      <ReportUserModal
+        reportedUserId={profileUserId}
+        reportedUsername={username}
+        onClose={() => setReportModalOpen(false)}
       />
     )}
     </>
