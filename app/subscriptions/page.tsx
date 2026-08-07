@@ -6,6 +6,7 @@ import { CheckCircle2, ShieldCheck, Zap, AlertCircle, Loader2 } from "lucide-rea
 import { SUBSCRIPTION_PLANS, PlanId, SubscriptionPlanConfig } from "@/lib/subscriptions/plans";
 import { SubscriptionService, SubscriptionResponse } from "@/lib/services/SubscriptionService";
 import { PaymentService } from "@/lib/services/PaymentService";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 
 import PageHeader from "@/app/components/UI/PageHeader/PageHeader";
@@ -19,6 +20,23 @@ function SubscriptionsContent() {
   const [loading, setLoading] = useState<boolean>(true);
   const [submittingPlanId, setSubmittingPlanId] = useState<string | null>(null);
   const [bannerMessage, setBannerMessage] = useState<{ type: "success" | "cancelled" | "error"; text: string } | null>(null);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    // Create an extra history entry so the first Back press stays in our app.
+    window.history.pushState(null, "", window.location.href);
+
+    const handlePopState = () => {
+      router.replace("/");
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [router]);
 
   useEffect(() => {
     async function loadData() {
@@ -49,7 +67,7 @@ function SubscriptionsContent() {
               type: "success",
               text: "🎉 Payment verified! Your new subscription plan has been successfully activated.",
             });
-          } catch (err: any) {
+          } catch (err: unknown) {
             console.warn("Payment verification on landing failed:", err);
             setBannerMessage({
               type: "error",
@@ -65,7 +83,7 @@ function SubscriptionsContent() {
 
         const sub = await SubscriptionService.getCurrentSubscription();
         setCurrentSub(sub);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Failed to load active subscription:", err);
       } finally {
         setLoading(false);
@@ -82,9 +100,10 @@ function SubscriptionsContent() {
       setSubmittingPlanId(planId);
       const { checkoutUrl } = await SubscriptionService.initiateCheckout(planId);
       // Redirect to PayMongo Checkout Sandbox
-      window.location.href = checkoutUrl;
-    } catch (err: any) {
-      alert(err.message || "Failed to start checkout. Please try again.");
+      window.location.assign(checkoutUrl);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      alert(msg || "Failed to start checkout. Please try again.");
       setSubmittingPlanId(null);
     }
   };
@@ -98,12 +117,13 @@ function SubscriptionsContent() {
 
   return (
     <div className={styles.container}>
-        <PageHeader
+      <PageHeader
           title="SwapSpot Membership Plans"
-          subtitle="Unlock unlimited item listings, gain trusted badges, and maximize your swapping reach."
+          subtitle="Unlock unlimited item listings..."
           showBack
           align="center"
-        />
+          onBack={() => router.replace("/")}
+      />
 
       {bannerMessage && (
         <div

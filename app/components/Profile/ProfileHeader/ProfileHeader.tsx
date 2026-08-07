@@ -146,7 +146,13 @@ export default function ProfileHeader({
       </h2>
 
       {badge && (
-        <span className={styles.badge}>
+        <span
+          className={styles.badge}
+          style={{
+            background: matchedPlan?.badgeBg,
+            color: matchedPlan?.badgeColor,
+          }}
+        >
           {badge}
         </span>
       )}

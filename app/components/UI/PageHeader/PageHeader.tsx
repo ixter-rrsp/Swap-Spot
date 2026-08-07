@@ -9,19 +9,32 @@ interface PageHeaderProps {
   action?: React.ReactNode;
   showBack?: boolean;
   align?: "left" | "center";
+
+  // NEW
+  backHref?: string;
+  onBack?: () => void;
 }
 
-export default function PageHeader({ title, subtitle, action, showBack, align = "left" }: PageHeaderProps) {
+export default function PageHeader({
+  title,
+  subtitle,
+  action,
+  showBack,
+  align = "left",
+  backHref,
+  onBack,
+}: PageHeaderProps){
   const isCentered = align === "center";
 
   return (
     <div className={`${styles.header} ${isCentered ? styles.headerCentered : ""}`}>
       {/* Back button — always in flow, never absolute */}
-      {showBack && (
-        <div className={styles.backButtonWrap}>
-          <BackButton variant="inline" className={styles.backButton} />
-        </div>
-      )}
+        {showBack && (
+          <BackButton
+            href={backHref}
+            onBack={onBack}
+          />
+        )}
 
       <div className={`${styles.copy} ${isCentered ? styles.copyCentered : ""}`}>
         <div className={`${styles.titleRow} ${isCentered ? styles.titleRowCentered : ""}`}>

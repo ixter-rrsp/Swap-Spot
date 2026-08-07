@@ -21,7 +21,7 @@ export const SUBSCRIPTION_PLANS: Record<PlanId, SubscriptionPlanConfig> = {
     durationMonths: null,
     maxActiveListings: 5,
     badgeName: "FREE",
-    badgeColor: "white", // Gray
+    badgeColor: "#ffffff",
     badgeBg: "#4b5563",
     description: "Default plan for all SwapSpot members.",
     features: [
@@ -38,8 +38,8 @@ export const SUBSCRIPTION_PLANS: Record<PlanId, SubscriptionPlanConfig> = {
     durationMonths: 1,
     maxActiveListings: 25,
     badgeName: "Basic",
-    badgeColor: "#059669", // Emerald Green
-    badgeBg: "#d1fae5",
+    badgeColor: "#ffffff",
+    badgeBg: "#16a34a",
     description: "Perfect for active swappers looking to list more items.",
     features: [
       "Up to 25 item listings",
@@ -55,8 +55,8 @@ export const SUBSCRIPTION_PLANS: Record<PlanId, SubscriptionPlanConfig> = {
     durationMonths: 3,
     maxActiveListings: 50,
     badgeName: "Premium",
-    badgeColor: "white", // Silver / Slate
-    badgeBg: "#A855F7",
+    badgeColor: "#111827",
+    badgeBg: "#d1d5db",
     description: "Great value for power users and frequent traders.",
     features: [
       "Up to 50 item listings",
@@ -72,8 +72,8 @@ export const SUBSCRIPTION_PLANS: Record<PlanId, SubscriptionPlanConfig> = {
     durationMonths: 12,
     maxActiveListings: null, // Unlimited
     badgeName: "VIP",
-    badgeColor: "#d97706", // Gold / Amber
-    badgeBg: "#fef3c7",
+    badgeColor: "#111827",
+    badgeBg: "#facc15",
     description: "Ultimate membership with full year benefits and maximum trust.",
     features: [
       "Unlimited item listings",
