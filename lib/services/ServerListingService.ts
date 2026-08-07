@@ -203,6 +203,18 @@ export async function getMyListingsForSwap(): Promise<Listing[]> {
 export async function getListingsByOwner(ownerId: string, limit?: number): Promise<Listing[]> {
   const supabase = await createClient();
 
+  // A suspended user's listings are hidden from every public surface —
+  // return early instead of querying listings at all.
+  const { data: ownerProfile } = await supabase
+    .from("profiles")
+    .select("suspension_status")
+    .eq("id", ownerId)
+    .maybeSingle();
+
+  if (ownerProfile?.suspension_status && ownerProfile.suspension_status !== "none") {
+    return [];
+  }
+
   let query = supabase
     .from("listings")
     .select(`
@@ -288,7 +300,8 @@ export async function getListingById(id: string) {
         rating,
         badge,
         is_verified,
-        city
+        city,
+        suspension_status
       )
     `)
     .eq("id", id)
@@ -357,6 +370,7 @@ export async function getListingById(id: string) {
       badge: data.profiles.badge,
       isVerified: data.profiles.is_verified ?? false,
       city: data.profiles.city,
+      suspensionStatus: data.profiles.suspension_status ?? "none",
     },
   };
 }
@@ -386,7 +400,7 @@ export async function getListings(options: GetListingsOptions = {}) {
         image_url,
         sort_order
       ),
-        profiles (
+        profiles!inner (
           id,
           username,
           full_name,
@@ -396,11 +410,13 @@ export async function getListings(options: GetListingsOptions = {}) {
           is_verified,
           city,
           latitude,
-          longitude
+          longitude,
+          suspension_status
         )
     `)
     .eq("traded", false)
     .is("locked_at", null)
+    .eq("profiles.suspension_status", "none")
     .order("created_at", {
       ascending: false,
     });
@@ -505,7 +521,7 @@ export async function getBoostedListings() {
         image_url,
         sort_order
       ),
-      profiles (
+      profiles!inner (
         id,
         username,
         full_name,
@@ -515,12 +531,14 @@ export async function getBoostedListings() {
         is_verified,
         city,
         latitude,
-        longitude
+        longitude,
+        suspension_status
       )
     `)
     .eq("traded", false)
     .is("locked_at", null)
     .eq("boosted", true)
+    .eq("profiles.suspension_status", "none")
     .gt("boost_expires_at", nowIso)
     .order("boost_expires_at", { ascending: false });
 

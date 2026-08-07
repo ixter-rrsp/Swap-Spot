@@ -81,6 +81,17 @@ export default async function ListingPage({
 
   }
 
+  // A soft/hard-suspended owner's listings are hidden from the public —
+  // only the owner themself can still open the direct link (e.g. to delete
+  // it or see why it's no longer visible to others).
+  if (
+    listing.owner.suspensionStatus &&
+    listing.owner.suspensionStatus !== "none" &&
+    currentUserId !== listing.owner.id
+  ) {
+    notFound();
+  }
+
 
 
   const pendingRequest =

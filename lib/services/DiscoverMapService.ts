@@ -82,7 +82,7 @@ export async function getMapVisibleListings(): Promise<Listing[]> {
         image_url,
         sort_order
       ),
-      profiles (
+      profiles!inner (
         id,
         username,
         full_name,
@@ -90,10 +90,12 @@ export async function getMapVisibleListings(): Promise<Listing[]> {
         rating,
         badge,
         is_verified,
-        city
+        city,
+        suspension_status
       )
     `)
     .eq("show_on_map", true)
+    .eq("profiles.suspension_status", "none")
     .order("created_at", {
       ascending: false,
     });

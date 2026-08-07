@@ -103,7 +103,7 @@ export async function getNearbyListings(): Promise<Listing[]> {
         image_url,
         sort_order
       ),
-      profiles (
+      profiles!inner (
         id,
         username,
         full_name,
@@ -112,11 +112,13 @@ export async function getNearbyListings(): Promise<Listing[]> {
         badge,
         city,
         latitude,
-        longitude
+        longitude,
+        suspension_status
       )
     `)
     .eq("traded", false)
     .is("locked_at", null)
+    .eq("profiles.suspension_status", "none")
     .neq("owner_id", user.id)
     .order("created_at", { ascending: false });
 

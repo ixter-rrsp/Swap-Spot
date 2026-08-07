@@ -70,4 +70,6 @@ export interface ListingOwner {
   latitude?: number | null;
 
   longitude?: number | null;
+
+  suspensionStatus?: "none" | "soft" | "hard";
 }
