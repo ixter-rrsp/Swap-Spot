@@ -89,6 +89,7 @@ export async function getMapVisibleListings(): Promise<Listing[]> {
         avatar_url,
         rating,
         badge,
+        is_verified,
         city
       )
     `)
@@ -210,6 +211,7 @@ export async function getMapVisibleListings(): Promise<Listing[]> {
             avatarUrl: profile.avatar_url,
             rating: profile.rating,
             badge: profile.badge,
+            isVerified: (profile as any).is_verified ?? false,
             city: profile.city,
           }
         : {
@@ -219,6 +221,7 @@ export async function getMapVisibleListings(): Promise<Listing[]> {
             avatarUrl: null,
             rating: 0,
             badge: "Member",
+            isVerified: false,
             city: listing.city,
           },
       showOnMap: listing.show_on_map ?? true,
