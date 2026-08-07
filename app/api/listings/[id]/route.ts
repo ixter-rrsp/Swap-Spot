@@ -14,10 +14,10 @@ export async function GET(
     const { id } = await params;
     const listing = await getListingById(id);
     return NextResponse.json(listing, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("GET /api/listings/[id] error:", error);
     return NextResponse.json(
-      { error: error.message || "Listing not found." },
+      { error: (error as Error).message || "Listing not found." },
       { status: 404 }
     );
   }
@@ -56,12 +56,12 @@ export async function PATCH(
     });
 
     return NextResponse.json(updated, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("PATCH /api/listings/[id] error:", error);
 
-    const isForbidden = error.message?.includes("not allowed");
+    const isForbidden = (error as Error).message?.includes("not allowed");
     return NextResponse.json(
-      { error: error.message || "Failed to update listing." },
+      { error: (error as Error).message || "Failed to update listing." },
       { status: isForbidden ? 403 : 400 }
     );
   }
@@ -88,12 +88,12 @@ export async function DELETE(
     await deleteListing(id);
 
     return NextResponse.json({ success: true }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("DELETE /api/listings/[id] error:", error);
 
-    const isForbidden = error.message?.includes("not allowed");
+    const isForbidden = (error as Error).message?.includes("not allowed");
     return NextResponse.json(
-      { error: error.message || "Failed to delete listing." },
+      { error: (error as Error).message || "Failed to delete listing." },
       { status: isForbidden ? 403 : 400 }
     );
   }

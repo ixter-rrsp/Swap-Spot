@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   try {
     const status = await getAgreementReviewStatus(agreementId);
     return NextResponse.json(status);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching review status:", error);
     return NextResponse.json(
       { error: "Failed to fetch review status" },
@@ -23,3 +23,4 @@ export async function GET(request: Request) {
     );
   }
 }
+

@@ -68,7 +68,7 @@ export async function createListing(
         }
       }
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (
       err.message &&
       (err.message.includes("Listing limit reached") ||

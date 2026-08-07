@@ -20,11 +20,12 @@ export async function POST(request: Request) {
       { received: true, result },
       { status: result.status === "failed" ? 400 : 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Webhook processing error:", error);
     return NextResponse.json(
-      { error: error.message || "Webhook handling failed." },
+      { error: (error as Error).message || "Webhook handling failed." },
       { status: 500 }
     );
   }
 }
+

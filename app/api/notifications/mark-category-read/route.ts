@@ -28,10 +28,13 @@ export async function POST(request: Request) {
     await markNotificationsByCategoryAsRead(category);
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error marking category as read:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to mark category as read." },
+      {
+        error:
+          (error as Error).message || "Failed to mark category as read.",
+      },
       { status: 500 }
     );
   }

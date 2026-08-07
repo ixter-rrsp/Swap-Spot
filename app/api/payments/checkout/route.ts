@@ -66,11 +66,12 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(checkoutResult, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating payment checkout session:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to create payment checkout session." },
+      { error: (error as Error).message || "Failed to create payment checkout session." },
       { status: 500 }
     );
   }
 }
+

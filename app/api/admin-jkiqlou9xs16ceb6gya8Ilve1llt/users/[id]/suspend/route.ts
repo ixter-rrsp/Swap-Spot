@@ -73,8 +73,9 @@ export async function POST(
 
   if (error) {
     console.error("Error updating suspension status:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 
   return NextResponse.json(data);
 }
+

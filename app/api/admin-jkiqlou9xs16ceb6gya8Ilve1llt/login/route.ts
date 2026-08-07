@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     let valid: boolean;
     try {
       valid = verifyAdminCredentials(username, password);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       return NextResponse.json(
         { error: "Admin auth is not configured on the server." },
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     });
 
     return response;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Admin login error:", error);
     return NextResponse.json({ error: "Login failed." }, { status: 500 });
   }

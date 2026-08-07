@@ -34,10 +34,10 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({ ok: true, ...result }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("[reconcile-payments] Failed:", error);
     return NextResponse.json(
-      { error: error.message || "Reconciliation failed." },
+      { error: (error as Error).message || "Reconciliation failed." },
       { status: 500 }
     );
   }

@@ -50,10 +50,10 @@ export async function GET() {
     });
 
     return NextResponse.json(receivedOffers);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching received offers:", error);
     return NextResponse.json(
-      { error: "Failed to fetch received offers" },
+      { error: (error as Error).message || "Failed to fetch received offers" },
       { status: 500 }
     );
   }

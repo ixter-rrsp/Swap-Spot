@@ -45,7 +45,9 @@ export default function AgreementPage() {
   }, [id, router]);
 
   useEffect(() => {
-    void load();
+    queueMicrotask(() => {
+      void load();
+    });
   }, [load]);
 
   if (loading) {

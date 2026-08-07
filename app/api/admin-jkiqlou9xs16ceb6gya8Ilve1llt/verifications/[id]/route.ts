@@ -40,7 +40,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Verification request not found." }, { status: 404 });
   }
 
-  const update: Record<string, any> = {};
+  const update: Record<string, unknown> = {};
   if (status) {
     update.status = status;
     update.reviewed_by = admin;
@@ -63,7 +63,7 @@ export async function PATCH(
 
   if (error) {
     console.error("Error updating verification request:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 
   // Approving flips the badge on; rejecting (or moving back to pending)
@@ -92,3 +92,4 @@ export async function PATCH(
 
   return NextResponse.json(data);
 }
+

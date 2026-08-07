@@ -6,10 +6,10 @@ export async function GET() {
   try {
     const unreadCount = await getUnreadActivityCount();
     return NextResponse.json({ unreadCount });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching unread count:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch unread count." },
+      { error: (error as Error).message || "Failed to fetch unread count." },
       { status: 500 }
     );
   }
@@ -28,11 +28,12 @@ export async function POST() {
 
     await markAllNotificationsAsRead();
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error marking all notifications as read:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to mark notifications as read." },
+      { error: (error as Error).message || "Failed to mark notifications as read." },
       { status: 500 }
     );
   }
 }
+

@@ -33,10 +33,10 @@ export async function POST(request: Request) {
     );
 
     return NextResponse.json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in /api/location/reverse:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to resolve location." },
+      { error: (error as Error).message || "Failed to resolve location." },
       { status: 500 }
     );
   }

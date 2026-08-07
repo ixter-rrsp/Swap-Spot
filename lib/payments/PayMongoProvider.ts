@@ -185,10 +185,10 @@ export class PayMongoProvider implements PaymentProvider {
         payload,
         error: isValid ? undefined : "HMAC signature comparison failed",
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       return {
         isValid: false,
-        error: err.message || "Failed to verify webhook signature",
+        error: (err as Error).message || "Failed to verify webhook signature",
       };
     }
   }
@@ -289,3 +289,4 @@ export class PayMongoProvider implements PaymentProvider {
     return data.data;
   }
 }
+

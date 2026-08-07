@@ -27,10 +27,10 @@ export async function GET(request: Request) {
 
     const messages = await getConversationMessages(conversationId, limit, before);
     return NextResponse.json(messages);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching messages:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch messages" },
+      { error: (error as Error).message || "Failed to fetch messages" },
       { status: 500 }
     );
   }
@@ -82,10 +82,10 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error sending message:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to send message." },
+      { error: (error as Error).message || "Failed to send message." },
       { status: 500 }
     );
   }

@@ -9,10 +9,11 @@ export async function PATCH(
     const { id } = await params;
     await unsendMessage(id);
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error unsending message:", error);
-    const message = error?.message || "Failed to unsend message.";
+    const message = (error as Error).message || "Failed to unsend message.";
     const status = message.includes("only unsend your own") ? 403 : 400;
     return NextResponse.json({ error: message }, { status });
   }
 }
+

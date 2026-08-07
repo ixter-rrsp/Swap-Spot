@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   try {
     const reviews = await getRecentReviews(userId, 5);
     return NextResponse.json(reviews);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching recent reviews:", error);
     return NextResponse.json(
       { error: "Failed to fetch reviews" },
@@ -23,3 +23,4 @@ export async function GET(request: Request) {
     );
   }
 }
+

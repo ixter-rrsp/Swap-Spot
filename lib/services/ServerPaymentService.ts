@@ -228,7 +228,7 @@ export class ServerPaymentService {
           }
         }
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       paymentUpdateError = err.message || "Failed to update payment";
     }
 
@@ -512,7 +512,7 @@ export class ServerPaymentService {
         }
 
         reconciled += 1;
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(`Reconciliation failed for payment ${payment.id}:`, err);
         errors.push(`${payment.id}: ${err.message || "unknown error"}`);
       }

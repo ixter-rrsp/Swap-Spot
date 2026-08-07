@@ -25,6 +25,7 @@ const HIDDEN_ON = [
   "/terms",
   "/privacy",
   "/contact",
+  "/admin-jkiqlou9xs16ceb6gya8Ilve1llt",
 ];
 const HIDDEN_EXACT = ["/"];
 
@@ -32,19 +33,22 @@ interface ConditionalNavbarProps {
   unreadCount: number;
 }
 
+type SupabaseRealtimePayload<Row = Record<string, unknown>> = {
+  eventType?: string;
+  event?: string;
+  type?: string;
+  new?: Row | null;
+  old?: Row | null;
+};
+
 export default function ConditionalNavbar({
   unreadCount,
 }: ConditionalNavbarProps) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "/";
   // Always start at 0 so the very first client render matches the server
   // render exactly, regardless of session/auth timing. The real count is
-  // synced in immediately after mount via the effect below.
-  const [localUnread, setLocalUnread] = useState(0);
-
-  useEffect(() => {
-    setLocalUnread(unreadCount ?? 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // synced in immediately after mount via the initial state below.
+  const [localUnread, setLocalUnread] = useState<number>(() => unreadCount ?? 0);
 
   const shouldHide =
     HIDDEN_EXACT.includes(pathname) ||
@@ -57,8 +61,10 @@ export default function ConditionalNavbar({
 
   useEffect(() => {
     if (pathname === "/notifications") {
-      setLocalUnread(0);
-      fetch("/api/notifications/unread", { method: "POST" }).catch(() => {});
+      queueMicrotask(() => {
+        setLocalUnread(0);
+        fetch("/api/notifications/unread", { method: "POST" }).catch(() => {});
+      });
     }
   }, [pathname]);
 
@@ -76,7 +82,7 @@ export default function ConditionalNavbar({
         const data = await res.json();
         if (!mounted) return;
         setLocalUnread(data.unreadCount ?? 0);
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
@@ -92,7 +98,7 @@ export default function ConditionalNavbar({
       unsubUnread = subscribeChannel(
         notifChannelName,
         { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
-        (payload: any) => {
+        (payload: SupabaseRealtimePayload<{ is_read?: boolean }>) => {
           const eventType = payload?.eventType || payload?.event || payload?.type;
           const newRow = payload?.new ?? null;
           const oldRow = payload?.old ?? null;
@@ -118,7 +124,7 @@ export default function ConditionalNavbar({
       unsubMessages = subscribeChannel(
         `messages:${user.id}`,
         { event: "*", schema: "public", table: "messages", filter: `receiver_id=eq.${user.id}` },
-        (payload: any) => {
+        (payload: SupabaseRealtimePayload<{ is_read?: boolean; sender_id?: string }>) => {
           const eventType = payload?.eventType || payload?.event || payload?.type;
           const newRow = payload?.new ?? null;
           const oldRow = payload?.old ?? null;
@@ -149,12 +155,12 @@ export default function ConditionalNavbar({
       mounted = false;
       try {
         unsubUnread?.();
-      } catch (e) {
+      } catch {
         // ignore
       }
       try {
         unsubMessages?.();
-      } catch (e) {
+      } catch {
         // ignore
       }
     };

@@ -32,11 +32,12 @@ export async function GET(request: Request) {
     );
 
     return NextResponse.json(verificationResult, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error verifying payment:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to verify payment." },
+      { error: (error as Error).message || "Failed to verify payment." },
       { status: 500 }
     );
   }
 }
+

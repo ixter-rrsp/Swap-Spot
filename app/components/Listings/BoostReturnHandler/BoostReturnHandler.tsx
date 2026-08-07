@@ -88,7 +88,7 @@ export default function BoostReturnHandler({
             text: "We received your payment redirect. Status update in progress — refresh in a moment.",
           });
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.warn("Boost payment verification failed:", err);
         setBanner({
           type: "error",
@@ -120,3 +120,4 @@ export default function BoostReturnHandler({
     </div>
   );
 }
+

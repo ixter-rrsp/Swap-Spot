@@ -22,10 +22,10 @@ export async function GET(request: Request) {
     const hasMore = listings.length > offset + PAGE_SIZE;
 
     return NextResponse.json({ listings: slice, hasMore });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching my listings:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch user listings." },
+      { error: (error as Error).message || "Failed to fetch user listings." },
       { status: 500 }
     );
   }

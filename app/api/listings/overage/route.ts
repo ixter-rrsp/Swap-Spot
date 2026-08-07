@@ -50,10 +50,10 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(checkoutResult, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating listing overage checkout:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to create overage checkout session." },
+      { error: (error as Error).message || "Failed to create overage checkout session." },
       { status: 500 }
     );
   }

@@ -48,7 +48,7 @@ export async function GET(request: Request) {
 
   if (error) {
     console.error("Error fetching reports:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 
   // proof_urls currently holds storage PATHS (bucket is private) — swap
@@ -62,3 +62,4 @@ export async function GET(request: Request) {
 
   return NextResponse.json(withSignedProofs);
 }
+

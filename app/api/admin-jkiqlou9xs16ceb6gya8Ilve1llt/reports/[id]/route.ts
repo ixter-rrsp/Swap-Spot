@@ -42,7 +42,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Report not found." }, { status: 404 });
   }
 
-  const update: Record<string, any> = {};
+  const update: Record<string, unknown> = {};
   if (status) {
     update.status = status;
     update.reviewed_by = admin;
@@ -78,7 +78,7 @@ export async function PATCH(
 
   if (error) {
     console.error("Error updating report:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 
   // Apply the strike delta to the reported user's profile, matching whatever
@@ -119,3 +119,4 @@ async function incrementStrikes(
     console.error("Failed to update strike count:", updateError);
   }
 }
+

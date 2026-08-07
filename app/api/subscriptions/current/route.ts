@@ -18,11 +18,12 @@ export async function GET() {
 
     const subscription = await ServerSubscriptionService.getActiveSubscription(user.id);
     return NextResponse.json({ subscription }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching current subscription:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch active subscription." },
+      { error: (error as Error).message || "Failed to fetch active subscription." },
       { status: 500 }
     );
   }
 }
+

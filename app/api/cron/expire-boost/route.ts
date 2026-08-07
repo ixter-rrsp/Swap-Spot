@@ -32,8 +32,9 @@ export async function GET(request: Request) {
 
   if (error) {
     console.error("Failed to expire stale boosts:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true }, { status: 200 });
 }
+

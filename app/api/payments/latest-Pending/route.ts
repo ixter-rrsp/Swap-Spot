@@ -60,11 +60,12 @@ export async function GET(request: Request) {
       purpose: payment.purpose,
       referenceId: payment.reference_id,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in latest-pending route:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to look up latest payment." },
+      { error: (error as Error).message || "Failed to look up latest payment." },
       { status: 500 }
     );
   }
 }
+

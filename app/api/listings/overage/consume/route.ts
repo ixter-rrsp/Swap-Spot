@@ -91,10 +91,10 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error consuming overage payment:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to consume overage payment." },
+      { error: (error as Error).message || "Failed to consume overage payment." },
       { status: 500 }
     );
   }

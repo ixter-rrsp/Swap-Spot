@@ -98,10 +98,10 @@ export async function POST(
     });
 
     return NextResponse.json(checkoutResult, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating listing boost checkout:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to create boost checkout session." },
+      { error: (error as Error).message || "Failed to create boost checkout session." },
       { status: 500 }
     );
   }

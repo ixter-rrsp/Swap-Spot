@@ -27,11 +27,12 @@ export async function GET(request: Request) {
       const notifications = await getNotifications();
       return NextResponse.json(notifications);
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching notifications:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch notifications." },
+      { error: (error as Error).message || "Failed to fetch notifications." },
       { status: 500 }
     );
   }
 }
+

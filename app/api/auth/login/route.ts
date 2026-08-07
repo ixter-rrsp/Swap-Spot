@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     });
 
     if (authError) {
-      return NextResponse.json({ error: authError.message }, { status: 400 });
+      return NextResponse.json({ error: (authError as Error).message }, { status: 400 });
     }
 
     const user = authData.user;
@@ -121,3 +121,4 @@ export async function POST(request: Request) {
     );
   }
 }
+
