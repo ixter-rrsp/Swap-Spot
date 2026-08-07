@@ -56,10 +56,13 @@ export async function createReport({
     .single();
 
   if (error) {
-    // Unique index blocks a second open report from the same reporter
-    // against the same user while one is still pending/reviewing.
+    // NOTE: if you still have idx_user_reports_unique_open on the DB, drop
+    // it (see migration below) — multiple reports per reporter/reported
+    // pair are allowed by design now, including simultaneous open ones.
     if (error.code === "23505") {
-      throw new Error("You've already reported this user. We're reviewing it.");
+      throw new Error(
+        "This report couldn't be submitted because of a database constraint. Please contact support."
+      );
     }
     throw new Error(error.message);
   }

@@ -52,7 +52,7 @@ export default function VerificationsPanel() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/admin-x9k2p/verifications?status=${tab}`);
+      const response = await fetch(`/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/verifications?status=${tab}`);
 
       if (!response.ok) {
         const body = await response.json().catch(() => null);
@@ -69,7 +69,10 @@ export default function VerificationsPanel() {
   }, [tab]);
 
   useEffect(() => {
-    void loadRequests();
+    const timeoutId = setTimeout(() => {
+      void loadRequests();
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [loadRequests]);
 
   async function updateRequest(
@@ -78,7 +81,7 @@ export default function VerificationsPanel() {
   ) {
     setSavingId(id);
     try {
-      const response = await fetch(`/api/admin-x9k2p/verifications/${id}`, {
+      const response = await fetch(`/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/verifications/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),

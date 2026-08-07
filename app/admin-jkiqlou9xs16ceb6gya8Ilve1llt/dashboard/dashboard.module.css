@@ -233,6 +233,11 @@
   margin: 0 0 10px;
 }
 
+.finalizedTag {
+  font-weight: 700;
+  color: #b91c1c;
+}
+
 .actions {
   display: flex;
   gap: 8px;

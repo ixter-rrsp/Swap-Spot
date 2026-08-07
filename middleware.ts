@@ -34,11 +34,11 @@ export async function middleware(
   // --- Hidden admin dashboard gate (hardcoded-credential session, separate
   // from the Supabase auth used above) ---
   const isAdminApiRoute =
-    pathname.startsWith("/api/admin-x9k2p/") &&
-    !pathname.startsWith("/api/admin-x9k2p/login");
+    pathname.startsWith("/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/") &&
+    !pathname.startsWith("/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/login");
 
   const isAdminDashboardRoute = pathname.startsWith(
-    "/admin-x9k2p/dashboard"
+    "/admin-jkiqlou9xs16ceb6gya8Ilve1llt/dashboard"
   );
 
   if (isAdminApiRoute || isAdminDashboardRoute) {
@@ -53,7 +53,7 @@ export async function middleware(
         );
       }
       const loginUrl = request.nextUrl.clone();
-      loginUrl.pathname = "/admin-x9k2p";
+      loginUrl.pathname = "/admin-jkiqlou9xs16ceb6gya8Ilve1llt";
       return NextResponse.redirect(loginUrl);
     }
 
@@ -123,7 +123,7 @@ export const config = {
     "/onboarding/:path*",
     "/saved/:path*",
     "/Listing/:path*/edit",
-    "/admin-x9k2p/dashboard/:path*",
-    "/api/admin-x9k2p/:path*",
+    "/admin-jkiqlou9xs16ceb6gya8Ilve1llt/dashboard/:path*",
+    "/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/:path*",
   ],
 };

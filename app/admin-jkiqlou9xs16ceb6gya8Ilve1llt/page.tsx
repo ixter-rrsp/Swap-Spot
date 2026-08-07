@@ -18,7 +18,7 @@ export default function AdminLoginPage() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("/api/admin-x9k2p/login", {
+      const response = await fetch("/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
         throw new Error(body?.error || "Login failed.");
       }
 
-      router.push("/admin-x9k2p/dashboard");
+      router.push("/admin-jkiqlou9xs16ceb6gya8Ilve1llt/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed.");
     } finally {

@@ -63,10 +63,10 @@ export default function AdminDashboardPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/admin-x9k2p/reports?status=${tab}`);
+      const response = await fetch(`/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/reports?status=${tab}`);
 
       if (response.status === 401) {
-        router.push("/admin-x9k2p");
+        router.push("/admin-jkiqlou9xs16ceb6gya8Ilve1llt");
         return;
       }
 
@@ -85,9 +85,12 @@ export default function AdminDashboardPage() {
   }, [tab, router]);
 
   useEffect(() => {
-    if (section === "reports") {
+    if (section !== "reports") return;
+
+    const timeoutId = setTimeout(() => {
       void loadReports();
-    }
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [loadReports, section]);
 
   async function updateReport(
@@ -96,7 +99,7 @@ export default function AdminDashboardPage() {
   ) {
     setSavingId(id);
     try {
-      const response = await fetch(`/api/admin-x9k2p/reports/${id}`, {
+      const response = await fetch(`/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/reports/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
@@ -116,8 +119,8 @@ export default function AdminDashboardPage() {
   }
 
   async function handleLogout() {
-    await fetch("/api/admin-x9k2p/logout", { method: "POST" });
-    router.push("/admin-x9k2p");
+    await fetch("/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/logout", { method: "POST" });
+    router.push("/admin-jkiqlou9xs16ceb6gya8Ilve1llt");
   }
 
   return (
@@ -168,7 +171,12 @@ export default function AdminDashboardPage() {
         <p className={styles.empty}>No reports in this category.</p>
       ) : (
         <div className={styles.list}>
-          {reports.map((report) => (
+          {reports.map((report) => {
+            const isFinalized =
+              report.status === "resolved" || report.status === "dismissed";
+            const isSaving = savingId === report.id;
+
+            return (
             <div key={report.id} className={styles.card}>
               <div className={styles.cardTop}>
                 <div>
@@ -258,13 +266,18 @@ export default function AdminDashboardPage() {
                   Last actioned by {report.reviewed_by}
                   {report.reviewed_at &&
                     ` on ${new Date(report.reviewed_at).toLocaleString()}`}
+                  {isFinalized && (
+                    <span className={styles.finalizedTag}>
+                      · {report.status === "resolved" ? "Resolved" : "Dismissed"} — locked
+                    </span>
+                  )}
                 </p>
               )}
 
               <div className={styles.actions}>
                 <button
                   className={styles.saveNotes}
-                  disabled={savingId === report.id}
+                  disabled={isSaving}
                   onClick={() =>
                     updateReport(report.id, {
                       adminNotes: notesDraft[report.id] ?? report.admin_notes ?? "",
@@ -277,7 +290,8 @@ export default function AdminDashboardPage() {
                 {report.status !== "reviewing" && (
                   <button
                     className={styles.actionBtn}
-                    disabled={savingId === report.id}
+                    disabled={isSaving || isFinalized}
+                    title={isFinalized ? "This report is already finalized." : undefined}
                     onClick={() => updateReport(report.id, { status: "reviewing" })}
                   >
                     Mark Reviewing
@@ -286,7 +300,8 @@ export default function AdminDashboardPage() {
                 {report.status !== "resolved" && (
                   <button
                     className={styles.resolveBtn}
-                    disabled={savingId === report.id}
+                    disabled={isSaving || isFinalized}
+                    title={isFinalized ? "This report is already finalized." : undefined}
                     onClick={() => updateReport(report.id, { status: "resolved" })}
                   >
                     Resolve
@@ -295,7 +310,8 @@ export default function AdminDashboardPage() {
                 {report.status !== "dismissed" && (
                   <button
                     className={styles.dismissBtn}
-                    disabled={savingId === report.id}
+                    disabled={isSaving || isFinalized}
+                    title={isFinalized ? "This report is already finalized." : undefined}
                     onClick={() => updateReport(report.id, { status: "dismissed" })}
                   >
                     Dismiss
@@ -303,7 +319,8 @@ export default function AdminDashboardPage() {
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
         </>
