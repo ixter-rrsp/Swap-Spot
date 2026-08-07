@@ -13,6 +13,7 @@ export interface Profile {
 
   rating: number;
   badge: string;
+  isVerified: boolean;
   dateOfBirth: string | null;
   createdAt: string;
   updatedAt: string | null;

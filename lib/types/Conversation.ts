@@ -12,6 +12,7 @@ export interface Conversation {
         username: string;
         fullName: string;
         avatarUrl: string | null;
+        isVerified: boolean;
     };
 
     lastMessage: {

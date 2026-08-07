@@ -8,6 +8,8 @@ import {
   ArrowLeftRight,
 } from "lucide-react";
 
+import VerifiedBadge from "@/app/components/UI/VerifiedBadge/VerifiedBadge";
+
 interface RequestUsersProps {
   sender: ListingOwner;
   receiver: ListingOwner;
@@ -35,7 +37,10 @@ export default function RequestUsers({
           )}
         </div>
 
-        <h3>{sender.fullName}</h3>
+        <h3>
+          {sender.fullName}
+          {sender.isVerified && <VerifiedBadge size={14} />}
+        </h3>
 
         <p>@{sender.username}</p>
       </div>
@@ -59,7 +64,10 @@ export default function RequestUsers({
           )}
         </div>
 
-        <h3>{receiver.fullName}</h3>
+        <h3>
+          {receiver.fullName}
+          {receiver.isVerified && <VerifiedBadge size={14} />}
+        </h3>
 
         <p>@{receiver.username}</p>
       </div>

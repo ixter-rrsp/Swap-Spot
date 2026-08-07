@@ -105,6 +105,18 @@ export async function createSwapRequest(
     );
   }
 
+  const { data: senderProfile } = await supabase
+    .from("profiles")
+    .select("suspension_status")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (senderProfile?.suspension_status && senderProfile.suspension_status !== "none") {
+    throw new Error(
+      "Your account is currently suspended and can't send swap requests."
+    );
+  }
+
 
 
   const {
@@ -154,6 +166,18 @@ export async function createSwapRequest(
   if (requestedListing.traded || requestedListing.locked_at) {
     throw new Error(
       "This listing is involved in an accepted swap and can't be requested right now."
+    );
+  }
+
+  const { data: receiverProfile } = await supabase
+    .from("profiles")
+    .select("suspension_status")
+    .eq("id", requestedListing.owner_id)
+    .maybeSingle();
+
+  if (receiverProfile?.suspension_status && receiverProfile.suspension_status !== "none") {
+    throw new Error(
+      "This user isn't currently accepting swap requests."
     );
   }
 

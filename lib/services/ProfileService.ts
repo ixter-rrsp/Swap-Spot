@@ -10,6 +10,7 @@ interface RawProfileData {
   bio: string | null;
   rating: number | string | null;
   badge: string | null;
+  is_verified?: boolean | null;
   date_of_birth: string | null;
   swap_radius?: number | null;
   latitude: number | null;
@@ -29,6 +30,7 @@ function mapProfile(data: RawProfileData): Profile {
 
     rating: Number(data.rating),
     badge: data.badge ?? "",
+    isVerified: data.is_verified ?? false,
     dateOfBirth: data.date_of_birth,
 
     swapRadius: data.swap_radius ?? 10,

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import BackButton from "@/app/components/UI/BackButton/BackButton";
+import VerifiedBadge from "@/app/components/UI/VerifiedBadge/VerifiedBadge";
 import { subscribeChannel } from "@/utils/supabase/channelRegistry";
 
 import styles from "./ChatHeader.module.css";
@@ -14,6 +15,7 @@ interface HeaderProps {
     username: string;
     fullName: string | null;
     avatarUrl: string | null;
+    isVerified?: boolean;
     lastSeenAt: string | null;
     listingId: string;
     listingTitle: string;
@@ -73,6 +75,7 @@ export default function Header({
     username,
     fullName,
     avatarUrl,
+    isVerified,
     lastSeenAt: initialLastSeenAt,
     listingId,
     listingTitle,
@@ -160,6 +163,7 @@ export default function Header({
                     <div>
                         <h3>
                             {fullName || username}
+                            {isVerified && <VerifiedBadge size={14} />}
                         </h3>
 
                         <p

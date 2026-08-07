@@ -35,7 +35,7 @@ export async function GET(request: Request) {
       reviewed_at,
       created_at,
       reporter:profiles!user_reports_reporter_id_fkey(id, username, full_name, avatar_url),
-      reported:profiles!user_reports_reported_user_id_fkey(id, username, full_name, avatar_url, badge, report_strikes)
+      reported:profiles!user_reports_reported_user_id_fkey(id, username, full_name, avatar_url, badge, report_strikes, suspension_status, suspension_reason, suspended_by)
       `
     )
     .order("created_at", { ascending: false });

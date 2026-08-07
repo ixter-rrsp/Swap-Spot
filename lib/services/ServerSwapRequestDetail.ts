@@ -30,6 +30,7 @@ export async function getSwapRequestById(
         full_name,
         avatar_url,
         badge,
+        is_verified,
         rating,
         city
       ),
@@ -39,6 +40,7 @@ export async function getSwapRequestById(
         full_name,
         avatar_url,
         badge,
+        is_verified,
         rating,
         city
       ),
@@ -100,6 +102,7 @@ export async function getSwapRequestById(
       fullName: data.sender.full_name,
       avatarUrl: data.sender.avatar_url,
       badge: data.sender.badge,
+      isVerified: data.sender.is_verified ?? false,
       rating: data.sender.rating,
       city: data.sender.city,
     },
@@ -110,6 +113,7 @@ export async function getSwapRequestById(
       fullName: data.receiver.full_name,
       avatarUrl: data.receiver.avatar_url,
       badge: data.receiver.badge,
+      isVerified: data.receiver.is_verified ?? false,
       rating: data.receiver.rating,
       city: data.receiver.city,
     },

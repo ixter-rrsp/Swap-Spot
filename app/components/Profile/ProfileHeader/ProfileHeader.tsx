@@ -8,6 +8,7 @@ import MenuDrawer from "@/app/components/UI/MenuDrawer";
 import { SUBSCRIPTION_PLANS } from "@/lib/subscriptions/plans";
 import MessageUserModal from "@/app/components/Profile/MessageUserModal/MessageUserModal";
 import ReportUserModal from "@/app/components/Profile/ReportUserModal/ReportUserModal";
+import VerifiedBadge from "@/app/components/UI/VerifiedBadge/VerifiedBadge";
 
 import BackButton from "@/app/components/UI/BackButton/BackButton";
 
@@ -23,6 +24,7 @@ interface ProfileHeaderProps {
   swapsCount?: number;
   bio?: string;
   badge?: string;
+  isVerified?: boolean;
   showActions?: boolean;
   showBackButton?: boolean;
   profileUserId?: string;
@@ -38,6 +40,7 @@ export default function ProfileHeader({
   swapsCount,
   bio,
   badge,
+  isVerified,
   showActions = true,
   showBackButton = false,
   profileUserId,
@@ -137,7 +140,10 @@ export default function ProfileHeader({
         )}
       </div>
 
-      <h2 className={styles.name}>{username}</h2>
+      <h2 className={styles.name}>
+        {username}
+        {isVerified && <VerifiedBadge size={18} />}
+      </h2>
 
       {badge && (
         <span className={styles.badge}>

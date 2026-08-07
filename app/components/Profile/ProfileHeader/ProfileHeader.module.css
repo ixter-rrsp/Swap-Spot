@@ -45,6 +45,10 @@
   font-size: 22px;
   font-weight: 700;
   color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
 .meta {

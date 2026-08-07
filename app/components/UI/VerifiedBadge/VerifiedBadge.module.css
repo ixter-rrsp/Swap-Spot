@@ -1,0 +1,7 @@
+.badge {
+  color: #2563eb;
+  fill: #dbeafe;
+  flex-shrink: 0;
+  vertical-align: middle;
+  display: inline-block;
+}

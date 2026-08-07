@@ -13,6 +13,7 @@ interface ProfileRow {
   avatar_url: string | null;
   rating: number;
   badge: string;
+  is_verified?: boolean | null;
   city: string;
   latitude?: number | null;
   longitude?: number | null;
@@ -69,6 +70,7 @@ export function mapListing(
           avatarUrl: listing.profiles.avatar_url,
           rating: Number(listing.profiles.rating),
           badge: listing.profiles.badge,
+          isVerified: listing.profiles.is_verified ?? false,
           city: listing.profiles.city,
           latitude: listing.profiles.latitude,
           longitude: listing.profiles.longitude,
@@ -80,6 +82,7 @@ export function mapListing(
           avatarUrl: null,
           rating: 0,
           badge: "Member",
+          isVerified: false,
           city: listing.city,
         });
 

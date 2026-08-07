@@ -127,13 +127,15 @@ export async function getUserConversations(): Promise<Conversation[]> {
         id,
         username,
         full_name,
-        avatar_url
+        avatar_url,
+        is_verified
       ),
       buyer:profiles!conversations_buyer_fkey (
         id,
         username,
         full_name,
-        avatar_url
+        avatar_url,
+        is_verified
       )
     `)
         .or(`seller_id.eq.${user.id},buyer_id.eq.${user.id}`)
@@ -159,12 +161,14 @@ export async function getUserConversations(): Promise<Conversation[]> {
             username: string;
             full_name: string;
             avatar_url: string | null;
+            is_verified?: boolean | null;
         };
         buyer: {
             id: string;
             username: string;
             full_name: string;
             avatar_url: string | null;
+            is_verified?: boolean | null;
         };
         last_message: string | null;
         last_message_at: string;
@@ -248,6 +252,7 @@ export async function getUserConversations(): Promise<Conversation[]> {
                 username: otherUser.username,
                 fullName: otherUser.full_name,
                 avatarUrl: otherUser.avatar_url,
+                isVerified: otherUser.is_verified ?? false,
             },
 
             lastMessage: conversation.last_message
@@ -1053,6 +1058,7 @@ export async function getConversationById(conversationId: string) {
         username,
         full_name,
         avatar_url,
+        is_verified,
         last_seen_at
       ),
       buyer:profiles!conversations_buyer_fkey (
@@ -1060,6 +1066,7 @@ export async function getConversationById(conversationId: string) {
         username,
         full_name,
         avatar_url,
+        is_verified,
         last_seen_at
       )
     `)
@@ -1097,6 +1104,7 @@ export async function getConversationById(conversationId: string) {
             username: otherUser.username,
             fullName: otherUser.full_name,
             avatarUrl: otherUser.avatar_url,
+            isVerified: otherUser.is_verified ?? false,
             lastSeenAt: otherUser.last_seen_at,
         },
     };

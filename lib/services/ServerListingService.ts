@@ -10,6 +10,7 @@ interface ListingRowProfile {
   avatar_url: string | null;
   rating: number;
   badge: string;
+  is_verified?: boolean | null;
   city: string;
   latitude?: number | null;
   longitude?: number | null;
@@ -116,6 +117,7 @@ export async function getMyListings(limit?: number): Promise<Listing[]> {
       avatarUrl: null,
       rating: 0,
       badge: "Member",
+      isVerified: false,
       city: listing.city,
     },
   }));
@@ -192,6 +194,7 @@ export async function getMyListingsForSwap(): Promise<Listing[]> {
       avatarUrl: null,
       rating: 0,
       badge: "Member",
+      isVerified: false,
       city: listing.city,
     },
   }));
@@ -259,6 +262,7 @@ export async function getListingsByOwner(ownerId: string, limit?: number): Promi
       avatarUrl: null,
       rating: 0,
       badge: "Member",
+      isVerified: false,
       city: listing.city,
     },
   }));
@@ -283,6 +287,7 @@ export async function getListingById(id: string) {
         avatar_url,
         rating,
         badge,
+        is_verified,
         city
       )
     `)
@@ -350,6 +355,7 @@ export async function getListingById(id: string) {
       avatarUrl: data.profiles.avatar_url,
       rating: Number(liveRating.toFixed(1)),
       badge: data.profiles.badge,
+      isVerified: data.profiles.is_verified ?? false,
       city: data.profiles.city,
     },
   };
@@ -387,6 +393,7 @@ export async function getListings(options: GetListingsOptions = {}) {
           avatar_url,
           rating,
           badge,
+          is_verified,
           city,
           latitude,
           longitude
@@ -505,6 +512,7 @@ export async function getBoostedListings() {
         avatar_url,
         rating,
         badge,
+        is_verified,
         city,
         latitude,
         longitude

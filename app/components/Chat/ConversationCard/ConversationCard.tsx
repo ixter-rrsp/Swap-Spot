@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import VerifiedBadge from "@/app/components/UI/VerifiedBadge/VerifiedBadge";
+
 import styles from "./ConversationCard.module.css";
 
 import { Conversation } from "@/lib/types/Conversation";
@@ -69,6 +71,7 @@ export default function ConversationCard({
 
         <h3 className={isUnread ? styles.unreadText : ""}>
           {displayName}
+          {otherUser.isVerified && <VerifiedBadge size={13} />}
         </h3>
 
         <p className={`${styles.message} ${isUnread ? styles.unreadMessage : ""}`}>

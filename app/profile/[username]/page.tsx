@@ -57,6 +57,7 @@ export default async function PublicProfilePage({
         reviewsCount={reviewStats.totalReviews}
         bio={profile.bio ?? undefined}
         badge={profile.badge || "Member"}
+        isVerified={profile.isVerified}
         showActions={!isOwnProfile}
         showBackButton={true}
         profileUserId={profile.id}

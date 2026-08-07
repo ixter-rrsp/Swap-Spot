@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import VerificationsPanel from "./VerificationsPanel";
+
 import styles from "./dashboard.module.css";
 
 interface ProfileRef {
@@ -49,6 +51,7 @@ const TABS: { value: string; label: string }[] = [
 
 export default function AdminDashboardPage() {
   const router = useRouter();
+  const [section, setSection] = useState<"reports" | "verifications">("reports");
   const [tab, setTab] = useState("pending");
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,8 +85,10 @@ export default function AdminDashboardPage() {
   }, [tab, router]);
 
   useEffect(() => {
-    void loadReports();
-  }, [loadReports]);
+    if (section === "reports") {
+      void loadReports();
+    }
+  }, [loadReports, section]);
 
   async function updateReport(
     id: string,
@@ -118,12 +123,31 @@ export default function AdminDashboardPage() {
   return (
     <main className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.title}>Report Review</h1>
+        <h1 className={styles.title}>Admin Dashboard</h1>
         <button className={styles.logout} onClick={handleLogout}>
           Log out
         </button>
       </header>
 
+      <div className={styles.tabs}>
+        <button
+          className={section === "reports" ? styles.tabActive : styles.tab}
+          onClick={() => setSection("reports")}
+        >
+          Report Review
+        </button>
+        <button
+          className={section === "verifications" ? styles.tabActive : styles.tab}
+          onClick={() => setSection("verifications")}
+        >
+          Account Verification
+        </button>
+      </div>
+
+      {section === "verifications" ? (
+        <VerificationsPanel />
+      ) : (
+        <>
       <div className={styles.tabs}>
         {TABS.map((t) => (
           <button
@@ -281,6 +305,8 @@ export default function AdminDashboardPage() {
             </div>
           ))}
         </div>
+      )}
+        </>
       )}
     </main>
   );

@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import VerifiedBadge from "@/app/components/UI/VerifiedBadge/VerifiedBadge";
+
 import styles from "./OwnerCard.module.css";
 
 interface OwnerCardProps {
@@ -10,6 +12,7 @@ interface OwnerCardProps {
     avatarUrl?: string | null;
     rating: number;
     badge?: string;
+    isVerified?: boolean;
     city?: string;
   };
 }
@@ -59,6 +62,7 @@ export default function OwnerCard({
         <div className={styles.info}>
           <h3 className={styles.name}>
             {displayName}
+            {owner.isVerified && <VerifiedBadge size={15} />}
           </h3>
 
           {subtitle && (

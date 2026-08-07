@@ -89,6 +89,23 @@ export async function middleware(
     );
   }
 
+  // Hard-suspended accounts are locked out of every authenticated route.
+  // (Soft suspension is enforced further down the stack — hidden listings,
+  // blocked listing/swap-request inserts — the account itself stays usable.)
+  if (isProtected && user && pathname !== "/suspended") {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("suspension_status, suspension_reason")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profile?.suspension_status === "hard") {
+      const suspendedUrl = request.nextUrl.clone();
+      suspendedUrl.pathname = "/suspended";
+      return NextResponse.redirect(suspendedUrl);
+    }
+  }
+
   return response;
 }
 

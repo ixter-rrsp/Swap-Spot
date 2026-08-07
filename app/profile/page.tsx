@@ -51,6 +51,7 @@ export default async function ProfilePage() {
         swapsCount={stats.completedSwaps}
         bio={profile.bio || undefined}
         badge={profile.badge || "Member"}
+        isVerified={profile.isVerified}
         showActions={false}
       />
 

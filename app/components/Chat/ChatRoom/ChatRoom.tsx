@@ -27,6 +27,7 @@ interface ChatRoomProps {
         username: string;
         fullName: string | null;
         avatarUrl: string | null;
+        isVerified?: boolean;
         lastSeenAt: string | null;
     };
 
@@ -441,6 +442,7 @@ export default function ChatRoom({
                 username={otherUser.username}
                 fullName={otherUser.fullName}
                 avatarUrl={otherUser.avatarUrl}
+                isVerified={otherUser.isVerified}
                 lastSeenAt={otherUser.lastSeenAt}
                 listingId={listing.id}
                 listingTitle={listing.title}

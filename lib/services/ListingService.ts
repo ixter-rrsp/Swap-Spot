@@ -89,7 +89,8 @@ export async function createListing(
     .select(`
       city,
       latitude,
-      longitude
+      longitude,
+      suspension_status
     `)
     .eq("id", user.id)
     .single();
@@ -97,6 +98,15 @@ export async function createListing(
   if (profileError) {
     throw new Error(
       "Failed to get profile location."
+    );
+  }
+
+  // Real enforcement lives in a DB trigger (block_suspended_listing_insert)
+  // so it can't be bypassed — this is just a friendlier, earlier error so we
+  // don't burn an image upload before finding out.
+  if (profile.suspension_status && profile.suspension_status !== "none") {
+    throw new Error(
+      "Your account is currently suspended and can't post new listings."
     );
   }
 

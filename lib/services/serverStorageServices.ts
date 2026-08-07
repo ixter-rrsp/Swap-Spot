@@ -136,3 +136,69 @@ export async function uploadChatFile(
 
   return publicUrl;
 }
+/**
+ * Uploads an ID verification document or selfie to the PRIVATE
+ * `verification-documents` bucket and returns the storage path (not a
+ * public URL — the bucket isn't public). Files live under
+ * `<userId>/<kind>-<uuid>.<ext>` so RLS can restrict each user to their
+ * own folder (see the storage policies in
+ * supabase/migrations/add_account_verification.sql).
+ */
+export async function uploadVerificationDocument(
+  file: File,
+  userId: string,
+  kind: "id" | "selfie"
+): Promise<string> {
+  const supabase = await createClient();
+
+  const extension =
+    file.name
+      .split(".")
+      .pop()
+      ?.toLowerCase() ?? "jpg";
+
+  const filePath = `${userId}/${kind}-${crypto.randomUUID()}.${extension}`;
+
+  const { error } = await supabase.storage
+    .from("verification-documents")
+    .upload(filePath, file);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return filePath;
+}
+
+/**
+ * Generates short-lived signed URLs for verification-document paths.
+ * Uses the service-role client so it works from the admin dashboard
+ * regardless of storage RLS policies. Only call this from admin-gated
+ * code — these images are government/school IDs and selfies.
+ */
+export async function getVerificationSignedUrls(
+  paths: string[],
+  expiresInSeconds = 60 * 10
+): Promise<Record<string, string>> {
+  if (paths.length === 0) return {};
+
+  const { createServiceClient } = await import("@/utils/supabase/service");
+  const supabase = createServiceClient();
+  if (!supabase) return {};
+
+  const results = await Promise.all(
+    paths.map(async (path) => {
+      const { data, error } = await supabase.storage
+        .from("verification-documents")
+        .createSignedUrl(path, expiresInSeconds);
+      if (error || !data) return [path, null] as const;
+      return [path, data.signedUrl] as const;
+    })
+  );
+
+  const map: Record<string, string> = {};
+  for (const [path, url] of results) {
+    if (url) map[path] = url;
+  }
+  return map;
+}

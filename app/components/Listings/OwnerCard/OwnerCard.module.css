@@ -93,6 +93,10 @@
   font-weight: 700;
 
   color: #111827;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .subtitle {

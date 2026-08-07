@@ -63,6 +63,8 @@ export interface ListingOwner {
 
   badge: string;
 
+  isVerified: boolean;
+
   city: string;
 
   latitude?: number | null;

@@ -1,0 +1,65 @@
+.container {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 8px;
+}
+
+.description {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0 0 12px;
+}
+
+.verified {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #1d4ed8;
+  font-weight: 500;
+  margin: 0;
+}
+
+.pending {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #b45309;
+  font-weight: 500;
+  margin: 0 0 4px;
+}
+
+.rejected {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #b91c1c;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+
+.verifyButton {
+  background: #1d4ed8;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+}
+
+.verifyButton:hover {
+  background: #1e40af;
+}
