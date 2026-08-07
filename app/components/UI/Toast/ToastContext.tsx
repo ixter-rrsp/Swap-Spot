@@ -13,7 +13,9 @@ type Toast = {
   };
 };
 
-const ToastContext = createContext<(msg: string, type?: Toast["type"], action?: Toast["action"]) => void>(() => {});
+const ToastContext = createContext<
+  (msg: string, type?: Toast["type"], action?: Toast["action"], durationMs?: number) => void
+>(() => {});
 
 export function useToast() {
   return useContext(ToastContext);
@@ -22,14 +24,17 @@ export function useToast() {
 export default function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const show = useCallback((message: string, type: Toast["type"] = "success", action?: Toast["action"]) => {
-    const id = String(Date.now()) + Math.random().toString(36).slice(2, 9);
-    const t: Toast = { id, message, type, action };
-    setToasts((s) => [t, ...s]);
-    window.setTimeout(() => {
-      setToasts((s) => s.filter((x) => x.id !== id));
-    }, 3500);
-  }, []);
+  const show = useCallback(
+    (message: string, type: Toast["type"] = "success", action?: Toast["action"], durationMs = 3500) => {
+      const id = String(Date.now()) + Math.random().toString(36).slice(2, 9);
+      const t: Toast = { id, message, type, action };
+      setToasts((s) => [t, ...s]);
+      window.setTimeout(() => {
+        setToasts((s) => s.filter((x) => x.id !== id));
+      }, durationMs);
+    },
+    []
+  );
 
   // listen for window-level toast events for compatibility
   useEffect(() => {
@@ -37,7 +42,7 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
       const custom = e as CustomEvent;
       const detail = custom?.detail;
       if (detail?.message) {
-        show(detail.message, detail.type ?? "success", detail.action);
+        show(detail.message, detail.type ?? "success", detail.action, detail.durationMs);
       }
     };
 
