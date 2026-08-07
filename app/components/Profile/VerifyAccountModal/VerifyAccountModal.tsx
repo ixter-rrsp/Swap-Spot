@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import UploadTile from "../../UI/UploadTile/UploadTile";
 import styles from "./VerifyAccountModal.module.css";
 
 interface VerifyAccountModalProps {
@@ -120,22 +121,20 @@ export default function VerifyAccountModal({
             <label className={styles.fieldLabel}>
               Photo of your ID (front, clearly legible)
             </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setIdDocument(e.target.files?.[0] ?? null)}
-              className={styles.fileInput}
-            />
+            <div className={styles.uploadGrid}>
+              <UploadTile
+                id="verify-id-document"
+                file={idDocument}
+                onChange={setIdDocument}
+              />
+            </div>
 
             <label className={styles.fieldLabel}>
               Selfie of you holding that ID
             </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setSelfie(e.target.files?.[0] ?? null)}
-              className={styles.fileInput}
-            />
+            <div className={styles.uploadGrid}>
+              <UploadTile id="verify-selfie" file={selfie} onChange={setSelfie} />
+            </div>
 
             <button
               className={styles.submit}

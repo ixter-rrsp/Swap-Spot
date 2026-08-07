@@ -120,10 +120,11 @@ export default function AdminDashboardPage() {
 
   async function handleLogout() {
     await fetch("/api/admin-jkiqlou9xs16ceb6gya8Ilve1llt/logout", { method: "POST" });
-    router.push("/admin-jkiqlou9xs16ceb6gya8Ilve1llt");
+    router.push("/");
   }
 
   return (
+    <div className={styles.page}>
     <main className={styles.container}>
       <header className={styles.header}>
         <h1 className={styles.title}>Admin Dashboard</h1>
@@ -326,5 +327,6 @@ export default function AdminDashboardPage() {
         </>
       )}
     </main>
+    </div>
   );
 }

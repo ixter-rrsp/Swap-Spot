@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+import UploadTile from "../../UI/UploadTile/UploadTile";
 import styles from "./ReportUserModal.module.css";
+
+const MAX_PROOFS = 3;
 
 interface ReportUserModalProps {
   reportedUserId: string;
@@ -30,14 +33,19 @@ export default function ReportUserModal({
 
   const [reason, setReason] = useState<string>("");
   const [description, setDescription] = useState("");
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<(File | null)[]>(
+    Array(MAX_PROOFS).fill(null)
+  );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const selected = Array.from(e.target.files ?? []).slice(0, 3);
-    setFiles(selected);
+  function handleSlotChange(index: number, file: File | null) {
+    setFiles((prev) => {
+      const next = [...prev];
+      next[index] = file;
+      return next;
+    });
   }
 
   async function handleSubmit() {
@@ -58,7 +66,9 @@ export default function ReportUserModal({
       formData.append("reportedUserId", reportedUserId);
       formData.append("reason", reason);
       formData.append("description", description);
-      files.forEach((file) => formData.append("proof", file));
+      files.forEach((file) => {
+        if (file) formData.append("proof", file);
+      });
 
       const response = await fetch("/api/reports", {
         method: "POST",
@@ -131,13 +141,16 @@ export default function ReportUserModal({
             <label className={styles.fieldLabel}>
               Add Proof: Screenshots / Photos (optional, up to 3)
             </label>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileChange}
-              className={styles.fileInput}
-            />
+            <div className={styles.uploadGrid}>
+              {files.map((file, index) => (
+                <UploadTile
+                  key={index}
+                  id={`report-proof-${index}`}
+                  file={file}
+                  onChange={(f) => handleSlotChange(index, f)}
+                />
+              ))}
+            </div>
 
             <label className={styles.fieldLabel}>
               Short Description / Explanation

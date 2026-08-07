@@ -91,10 +91,9 @@
   color: #374151;
 }
 
-.fileInput {
-  width: 100%;
-  font-size: 13px;
-  color:#111827
+.uploadGrid {
+  display: flex;
+  gap: 10px;
 }
 
 .textarea {
