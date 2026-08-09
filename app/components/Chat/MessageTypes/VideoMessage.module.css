@@ -1,5 +1,72 @@
+.thumbnailButton {
+  position: relative;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 12px;
+  overflow: hidden;
+  display: block;
+  line-height: 0;
+}
+
 .video {
   max-width: 260px;
   max-height: 260px;
   border-radius: 12px;
+  display: block;
+  pointer-events: none;
+}
+
+.playOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 3px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: zoom-out;
+  padding: 20px;
+}
+
+.fullVideo {
+  max-width: min(94vw, 1200px);
+  max-height: min(90vh, 1200px);
+  border-radius: 8px;
+  cursor: default;
+}
+
+.closeButton {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1001;
+  border: none;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
