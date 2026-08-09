@@ -1,5 +1,5 @@
 import { Conversation } from "@/lib/types/Conversation";
-import { Message, MessageType } from "@/lib/types/Message";
+import { Message, MessageType, MessageReaction, ReactionType, REACTION_TYPES } from "@/lib/types/Message";
 import { createClient } from "@/utils/supabase/server";
 import { createServiceClient } from "@/utils/supabase/service";
 import { createNotification } from "@/lib/services/NotificationService";
@@ -436,6 +436,29 @@ export async function getConversationMessages(
         }
     }
 
+    const messageIds = data.map((message) => message.id);
+    const reactionsByMessageId = new Map<string, MessageReaction[]>();
+
+    if (messageIds.length > 0) {
+        const { data: reactionRows, error: reactionsError } = await supabase
+            .from("message_reactions")
+            .select("message_id, user_id, reaction")
+            .in("message_id", messageIds);
+
+        if (reactionsError) {
+            console.error(
+                "getConversationMessages: failed to fetch reactions:",
+                reactionsError.message
+            );
+        } else {
+            for (const row of reactionRows ?? []) {
+                const list = reactionsByMessageId.get(row.message_id) ?? [];
+                list.push({ userId: row.user_id, reaction: row.reaction as ReactionType });
+                reactionsByMessageId.set(row.message_id, list);
+            }
+        }
+    }
+
     return data.map((message): Message => ({
         id: message.id,
         senderId: message.sender_id,
@@ -454,7 +477,104 @@ export async function getConversationMessages(
         replyPreview: message.reply_to_id
             ? replyPreviewById.get(message.reply_to_id) ?? null
             : null,
+
+        reactions: reactionsByMessageId.get(message.id) ?? [],
     }));
+}
+
+// Adds/updates/removes the current user's reaction on a message.
+// Tapping the SAME reaction the user already left removes it; tapping a
+// DIFFERENT reaction swaps it. Returns the reaction the user now has on
+// the message (or null if it was removed).
+export async function toggleMessageReaction(
+    messageId: string,
+    reaction: ReactionType
+): Promise<ReactionType | null> {
+    if (!REACTION_TYPES.includes(reaction)) {
+        throw new Error("Invalid reaction type.");
+    }
+
+    const supabase = await createClient();
+
+    const {
+        data: { user },
+        error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError) {
+        throw new Error(authError.message);
+    }
+
+    if (!user) {
+        throw new Error("User not authenticated.");
+    }
+
+    const { data: existingMessage, error: fetchError } = await supabase
+        .from("messages")
+        .select("id, conversation_id")
+        .eq("id", messageId)
+        .single();
+
+    if (fetchError || !existingMessage) {
+        throw new Error("Message not found.");
+    }
+
+    // Verify the user belongs to the conversation before letting them react.
+    await requireConversationParticipant(supabase, existingMessage.conversation_id);
+
+    const { data: existingReaction, error: existingReactionError } = await supabase
+        .from("message_reactions")
+        .select("id, reaction")
+        .eq("message_id", messageId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+    if (existingReactionError) {
+        throw new Error(existingReactionError.message);
+    }
+
+    if (existingReaction) {
+        if (existingReaction.reaction === reaction) {
+            // Same reaction tapped again — remove it.
+            const { error } = await supabase
+                .from("message_reactions")
+                .delete()
+                .eq("id", existingReaction.id);
+
+            if (error) {
+                throw new Error(error.message);
+            }
+
+            return null;
+        }
+
+        // Different reaction — swap it.
+        const { error } = await supabase
+            .from("message_reactions")
+            .update({ reaction })
+            .eq("id", existingReaction.id);
+
+        if (error) {
+            throw new Error(error.message);
+        }
+
+        return reaction;
+    }
+
+    const { error: insertError } = await supabase
+        .from("message_reactions")
+        .insert({
+            message_id: messageId,
+            conversation_id: existingMessage.conversation_id,
+            user_id: user.id,
+            reaction,
+        });
+
+    if (insertError) {
+        throw new Error(insertError.message);
+    }
+
+    return reaction;
 }
 
 function isAllowedImage(file: File): boolean {

@@ -205,3 +205,95 @@
     animation: flashHighlight 1.2s ease;
     border-radius: 18px;
 }
+
+.bubbleWrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Heart burst shown briefly over the bubble on double-tap. */
+@keyframes tapBurst {
+    0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
+    30% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+    70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+.tapBurst {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 40px;
+    pointer-events: none;
+    animation: tapBurst 0.65s ease forwards;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+/* Small pill row of aggregated reactions, overlapping the bottom edge
+   of the bubble like IG/Messenger. */
+.reactionBar {
+    display: flex;
+    gap: 4px;
+    margin-top: -10px;
+    margin-left: 10px;
+    align-self: flex-start;
+    z-index: 1;
+}
+
+.reactionBarMine {
+    align-self: flex-end;
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+.reactionPill {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    padding: 2px 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    cursor: pointer;
+}
+
+.reactionPillMine {
+    border-color: #16a34a;
+    background: #f0fdf4;
+}
+
+.reactionCount {
+    font-size: 11px;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* Row of emoji options at the top of the long-press menu. */
+.reactionPicker {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.reactionPickerButton {
+    background: none;
+    border: none;
+    font-size: 20px;
+    padding: 4px;
+    border-radius: 999px;
+    cursor: pointer;
+    line-height: 1;
+    transition: transform 0.1s ease, background 0.1s ease;
+}
+
+.reactionPickerButton:hover {
+    background: #f3f4f6;
+    transform: scale(1.15);
+}

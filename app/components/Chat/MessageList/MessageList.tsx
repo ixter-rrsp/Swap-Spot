@@ -1,6 +1,6 @@
 import MessageBubble from "../MessageBubble/MessageBubble";
 
-import { Message } from "@/lib/types/Message";
+import { Message, ReactionType } from "@/lib/types/Message";
 
 import styles from "./MessageList.module.css";
 
@@ -10,6 +10,7 @@ interface MessageListProps {
     onReply?: (message: Message) => void;
     onUnsend?: (messageId: string) => void;
     onRemoveForMe?: (messageId: string) => void;
+    onReact?: (messageId: string, reaction: ReactionType) => void;
 }
 
 export default function MessageList({
@@ -18,6 +19,7 @@ export default function MessageList({
     onReply,
     onUnsend,
     onRemoveForMe,
+    onReact,
 }: MessageListProps) {
 
     return (
@@ -35,6 +37,7 @@ export default function MessageList({
                     onReply={onReply}
                     onUnsend={onUnsend}
                     onRemoveForMe={onRemoveForMe}
+                    onReact={onReact}
                 />
 
             ))}

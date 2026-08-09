@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Reply } from "lucide-react";
 
-import { Message, MessageReplyPreview } from "@/lib/types/Message";
+import { Message, MessageReplyPreview, ReactionType, REACTION_EMOJI, REACTION_TYPES } from "@/lib/types/Message";
 
 import ImageMessage from "../MessageTypes/ImageMessage";
 import VideoMessage from "../MessageTypes/VideoMessage";
@@ -22,6 +22,7 @@ interface MessageBubbleProps {
     onReply?: (message: Message) => void;
     onUnsend?: (messageId: string) => void;
     onRemoveForMe?: (messageId: string) => void;
+    onReact?: (messageId: string, reaction: ReactionType) => void;
     highlighted?: boolean;
 }
 
@@ -29,6 +30,28 @@ const SWIPE_TRIGGER_DISTANCE = 56; // px of drag before a swipe counts as "reply
 const SWIPE_MAX_DISTANCE = 72; // px the bubble is allowed to visually travel
 const LONG_PRESS_MS = 450;
 const MOVE_CANCELS_LONG_PRESS_PX = 8;
+const DOUBLE_TAP_MS = 300; // max gap between taps to count as a double-tap
+const DOUBLE_TAP_REACTION: ReactionType = "heart";
+
+function aggregateReactions(
+    reactions: Message["reactions"],
+    currentUserId: string
+): { reaction: ReactionType; count: number; mine: boolean }[] {
+    if (!reactions || reactions.length === 0) return [];
+
+    const counts = new Map<ReactionType, { count: number; mine: boolean }>();
+    for (const r of reactions) {
+        const entry = counts.get(r.reaction) ?? { count: 0, mine: false };
+        entry.count += 1;
+        if (r.userId === currentUserId) entry.mine = true;
+        counts.set(r.reaction, entry);
+    }
+
+    return REACTION_TYPES.filter((type) => counts.has(type)).map((type) => ({
+        reaction: type,
+        ...counts.get(type)!,
+    }));
+}
 
 function replyPreviewText(message: MessageReplyPreview): string {
     if (message.messageType === "image") return "📷 Photo";
@@ -46,11 +69,15 @@ export default function MessageBubble({
     onReply,
     onUnsend,
     onRemoveForMe,
+    onReact,
     highlighted,
 }: MessageBubbleProps) {
     const [dragX, setDragX] = useState(0);
     const [dragging, setDragging] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    // Brief heart burst shown over the bubble right after a double-tap,
+    // like IG/Messenger — purely cosmetic, doesn't affect state.
+    const [showTapBurst, setShowTapBurst] = useState(false);
     // Position for the portaled menu, computed fresh each time it opens
     // from the row's actual on-screen rect. Rendering the menu into a
     // portal with position: fixed (instead of position: absolute inside
@@ -69,6 +96,8 @@ export default function MessageBubble({
     const startYRef = useRef<number | null>(null);
     const longPressTimerRef = useRef<number | null>(null);
     const swipeCommittedRef = useRef(false);
+    const longPressFiredRef = useRef(false);
+    const lastTapAtRef = useRef<number | null>(null);
 
     // Rough height of the options menu (Reply / Unsend / Remove for You,
     // ~3 rows) plus a little breathing room — used to decide whether to
@@ -111,13 +140,22 @@ export default function MessageBubble({
         startXRef.current = event.clientX;
         startYRef.current = event.clientY;
         swipeCommittedRef.current = false;
+        longPressFiredRef.current = false;
 
         clearLongPressTimer();
         longPressTimerRef.current = window.setTimeout(() => {
+            longPressFiredRef.current = true;
             openMenu();
         }, LONG_PRESS_MS);
 
         rowRef.current?.setPointerCapture(event.pointerId);
+    }
+
+    function triggerDoubleTapReaction() {
+        if (!onReact) return;
+        onReact(message.id, DOUBLE_TAP_REACTION);
+        setShowTapBurst(true);
+        window.setTimeout(() => setShowTapBurst(false), 650);
     }
 
     function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
@@ -164,6 +202,21 @@ export default function MessageBubble({
 
         if (swipeCommittedRef.current && onReply && !message.unsentAt) {
             onReply(message);
+        } else if (
+            !longPressFiredRef.current &&
+            !swipeCommittedRef.current &&
+            !message.unsentAt
+        ) {
+            // A plain tap (no swipe, no long-press menu) — check if it
+            // landed close enough after the previous one to count as a
+            // double-tap, Instagram/Messenger-style, for a quick heart.
+            const now = Date.now();
+            if (lastTapAtRef.current && now - lastTapAtRef.current < DOUBLE_TAP_MS) {
+                triggerDoubleTapReaction();
+                lastTapAtRef.current = null;
+            } else {
+                lastTapAtRef.current = now;
+            }
         }
 
         setDragging(false);
@@ -224,6 +277,7 @@ export default function MessageBubble({
                 </div>
             )}
 
+            <div className={styles.bubbleWrap}>
             <div
                 className={
                     message.messageType === "image" || message.messageType === "video"
@@ -298,6 +352,29 @@ export default function MessageBubble({
                 )}
             </div>
 
+            {showTapBurst && (
+                <div className={styles.tapBurst}>{REACTION_EMOJI[DOUBLE_TAP_REACTION]}</div>
+            )}
+
+            {aggregateReactions(message.reactions, currentUserId).length > 0 && (
+                <div className={`${styles.reactionBar} ${isMine ? styles.reactionBarMine : ""}`}>
+                    {aggregateReactions(message.reactions, currentUserId).map(
+                        ({ reaction, count, mine }) => (
+                            <button
+                                key={reaction}
+                                type="button"
+                                className={`${styles.reactionPill} ${mine ? styles.reactionPillMine : ""}`}
+                                onClick={() => onReact?.(message.id, reaction)}
+                            >
+                                <span>{REACTION_EMOJI[reaction]}</span>
+                                {count > 1 && <span className={styles.reactionCount}>{count}</span>}
+                            </button>
+                        )
+                    )}
+                </div>
+            )}
+            </div>
+
             {isMine && (
                 <div
                     className={styles.replyIcon}
@@ -323,6 +400,24 @@ export default function MessageBubble({
                                 right: menuPosition?.right,
                             }}
                         >
+                            {onReact && (
+                                <div className={styles.reactionPicker}>
+                                    {REACTION_TYPES.map((type) => (
+                                        <button
+                                            key={type}
+                                            type="button"
+                                            className={styles.reactionPickerButton}
+                                            onClick={() => {
+                                                onReact(message.id, type);
+                                                setMenuOpen(false);
+                                            }}
+                                        >
+                                            {REACTION_EMOJI[type]}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+
                             <button
                                 type="button"
                                 onClick={() => {

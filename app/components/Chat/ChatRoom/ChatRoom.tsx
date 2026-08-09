@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { subscribeChannel } from "@/utils/supabase/channelRegistry";
 
-import { Message, MessageType } from "@/lib/types/Message";
+import { Message, MessageType, ReactionType } from "@/lib/types/Message";
 
 import MessageInput from "../MessageInput/MessageInput";
 import MessageList from "../MessageList/MessageList";
@@ -62,6 +62,21 @@ interface RealtimeMessagePayload {
     new: RealtimeMessageRow;
 }
 
+// Shape of a `message_reactions` table row as delivered by Supabase
+// realtime payloads.
+interface RealtimeReactionRow {
+    id: string;
+    message_id: string;
+    conversation_id: string;
+    user_id: string;
+    reaction: ReactionType;
+}
+
+interface RealtimeReactionPayload {
+    new: RealtimeReactionRow;
+    old: RealtimeReactionRow;
+}
+
 function replyPreviewLabel(message: Message): string {
     if (message.messageType === "image") return "📷 Photo";
     if (message.messageType === "video") return "🎥 Video";
@@ -113,6 +128,9 @@ export default function ChatRoom({
             let isActive = true;
             let unsubscribeInsert: (() => void) | null = null;
             let unsubscribeUpdate: (() => void) | null = null;
+            let unsubscribeReactionInsert: (() => void) | null = null;
+            let unsubscribeReactionUpdate: (() => void) | null = null;
+            let unsubscribeReactionDelete: (() => void) | null = null;
 
             async function setupRealtime() {
                 const {
@@ -218,6 +236,84 @@ export default function ChatRoom({
                         });
                     }
                 );
+
+                // Reflects reactions added/changed/removed by the OTHER
+                // participant in real time (our own reactions are applied
+                // optimistically already — see handleReact below).
+                function upsertReaction(row: RealtimeReactionRow) {
+                    setMessages((previous) =>
+                        previous.map((m) => {
+                            if (m.id !== row.message_id) return m;
+                            const withoutUser = (m.reactions ?? []).filter(
+                                (r) => r.userId !== row.user_id
+                            );
+                            return {
+                                ...m,
+                                reactions: [
+                                    ...withoutUser,
+                                    { userId: row.user_id, reaction: row.reaction },
+                                ],
+                            };
+                        })
+                    );
+                }
+
+                unsubscribeReactionInsert = subscribeChannel(
+                    channelName,
+                    {
+                        event: "INSERT",
+                        schema: "public",
+                        table: "message_reactions",
+                        filter: `conversation_id=eq.${conversationId}`,
+                    },
+                    (payload: RealtimeReactionPayload) => {
+                        if (payload.new?.id) upsertReaction(payload.new);
+                    }
+                );
+
+                unsubscribeReactionUpdate = subscribeChannel(
+                    channelName,
+                    {
+                        event: "UPDATE",
+                        schema: "public",
+                        table: "message_reactions",
+                        filter: `conversation_id=eq.${conversationId}`,
+                    },
+                    (payload: RealtimeReactionPayload) => {
+                        if (payload.new?.id) upsertReaction(payload.new);
+                    }
+                );
+
+                unsubscribeReactionDelete = subscribeChannel(
+                    channelName,
+                    {
+                        event: "DELETE",
+                        schema: "public",
+                        table: "message_reactions",
+                        filter: `conversation_id=eq.${conversationId}`,
+                    },
+                    (payload: RealtimeReactionPayload) => {
+                        const removed = payload.old;
+                        if (!removed?.message_id) return;
+
+                        setMessages((previous) =>
+                            previous.map((m) =>
+                                m.id === removed.message_id
+                                    ? {
+                                          ...m,
+                                          reactions: (m.reactions ?? []).filter(
+                                              (r) =>
+                                                  !(
+                                                      r.userId === removed.user_id &&
+                                                      r.reaction === removed.reaction
+                                                  )
+                                          ),
+                                      }
+                                    : m
+                            )
+                        );
+                    }
+                );
             }
 
             void setupRealtime();
@@ -227,6 +323,9 @@ export default function ChatRoom({
                 try {
                     unsubscribeInsert?.();
                     unsubscribeUpdate?.();
+                    unsubscribeReactionInsert?.();
+                    unsubscribeReactionUpdate?.();
+                    unsubscribeReactionDelete?.();
                 } catch (e) {
                     // ignore
                 }
@@ -453,6 +552,44 @@ export default function ChatRoom({
         }
     }
 
+    async function handleReact(messageId: string, reaction: ReactionType) {
+        // Optimistic: apply/swap/remove locally right away, roll back on failure.
+        const previous = messages;
+        const existing = previous
+            .find((m) => m.id === messageId)
+            ?.reactions?.find((r) => r.userId === currentUserId);
+        const willRemove = existing?.reaction === reaction;
+
+        setMessages((prev) =>
+            prev.map((m) => {
+                if (m.id !== messageId) return m;
+                const withoutMine = (m.reactions ?? []).filter(
+                    (r) => r.userId !== currentUserId
+                );
+                return {
+                    ...m,
+                    reactions: willRemove
+                        ? withoutMine
+                        : [...withoutMine, { userId: currentUserId, reaction }],
+                };
+            })
+        );
+
+        try {
+            const response = await fetch(`/api/messages/${messageId}/reactions`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ reaction }),
+            });
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+        } catch (err) {
+            console.error("Failed to react to message:", err);
+            setMessages(previous);
+        }
+    }
+
     const isAgreementButtonEnabled = activeSwapRequestStatus === "accepted";
 
     return (
@@ -498,6 +635,7 @@ export default function ChatRoom({
                         onReply={handleReply}
                         onUnsend={handleUnsend}
                         onRemoveForMe={handleRemoveForMe}
+                        onReact={handleReact}
                     />
 
                 )}
