@@ -225,7 +225,7 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    font-size: 40px;
+    font-size: 52px;
     pointer-events: none;
     animation: tapBurst 0.65s ease forwards;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
@@ -236,7 +236,7 @@
 .reactionBar {
     display: flex;
     gap: 4px;
-    margin-top: -10px;
+    margin-top: -12px;
     margin-left: 10px;
     align-self: flex-start;
     z-index: 1;
@@ -251,13 +251,13 @@
 .reactionPill {
     display: flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
     background: white;
     border: 1px solid #e5e7eb;
     border-radius: 999px;
-    padding: 2px 6px;
-    font-size: 12px;
-    line-height: 1.4;
+    padding: 3px 8px;
+    font-size: 18px;
+    line-height: 1.2;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     cursor: pointer;
 }
@@ -268,7 +268,7 @@
 }
 
 .reactionCount {
-    font-size: 11px;
+    font-size: 12px;
     color: #6b7280;
     font-weight: 600;
 }
@@ -278,15 +278,21 @@
     display: flex;
     justify-content: space-between;
     gap: 4px;
-    padding: 8px 10px;
+    padding: 10px 8px;
     border-bottom: 1px solid #e5e7eb;
+    min-width: 260px;
 }
 
 .reactionPickerButton {
     background: none;
     border: none;
-    font-size: 20px;
-    padding: 4px;
+    font-size: 42px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     border-radius: 999px;
     cursor: pointer;
     line-height: 1;
@@ -295,5 +301,5 @@
 
 .reactionPickerButton:hover {
     background: #f3f4f6;
-    transform: scale(1.15);
+    transform: scale(1.2);
 }
