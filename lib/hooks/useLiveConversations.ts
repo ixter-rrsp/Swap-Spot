@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { subscribeChannel } from "@/utils/supabase/channelRegistry";
 import { Conversation } from "@/lib/types/Conversation";
+import { MessageType } from "@/lib/types/Message";
 
 interface MessageRow {
   id: string;
   conversation_id: string;
   sender_id: string;
   message: string;
+  message_type: MessageType;
   created_at: string;
   is_read: boolean;
 }
@@ -101,6 +103,7 @@ export function useLiveConversations(initialConversations: Conversation[]) {
                   message: newRow.message,
                   createdAt: newRow.created_at,
                   senderId: newRow.sender_id,
+                  messageType: newRow.message_type,
                 },
                 unreadCount: isMine
                   ? current.unreadCount ?? 0
@@ -130,6 +133,7 @@ export function useLiveConversations(initialConversations: Conversation[]) {
                   message: newRow.message,
                   createdAt: newRow.created_at,
                   senderId: newRow.sender_id,
+                  messageType: newRow.message_type,
                 },
                 unreadCount: unread,
               };

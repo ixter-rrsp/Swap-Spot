@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Reply } from "lucide-react";
 
 import { Message, MessageReplyPreview } from "@/lib/types/Message";
@@ -50,7 +51,18 @@ export default function MessageBubble({
     const [dragX, setDragX] = useState(0);
     const [dragging, setDragging] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
-    const [menuFlip, setMenuFlip] = useState(false);
+    // Position for the portaled menu, computed fresh each time it opens
+    // from the row's actual on-screen rect. Rendering the menu into a
+    // portal with position: fixed (instead of position: absolute inside
+    // the message row) means it's never clipped by .messageArea's
+    // overflow-y: auto, no matter how close to the top/bottom of the
+    // scroll area the long-pressed message is.
+    const [menuPosition, setMenuPosition] = useState<{
+        top?: number;
+        bottom?: number;
+        left?: number;
+        right?: number;
+    } | null>(null);
 
     const rowRef = useRef<HTMLDivElement | null>(null);
     const startXRef = useRef<number | null>(null);
@@ -59,17 +71,30 @@ export default function MessageBubble({
     const swipeCommittedRef = useRef(false);
 
     // Rough height of the options menu (Reply / Unsend / Remove for You,
-    // ~3 rows) plus a little breathing room — used to decide whether
-    // there's enough space above the bubble to open the menu upward
-    // without it sliding underneath the sticky chat header.
+    // ~3 rows) plus a little breathing room — used to decide whether to
+    // anchor the menu above or below the long-pressed row.
     const MENU_ESTIMATED_HEIGHT = 160;
+    const MENU_MARGIN = 8;
 
     function openMenu() {
         const rect = rowRef.current?.getBoundingClientRect();
-        const notEnoughRoomAbove =
-            !rect || rect.top < MENU_ESTIMATED_HEIGHT;
 
-        setMenuFlip(notEnoughRoomAbove);
+        if (!rect) {
+            setMenuOpen(true);
+            return;
+        }
+
+        const notEnoughRoomAbove = rect.top < MENU_ESTIMATED_HEIGHT;
+
+        const horizontal = isMine
+            ? { right: Math.max(MENU_MARGIN, window.innerWidth - rect.right) }
+            : { left: Math.max(MENU_MARGIN, rect.left) };
+
+        const vertical = notEnoughRoomAbove
+            ? { top: rect.bottom + MENU_MARGIN }
+            : { bottom: window.innerHeight - rect.top + MENU_MARGIN };
+
+        setMenuPosition({ ...horizontal, ...vertical });
         setMenuOpen(true);
     }
 
@@ -200,7 +225,15 @@ export default function MessageBubble({
             )}
 
             <div
-                className={isMine ? styles.mine : styles.theirs}
+                className={
+                    message.messageType === "image" || message.messageType === "video"
+                        ? isMine
+                            ? styles.mineMedia
+                            : styles.theirsMedia
+                        : isMine
+                        ? styles.mine
+                        : styles.theirs
+                }
                 style={{
                     transform: `translateX(${dragX}px)`,
                     transition: dragging ? "none" : "transform 0.15s ease",
@@ -219,9 +252,25 @@ export default function MessageBubble({
                 )}
 
                 {message.messageType === "image" && message.imageUrl ? (
-                    <ImageMessage imageUrl={message.imageUrl} />
+                    <div className={styles.mediaWrap}>
+                        <ImageMessage imageUrl={message.imageUrl} />
+                        <span className={styles.mediaTimestamp}>
+                            {new Date(message.createdAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}
+                        </span>
+                    </div>
                 ) : message.messageType === "video" && message.videoUrl ? (
-                    <VideoMessage videoUrl={message.videoUrl} />
+                    <div className={styles.mediaWrap}>
+                        <VideoMessage videoUrl={message.videoUrl} />
+                        <span className={styles.mediaTimestamp}>
+                            {new Date(message.createdAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}
+                        </span>
+                    </div>
                 ) : message.messageType === "swap_proposal" && message.swapRequestId ? (
                     <SwapProposalCard
                         swapRequestId={message.swapRequestId}
@@ -232,19 +281,21 @@ export default function MessageBubble({
                 ) : message.messageType === "review_request" && message.swapAgreementId ? (
                     <ReviewRequestCard swapAgreementId={message.swapAgreementId} />
                 ) : (
-                    <p>
+                    <p className={styles.messageText}>
                         {message.message}
                     </p>
                 )}
 
-                <span>
-                    {new Date(
-                        message.createdAt
-                    ).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    })}
-                </span>
+                {message.messageType !== "image" && message.messageType !== "video" && (
+                    <span>
+                        {new Date(
+                            message.createdAt
+                        ).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        })}
+                    </span>
+                )}
             </div>
 
             {isMine && (
@@ -256,54 +307,59 @@ export default function MessageBubble({
                 </div>
             )}
 
-            {menuOpen && (
-                <>
-                    <div
-                        className={styles.menuBackdrop}
-                        onClick={() => setMenuOpen(false)}
-                    />
-                    <div
-                        className={[
-                            isMine ? styles.menuMine : styles.menuTheirs,
-                            menuFlip ? styles.menuFlip : "",
-                        ].join(" ").trim()}
-                    >
-                        <button
-                            type="button"
-                            onClick={() => {
-                                onReply?.(message);
-                                setMenuOpen(false);
+            {menuOpen &&
+                createPortal(
+                    <>
+                        <div
+                            className={styles.menuBackdrop}
+                            onClick={() => setMenuOpen(false)}
+                        />
+                        <div
+                            className={styles.menuPortal}
+                            style={{
+                                top: menuPosition?.top,
+                                bottom: menuPosition?.bottom,
+                                left: menuPosition?.left,
+                                right: menuPosition?.right,
                             }}
                         >
-                            Reply
-                        </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    onReply?.(message);
+                                    setMenuOpen(false);
+                                }}
+                            >
+                                Reply
+                            </button>
 
-                        {isMine && (
+                            {isMine && (
+                                <button
+                                    type="button"
+                                    className={styles.destructive}
+                                    onClick={() => {
+                                        onUnsend?.(message.id);
+                                        setMenuOpen(false);
+                                    }}
+                                >
+                                    Unsend
+                                </button>
+                            )}
+
                             <button
                                 type="button"
                                 className={styles.destructive}
                                 onClick={() => {
-                                    onUnsend?.(message.id);
+                                    onRemoveForMe?.(message.id);
                                     setMenuOpen(false);
                                 }}
                             >
-                                Unsend
+                                Remove for You
                             </button>
-                        )}
-
-                        <button
-                            type="button"
-                            className={styles.destructive}
-                            onClick={() => {
-                                onRemoveForMe?.(message.id);
-                                setMenuOpen(false);
-                            }}
-                        >
-                            Remove for You
-                        </button>
-                    </div>
-                </>
-            )}
+                        </div>
+                    </>,
+                    document.body
+                )}
         </div>
     );
 }

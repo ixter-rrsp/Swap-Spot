@@ -35,6 +35,17 @@ export default function ConversationCard({
     !!currentUserId &&
     lastMessage.senderId === currentUserId;
 
+  const lastMessagePreview = (() => {
+    if (!lastMessage) return "No messages yet";
+
+    const prefix = isMine ? "You: " : "";
+
+    if (lastMessage.messageType === "image") return `${prefix}Photo`;
+    if (lastMessage.messageType === "video") return `${prefix}Video`;
+
+    return `${prefix}${lastMessage.message}`;
+  })();
+
   return (
 
     <Link
@@ -76,11 +87,7 @@ export default function ConversationCard({
 
         <p className={`${styles.message} ${isUnread ? styles.unreadMessage : ""}`}>
 
-          {
-            lastMessage
-              ? `${isMine ? "You: " : ""}${lastMessage.message}`
-              : "No messages yet"
-          }
+          {lastMessagePreview}
 
         </p>
 

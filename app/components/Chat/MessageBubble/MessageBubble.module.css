@@ -4,6 +4,7 @@
     align-items: center;
     gap: 6px;
     max-width: 75%;
+    min-width: 0;
     position: relative;
 }
 
@@ -13,6 +14,7 @@
     align-items: center;
     gap: 6px;
     max-width: 75%;
+    min-width: 0;
     position: relative;
 }
 
@@ -24,6 +26,10 @@
     border-bottom-right-radius: 4px;
     touch-action: pan-y;
     user-select: none;
+    /* Flex children default to min-width: auto, which lets them overflow
+       their row instead of shrinking — that's what let a long unbroken
+       string stretch the bubble sideways instead of wrapping. */
+    min-width: 0;
 }
 
 .mine > span {
@@ -43,6 +49,7 @@
     border-bottom-left-radius: 4px;
     touch-action: pan-y;
     user-select: none;
+    min-width: 0;
 }
 
 .theirs > span {
@@ -50,6 +57,47 @@
     font-size: 11px;
     display: block;
     margin-top: 4px;
+}
+
+.messageText {
+    margin: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+/* Media messages (image/video) render without bubble chrome — no
+   background, no padding, no border-radius on the wrapper — so the
+   media itself defines the shape, like IG/FB Messenger. */
+.mineMedia,
+.theirsMedia {
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    touch-action: pan-y;
+    user-select: none;
+}
+
+/* Wraps the image/video so the timestamp can be overlaid on its
+   bottom-right corner, IG/Messenger-style, instead of sitting in its
+   own row below. */
+.mediaWrap {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+}
+
+.mediaTimestamp {
+    position: absolute;
+    right: 6px;
+    bottom: 6px;
+    font-size: 10px;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.55);
+    padding: 2px 6px;
+    border-radius: 8px;
+    line-height: normal;
+    pointer-events: none;
 }
 
 .replyIcon {
@@ -111,11 +159,14 @@
     z-index: 40;
 }
 
-.menuMine,
-.menuTheirs {
-    position: absolute;
-    top: -8px;
-    transform: translateY(-100%);
+/* Rendered via a portal into document.body with inline top/bottom/
+   left/right (in viewport coordinates) set by MessageBubble.tsx at
+   open time. Being outside the scrollable message list means it's
+   never clipped by .messageArea's overflow-y: auto, regardless of
+   whether the long-pressed message is right at the top or bottom of
+   the visible area. */
+.menuPortal {
+    position: fixed;
     z-index: 50;
     background: white;
     border: 1px solid #e5e7eb;
@@ -127,25 +178,7 @@
     overflow: hidden;
 }
 
-.menuMine {
-    right: 0;
-}
-
-.menuTheirs {
-    left: 0;
-}
-
-/* When there isn't enough room above the bubble (e.g. it's one of the
-   first messages, right under the sticky chat header with the listing
-   name/photo), open the menu downward instead so it can't slide behind
-   the header. */
-.menuFlip {
-    top: 100%;
-    transform: translateY(8px);
-}
-
-.menuMine button,
-.menuTheirs button {
+.menuPortal button {
     background: none;
     border: none;
     text-align: left;
@@ -155,13 +188,11 @@
     cursor: pointer;
 }
 
-.menuMine button:hover,
-.menuTheirs button:hover {
+.menuPortal button:hover {
     background: #f3f4f6;
 }
 
-.menuMine button.destructive,
-.menuTheirs button.destructive {
+.menuPortal button.destructive {
     color: #dc2626;
 }
 

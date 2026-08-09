@@ -1,3 +1,5 @@
+import { MessageType } from "@/lib/types/Message";
+
 export interface Conversation {
     id: string;
 
@@ -19,6 +21,7 @@ export interface Conversation {
         message: string;
         createdAt: string;
         senderId: string;
+        messageType: MessageType;
     } | null;
 
     lastMessageRelativeTime?: string;

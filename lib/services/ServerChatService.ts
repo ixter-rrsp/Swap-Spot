@@ -178,7 +178,10 @@ export async function getUserConversations(): Promise<Conversation[]> {
     const conversationIds = conversationsData.map((conversation) => conversation.id);
 
     const unreadCounts: Record<string, number> = {};
-    const latestSenderByConversation: Record<string, string> = {};
+    const latestMessageByConversation: Record<
+        string,
+        { sender_id: string; message: string; message_type: MessageType; created_at: string }
+    > = {};
 
     if (conversationIds.length > 0) {
         type UnreadMessageRow = {
@@ -205,18 +208,22 @@ export async function getUserConversations(): Promise<Conversation[]> {
         }
 
         // conversations.last_message is a denormalized text snapshot with
-        // no sender attached, so to know whether "you" sent the last
-        // message we look up the actual latest message row per
-        // conversation instead of adding a new column.
+        // no sender/type attached, and it's empty for image/video
+        // messages (their `message` column is ""), which is falsy and
+        // was making those conversations wrongly show "No messages yet".
+        // So we look up the actual latest message row per conversation
+        // instead of trusting that column.
         type LatestMessageRow = {
             conversation_id: string;
             sender_id: string;
+            message: string;
+            message_type: MessageType;
             created_at: string;
         };
 
         const latestMessagesResult = await supabase
             .from("messages")
-            .select("conversation_id, sender_id, created_at")
+            .select("conversation_id, sender_id, message, message_type, created_at")
             .in("conversation_id", conversationIds)
             .order("created_at", { ascending: false });
 
@@ -225,8 +232,8 @@ export async function getUserConversations(): Promise<Conversation[]> {
         }
 
         for (const message of (latestMessagesResult.data ?? []) as LatestMessageRow[]) {
-            if (!latestSenderByConversation[message.conversation_id]) {
-                latestSenderByConversation[message.conversation_id] = message.sender_id;
+            if (!latestMessageByConversation[message.conversation_id]) {
+                latestMessageByConversation[message.conversation_id] = message;
             }
         }
     }
@@ -255,15 +262,16 @@ export async function getUserConversations(): Promise<Conversation[]> {
                 isVerified: otherUser.is_verified ?? false,
             },
 
-            lastMessage: conversation.last_message
+            lastMessage: latestMessageByConversation[conversation.id]
                 ? {
-                    message: conversation.last_message,
-                    createdAt: conversation.last_message_at,
-                    senderId: latestSenderByConversation[conversation.id] ?? "",
+                    message: latestMessageByConversation[conversation.id].message,
+                    createdAt: latestMessageByConversation[conversation.id].created_at,
+                    senderId: latestMessageByConversation[conversation.id].sender_id,
+                    messageType: latestMessageByConversation[conversation.id].message_type,
                 }
                 : null,
-                lastMessageRelativeTime: conversation.last_message
-                    ? formatRelativeTime(conversation.last_message_at)
+                lastMessageRelativeTime: latestMessageByConversation[conversation.id]
+                    ? formatRelativeTime(latestMessageByConversation[conversation.id].created_at)
                     : undefined,
                 unreadCount: unreadCounts[conversation.id] ?? 0,
         };
