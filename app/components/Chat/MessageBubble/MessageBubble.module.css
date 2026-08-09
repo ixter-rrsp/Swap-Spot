@@ -26,9 +26,11 @@
     border-bottom-right-radius: 4px;
     touch-action: pan-y;
     user-select: none;
-    /* Flex children default to min-width: auto, which lets them overflow
-       their row instead of shrinking — that's what let a long unbroken
-       string stretch the bubble sideways instead of wrapping. */
+    /*
+     * Flex children default to min-width: auto, which lets them overflow
+     * their row instead of shrinking — that's what let a long unbroken
+     * string stretch the bubble sideways instead of wrapping.
+     */
     min-width: 0;
 }
 
@@ -66,9 +68,7 @@
     white-space: pre-wrap;
 }
 
-/* Media messages (image/video) render without bubble chrome — no
-   background, no padding, no border-radius on the wrapper — so the
-   media itself defines the shape, like IG/FB Messenger. */
+/* Media messages */
 .mineMedia,
 .theirsMedia {
     background: transparent;
@@ -78,9 +78,7 @@
     user-select: none;
 }
 
-/* Wraps the image/video so the timestamp can be overlaid on its
-   bottom-right corner, IG/Messenger-style, instead of sitting in its
-   own row below. */
+/* Wraps image/video so timestamp can be overlaid */
 .mediaWrap {
     position: relative;
     display: inline-block;
@@ -141,7 +139,6 @@
     font-size: 11px;
     font-weight: 600;
     opacity: 0.85;
-    
 }
 
 .quotedReplyText {
@@ -159,12 +156,10 @@
     z-index: 40;
 }
 
-/* Rendered via a portal into document.body with inline top/bottom/
-   left/right (in viewport coordinates) set by MessageBubble.tsx at
-   open time. Being outside the scrollable message list means it's
-   never clipped by .messageArea's overflow-y: auto, regardless of
-   whether the long-pressed message is right at the top or bottom of
-   the visible area. */
+/*
+ * Rendered via a portal into document.body with inline top/bottom/
+ * left/right coordinates set by MessageBubble.tsx.
+ */
 .menuPortal {
     position: fixed;
     z-index: 50;
@@ -197,8 +192,14 @@
 }
 
 @keyframes flashHighlight {
-    0%, 100% { background-color: transparent; }
-    30% { background-color: rgba(250, 204, 21, 0.35); }
+    0%,
+    100% {
+        background-color: transparent;
+    }
+
+    30% {
+        background-color: rgba(250, 204, 21, 0.35);
+    }
 }
 
 .flashHighlight {
@@ -213,12 +214,27 @@
     min-width: 0;
 }
 
-/* Heart burst shown briefly over the bubble on double-tap. */
+/* Heart burst shown briefly over the bubble on double-tap */
 @keyframes tapBurst {
-    0% { transform: translate(-50%, -50%) scale(0.4); opacity: 0; }
-    30% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-    70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+    0% {
+        transform: translate(-50%, -50%) scale(0.4);
+        opacity: 0;
+    }
+
+    30% {
+        transform: translate(-50%, -50%) scale(1.15);
+        opacity: 1;
+    }
+
+    70% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
 }
 
 .tapBurst {
@@ -231,8 +247,7 @@
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
 }
 
-/* Small pill row of aggregated reactions, overlapping the bottom edge
-   of the bubble like IG/Messenger. */
+/* Small pill row of aggregated reactions */
 .reactionBar {
     display: flex;
     gap: 4px;
@@ -256,7 +271,7 @@
     border: 1px solid #e5e7eb;
     border-radius: 999px;
     padding: 3px 8px;
-    font-size: 18px;
+    font-size: 14px;
     line-height: 1.2;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
     cursor: pointer;
@@ -273,7 +288,7 @@
     font-weight: 600;
 }
 
-/* Row of emoji options at the top of the long-press menu. */
+/* Row of emoji options at the top of the long-press menu */
 .reactionPicker {
     display: flex;
     justify-content: space-between;
@@ -283,10 +298,17 @@
     min-width: 260px;
 }
 
-.reactionPickerButton {
+/*
+ * More specific selector overrides:
+ * .menuPortal button { font-size: 14px; }
+ *
+ * This makes the actual reaction emoji larger while keeping
+ * the clickable button at a comfortable size.
+ */
+.menuPortal .reactionPickerButton {
     background: none;
     border: none;
-    font-size: 42px;
+    font-size: 24px;
     width: 44px;
     height: 44px;
     display: flex;
@@ -299,7 +321,7 @@
     transition: transform 0.1s ease, background 0.1s ease;
 }
 
-.reactionPickerButton:hover {
+.menuPortal .reactionPickerButton:hover {
     background: #f3f4f6;
     transform: scale(1.2);
 }
